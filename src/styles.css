@@ -515,3 +515,28 @@ button:active, .clickable:active {
 .fade-enter-from, .fade-leave-to {
   opacity: 0;
 }
+
+/* Wu Xing footer bar: sticky at viewport bottom, rests as footer at page bottom */
+.wuxing-footer {
+  background-color: var(--color-white);
+  border-top: 2px solid var(--color-gray-400);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+  padding: 0.75rem;
+  z-index: 30;
+}
+
+/* Mobile-specific tweaks */
+@media (max-width: 640px) {
+  /* Hide auxiliary Latin/pinyin labels on mobile */
+  .mobile-hide {
+    display: none !important;
+  }
+
+  /* Tighter main padding and smaller bottom padding for sticky Wu Xing bar */
+  .main-content {
+    padding-top: 1rem;
+    padding-bottom: 4.5rem; /* leave room for Wu Xing bar */
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+}

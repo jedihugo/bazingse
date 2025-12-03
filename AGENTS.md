@@ -23,8 +23,12 @@ npm run preview # Preview production build
 
 ### Backend (FastAPI - Port 8008)
 ```bash
-cd /Users/macbookair/GitHub/bazingse
+cd /Users/macbookair/GitHub/bazingse-app/api
+# Create/activate venv if needed
+python3 -m venv .venv
 source .venv/bin/activate
+pip install -r requirements.txt
+# Run server
 python run_bazingse.py  # http://localhost:8008
 ```
 
@@ -84,14 +88,14 @@ Backend Position Codes:
 Luck pillars (10Y, Annual, Monthly, Daily, Hourly) are NOT spatial positions—they are **temporal overlays** affecting the ENTIRE natal chart equally.
 
 **Backend Implementation:**
-- `calculate_interaction_distance()` in `app/bazingse.py` treats luck positions (4-8) as **distance=0** to ALL natal positions (0-3)
+- `calculate_interaction_distance()` in `api/bazingse.py` treats luck positions (4-8) as **distance=0** to ALL natal positions (0-3)
 - All luck-natal interactions receive full adjacency strength
 - Luck-luck interactions use normal distance
 - This ensures luck pillars interact equally with Year, Month, Day, and Hour (no spatial bias)
 
 ## Backend Structure
 
-**Location:** `/Users/macbookair/GitHub/bazingse/app/`
+**Location:** `/Users/macbookair/GitHub/bazingse-app/api/`
 
 **Key Modules:**
 - `routes.py` - FastAPI endpoint definitions (main: `/analyze_bazi`)
@@ -383,9 +387,9 @@ Purple gradient dividers: ↑           ↑
 ### Backend Development
 
 **Adding New Calculations:**
-1. Update `app/library.py` if new constants needed
-2. Add logic to `app/bazingse.py` or `app/interaction.py`
-3. Expose via new parameter in `app/routes.py` or modify existing endpoint
+1. Update `api/library.py` if new constants needed
+2. Add logic to `api/bazingse.py` or `api/interaction.py`
+3. Expose via new parameter in `api/routes.py` or modify existing endpoint
 4. Return all calculated data in response (frontend should not re-calculate)
 
 **Position System Rules:**
@@ -439,7 +443,7 @@ const tenGod = chartData.mappings.ten_gods[dayMasterStem][stem].abbreviation
 
 ### Restart Backend with Changes
 ```bash
-cd /Users/macbookair/GitHub/bazingse
+cd /Users/macbookair/GitHub/bazingse-app/api
 pkill -f "python.*run_bazingse"
 source .venv/bin/activate && nohup python run_bazingse.py > /tmp/bazingse.log 2>&1 &
 ```
@@ -458,11 +462,11 @@ curl "..." 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); pr
 ## Important Files
 
 **Backend:**
-- `/Users/macbookair/GitHub/bazingse/app/routes.py` - API endpoints
-- `/Users/macbookair/GitHub/bazingse/app/bazingse.py` - Interaction engine (~2900 lines)
-- `/Users/macbookair/GitHub/bazingse/app/library.py` - BaZi constants
-- `/Users/macbookair/GitHub/bazingse/app/chart_constructor.py` - Chart generation and luck pillar calculations
-- `/Users/macbookair/GitHub/bazingse/app/interaction.py` - Pattern analysis helpers
+- `/Users/macbookair/GitHub/bazingse-app/api/routes.py` - API endpoints
+- `/Users/macbookair/GitHub/bazingse-app/api/bazingse.py` - Interaction engine (~2900 lines)
+- `/Users/macbookair/GitHub/bazingse-app/api/library.py` - BaZi constants
+- `/Users/macbookair/GitHub/bazingse-app/api/chart_constructor.py` - Chart generation and luck pillar calculations
+- `/Users/macbookair/GitHub/bazingse-app/api/interaction.py` - Pattern analysis helpers
 
 **Frontend:**
 - `/Users/macbookair/GitHub/bazingse-app/index.html` - HTML entry point

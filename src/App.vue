@@ -18,7 +18,7 @@
   </header>
 
   <!-- Main Content -->
-  <main class="mx-auto px-4 py-8 pb-64">
+  <main class="mx-auto px-4 py-8 pb-64 main-content">
    <!-- Main Container -->
    <div class="mx-auto" style="max-width: 800px;">
     <!-- BaZi Chart Section -->
@@ -41,6 +41,7 @@
        >
         <span class="font-mono">{{ preset.date }}</span>
         <span class="mx-1">{{ preset.time }}</span>
+        <span v-if="preset.note" class="mr-1 font-bold">({{ preset.note }})</span>
         <span>{{ preset.gender === 'female' ? '♀' : '♂' }}</span>
        </button>
       </div>
@@ -245,8 +246,8 @@
            </div>
           </div>
           
-          <!-- Pinyin name at top -->
-          <div v-if="!pillar.isUnknown && pillar.stemName" class="text-xs text-gray-700 mb-1">{{ pillar.stemName }}</div>
+          <!-- Pinyin name at top (hidden on mobile for compact view) -->
+          <div v-if="!pillar.isUnknown && pillar.stemName" class="text-xs text-gray-700 mb-1 mobile-hide">{{ pillar.stemName }}</div>
           <!-- Chinese character (always show original from base) -->
           <div v-if="pillar.stem" class="text-2xl font-bold text-black">
            {{ pillar.stem.chinese }}
@@ -261,8 +262,8 @@
             {{ pillar.stem.element.replace('Yang ', '').replace('Yin ', '') }} {{ pillar.stem.element.includes('Yang') ? '+' : '-' }}
            </template>
           </div>
-          <!-- Ten God or Day Master -->
-          <div v-if="!pillar.isUnknown" class="text-xs mt-1 text-gray-900">
+          <!-- Ten God or Day Master (hidden on mobile for compact view) -->
+          <div v-if="!pillar.isUnknown" class="text-xs mt-1 text-gray-900 mobile-hide">
            {{ index === 1 ? 'Day master' : (pillar.tenGod || '') }}
           </div>
           
@@ -374,8 +375,8 @@
           
           <!-- Main content with proper spacing from bottom -->
           <div class="flex-1 flex flex-col items-center justify-center pb-10">
-           <!-- Branch pinyin name (always show original) -->
-           <div v-if="!pillar.isUnknown && pillar.branchName" class="text-xs text-gray-700 mb-1">
+           <!-- Branch pinyin name (hidden on mobile for compact view) -->
+           <div v-if="!pillar.isUnknown && pillar.branchName" class="text-xs text-gray-700 mb-1 mobile-hide">
             {{ pillar.branchName }}
            </div>
            <!-- Chinese character (always show original from base) -->
@@ -383,8 +384,13 @@
             {{ pillar.branch.chinese }}
            </div>
            <div v-else class="text-xl text-gray-400">-</div>
-           <!-- Animal name (only show if not a pure element transformation) -->
-           <div v-if="!pillar.isUnknown && pillar.branch && !['Fire', 'Water', 'Metal', 'Wood', 'Earth'].includes(pillar.branch.animal)" class="text-xs text-gray-800">{{ pillar.branch.animal }}</div>
+           <!-- Animal name (hidden on mobile for compact view) -->
+           <div
+            v-if="!pillar.isUnknown && pillar.branch && !['Fire', 'Water', 'Metal', 'Wood', 'Earth'].includes(pillar.branch.animal)"
+            class="text-xs text-gray-800 mobile-hide"
+           >
+            {{ pillar.branch.animal }}
+           </div>
           </div>
           
           <!-- Combination Badges (bottom-right corner, above hidden stems) -->
@@ -419,10 +425,10 @@
             }"
             :title="`${stem}: ${qiData.god ? qiData.god + ' - ' : ''}Score: ${qiData.score || 'N/A'} (${qiData.weight}%)`"
            >
-            <!-- Vertical layout: pinyin, char, ten god -->
-            <div class="text-[8px] text-gray-600 leading-tight">{{ stem }}</div>
+            <!-- Vertical layout: pinyin, char, ten god (pinyin and Ten God hidden on mobile) -->
+            <div class="text-[8px] text-gray-600 leading-tight mobile-hide">{{ stem }}</div>
             <div class="text-[10px] text-black leading-tight">{{ stemMappings[stem] || stem }}</div>
-            <div class="text-[8px] text-gray-800 font-medium leading-tight">{{ qiData.god || '' }}</div>
+            <div class="text-[8px] text-gray-800 font-medium leading-tight mobile-hide">{{ qiData.god || '' }}</div>
            </div>
           </div>
           
@@ -611,14 +617,14 @@
              </div>
             </div>
             
-            <!-- Content -->
-            <div v-if="pillar.stemName" class="text-xs text-gray-700 mb-1">{{ pillar.stemName }}</div>
+            <!-- Content: pinyin hidden on mobile -->
+            <div v-if="pillar.stemName" class="text-xs text-gray-700 mb-1 mobile-hide">{{ pillar.stemName }}</div>
             <div v-if="pillar.stem" class="text-2xl font-bold text-black">{{ pillar.stem.chinese }}</div>
             <div v-else class="text-xl text-gray-400">-</div>
             <div v-if="pillar.stem" class="text-xs text-gray-700">
              {{ pillar.stem.element.replace('Yang ', '').replace('Yin ', '') }} {{ pillar.stem.element.includes('Yang') ? '+' : '-' }}
             </div>
-            <div class="text-xs mt-1 text-gray-900">{{ pillar.tenGod || '' }}</div>
+            <div class="text-xs mt-1 text-gray-900 mobile-hide">{{ pillar.tenGod || '' }}</div>
             
             <!-- Combination Badges -->
             <div v-if="pillar.stemCombinations && pillar.stemCombinations.length > 0" 
@@ -779,9 +785,9 @@
               }"
               :title="`${stem}: ${qiData.god ? qiData.god + ' - ' : ''}Score: ${qiData.score || 'N/A'} (${qiData.weight}%)`"
              >
-              <div class="text-[8px] text-gray-600 leading-tight">{{ stem }}</div>
+              <div class="text-[8px] text-gray-600 leading-tight mobile-hide">{{ stem }}</div>
               <div class="text-[10px] text-black leading-tight">{{ stemMappings[stem] || stem }}</div>
-              <div class="text-[8px] text-gray-800 font-medium leading-tight">{{ qiData.god || '' }}</div>
+              <div class="text-[8px] text-gray-800 font-medium leading-tight mobile-hide">{{ qiData.god || '' }}</div>
              </div>
             </div>
            </div>
@@ -999,8 +1005,8 @@
             </div>
            </div>
            
-           <!-- Pinyin name -->
-           <div v-if="!pillar.isUnknown && pillar.stemName" class="text-xs text-gray-700 mb-1">{{ pillar.stemName }}</div>
+           <!-- Pinyin name (hidden on mobile for compact view) -->
+           <div v-if="!pillar.isUnknown && pillar.stemName" class="text-xs text-gray-700 mb-1 mobile-hide">{{ pillar.stemName }}</div>
            <!-- Chinese character -->
            <div v-if="pillar.stem" class="text-2xl font-bold text-black">{{ pillar.stem.chinese }}</div>
            <div v-else class="text-xl text-gray-400">-</div>
@@ -1008,8 +1014,8 @@
            <div v-if="!pillar.isUnknown && pillar.stem" class="text-xs text-gray-700">
             {{ pillar.stem.element.replace('Yang ', '').replace('Yin ', '') }} {{ pillar.stem.element.includes('Yang') ? '+' : '-' }}
            </div>
-           <!-- Ten God -->
-           <div v-if="!pillar.isUnknown" class="text-xs mt-1 text-gray-900">{{ pillar.tenGod || '' }}</div>
+           <!-- Ten God (hidden on mobile for compact view) -->
+           <div v-if="!pillar.isUnknown" class="text-xs mt-1 text-gray-900 mobile-hide">{{ pillar.tenGod || '' }}</div>
            
            <!-- Combination Badges (bottom-right) -->
            <div v-if="pillar.stemCombinations && pillar.stemCombinations.length > 0" 
@@ -1112,13 +1118,18 @@
            
            <!-- Main content -->
            <div class="flex-1 flex flex-col items-center justify-center pb-10">
-            <!-- Branch pinyin name -->
-            <div v-if="!pillar.isUnknown && pillar.branchName" class="text-xs text-gray-700 mb-1">{{ pillar.branchName }}</div>
+           <!-- Branch pinyin name (hidden on mobile for compact view) -->
+           <div v-if="!pillar.isUnknown && pillar.branchName" class="text-xs text-gray-700 mb-1 mobile-hide">{{ pillar.branchName }}</div>
             <!-- Chinese character -->
             <div v-if="pillar.branch" class="text-2xl font-bold text-black">{{ pillar.branch.chinese }}</div>
             <div v-else class="text-xl text-gray-400">-</div>
-            <!-- Animal name -->
-            <div v-if="!pillar.isUnknown && pillar.branch && !['Fire', 'Water', 'Metal', 'Wood', 'Earth'].includes(pillar.branch.animal)" class="text-xs text-gray-800">{{ pillar.branch.animal }}</div>
+            <!-- Animal name (hidden on mobile for compact view) -->
+            <div
+             v-if="!pillar.isUnknown && pillar.branch && !['Fire', 'Water', 'Metal', 'Wood', 'Earth'].includes(pillar.branch.animal)"
+             class="text-xs text-gray-800 mobile-hide"
+            >
+             {{ pillar.branch.animal }}
+            </div>
            </div>
            
            <!-- Combination Badges (bottom-right, above hidden stems) -->
@@ -1153,9 +1164,9 @@
              }"
              :title="`${stem}: ${qiData.god ? qiData.god + ' - ' : ''}Score: ${qiData.score || 'N/A'} (${qiData.weight}%)`"
             >
-             <div class="text-[8px] text-gray-600 leading-tight">{{ stem }}</div>
+             <div class="text-[8px] text-gray-600 leading-tight mobile-hide">{{ stem }}</div>
              <div class="text-[10px] text-black leading-tight">{{ stemMappings[stem] || stem }}</div>
-             <div class="text-[8px] text-gray-800 font-medium leading-tight">{{ qiData.god || '' }}</div>
+             <div class="text-[8px] text-gray-800 font-medium leading-tight mobile-hide">{{ qiData.god || '' }}</div>
             </div>
            </div>
           </div>
@@ -1189,8 +1200,8 @@
            :style="pillar.stem ? getNodeBgColor(pillar.stem.element, pillar.stem.color) : {}"
           >
            <!-- NO BADGES - just content -->
-           <!-- Pinyin name -->
-           <div v-if="pillar.stemName" class="text-xs text-gray-700 mb-1">{{ pillar.stemName }}</div>
+            <!-- Pinyin name (hidden on mobile for compact view) -->
+            <div v-if="pillar.stemName" class="text-xs text-gray-700 mb-1 mobile-hide">{{ pillar.stemName }}</div>
            <!-- Chinese character -->
            <div v-if="pillar.stem" class="text-2xl font-bold text-black">{{ pillar.stem.chinese }}</div>
            <div v-else class="text-xl text-gray-400">-</div>
@@ -1199,7 +1210,7 @@
             {{ pillar.stem.element.replace('Yang ', '').replace('Yin ', '') }} {{ pillar.stem.element.includes('Yang') ? '+' : '-' }}
            </div>
            <!-- Ten God -->
-           <div class="text-xs mt-1 text-gray-900">{{ pillar.tenGod || '' }}</div>
+            <div class="text-xs mt-1 text-gray-900 mobile-hide">{{ pillar.tenGod || '' }}</div>
           </div>
          </div>
         </template>
@@ -1240,13 +1251,18 @@
            <!-- NO BADGES - just content -->
            <!-- Main content -->
            <div class="flex-1 flex flex-col items-center justify-center pb-10">
-            <!-- Branch pinyin name -->
-            <div v-if="pillar.branchName" class="text-xs text-gray-700 mb-1">{{ pillar.branchName }}</div>
+            <!-- Branch pinyin name (hidden on mobile for compact view) -->
+            <div v-if="pillar.branchName" class="text-xs text-gray-700 mb-1 mobile-hide">{{ pillar.branchName }}</div>
             <!-- Chinese character -->
             <div v-if="pillar.branch" class="text-2xl font-bold text-black">{{ pillar.branch.chinese }}</div>
             <div v-else class="text-xl text-gray-400">-</div>
-            <!-- Animal name -->
-            <div v-if="pillar.branch && !['Fire', 'Water', 'Metal', 'Wood', 'Earth'].includes(pillar.branch.animal)" class="text-xs text-gray-800">{{ pillar.branch.animal }}</div>
+            <!-- Animal name (hidden on mobile for compact view) -->
+            <div
+             v-if="pillar.branch && !['Fire', 'Water', 'Metal', 'Wood', 'Earth'].includes(pillar.branch.animal)"
+             class="text-xs text-gray-800 mobile-hide"
+            >
+             {{ pillar.branch.animal }}
+            </div>
            </div>
            
            <!-- Hidden Stems Section (at bottom) -->
@@ -1262,7 +1278,7 @@
                 :title="`${stem}: ${god || 'Unknown'} - ${pillar.hiddenQi ? pillar.hiddenQi[stem] || 'N/A' : 'N/A'}`"
              >
               <div class="text-black font-medium">{{ stemMappings[stem] || stem }}</div>
-              <div v-if="god" class="ml-0.5 text-gray-600">{{ god }}</div>
+              <div v-if="god" class="ml-0.5 text-gray-600 mobile-hide">{{ god }}</div>
              </div>
             </div>
            </div>
@@ -1367,10 +1383,12 @@
    </div>
     </div>
    </div>
-  </main>
   
-  <!-- Wu Xing Element Chart - Floating Bottom Bar (outside main container) -->
-  <div v-if="chartData?.daymaster_analysis" style="position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; z-index: 9999 !important; background-color: white; border-top: 2px solid #9ca3af; box-shadow: 0 -4px 20px rgba(0,0,0,0.15); padding: 0.75rem;">
+   <!-- Wu Xing Element Chart - Sticky bar that becomes footer at page bottom -->
+   <div
+    v-if="chartData?.daymaster_analysis"
+    class="wuxing-footer sticky bottom-0"
+   >
    <div class="mx-auto" style="max-width: 800px;">
     <div class="flex items-center justify-between mb-1.5">
      <h3 class="text-xs font-semibold text-gray-800">五行 Wu Xing Elements</h3>
@@ -1445,7 +1463,8 @@
      </div>
     </div>
    </div>
-  </div>
+   </div>
+  </main>
   
  </div>
 </template>
@@ -1521,7 +1540,14 @@ const testPresets = [
  { date: '1986-11-29', time: '13:30', gender: 'male' },
  { date: '1995-08-14', time: '11:30', gender: 'female' },
  { date: '1995-07-18', time: '16:30', gender: 'female' },
- { date: '1992-09-18', time: '09:30', gender: 'female' }
+ { date: '1992-09-18', time: '09:30', gender: 'female' },
+ { date: '2002-04-17', time: '08:20', gender: 'female' },
+ { date: '2019-09-18', time: '05:00', gender: 'female' },
+ { date: '2021-08-09', time: '21:00', gender: 'female' },
+ { date: '1985-03-20', time: '23:00', gender: 'female' },
+ { date: '1995-02-10', time: '10:10', gender: 'female' },
+ { date: '1946-08-12', time: '07:00', gender: 'male', note: 'Suharsa' },
+ { date: '1962-11-03', time: '11:45', gender: 'male', note: 'Malaysian - Mata Ikan' }
 ]
 
 // Heavenly Stems for dropdowns (10 stems)

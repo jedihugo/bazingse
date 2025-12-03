@@ -33,7 +33,7 @@ npm run preview
 ### Backend Development
 ```bash
 # Navigate to backend directory
-cd ../bazingse
+cd api
 
 # Activate virtual environment
 source .venv/bin/activate
@@ -47,6 +47,10 @@ python run_bazingse.py
 
 ```
 bazingse-app/
+├── api/                # Backend (Python FastAPI)
+│   ├── run_bazingse.py # Backend entry point
+│   ├── requirements.txt
+│   └── ...
 ├── index.html          # Entry point
 ├── vite.config.js      # Vite configuration + API proxy
 ├── package.json        # Dependencies
