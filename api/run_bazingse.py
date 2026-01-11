@@ -5,8 +5,8 @@ from routes import router
 # Initialize FastAPI app
 app = FastAPI(title="BaZingSe API")
 
-# Include router
-app.include_router(router)
+# Include router with /api prefix
+app.include_router(router, prefix="/api")
 
 if __name__ == "__main__":
     uvicorn.run(

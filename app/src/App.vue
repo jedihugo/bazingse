@@ -1,9 +1,9 @@
 <template>
  <div class="min-h-screen bg-gray-50">
   
-  <!-- Header -->
+  <!-- Header - TUI style: minimal chrome -->
   <header class="bg-white border-b border-gray-200">
-   <div class="max-w-7xl mx-auto px-4 py-4 flex items-center gap-4">
+   <div class="max-w-7xl mx-auto px-1 py-1 sm:px-2 sm:py-2 md:px-3 flex items-center gap-2">
     <img 
      src="/bazingse-logo.png" 
      alt="BaZingSe Logo" 
@@ -17,15 +17,15 @@
    </div>
   </header>
 
-  <!-- Main Content -->
-  <main class="mx-auto px-4 py-8 pb-64 main-content">
+  <!-- Main Content - Mobile-first: base = compact, larger screens = more spacious -->
+  <main class="mx-auto main-content">
    <!-- Main Container -->
    <div class="mx-auto" style="max-width: 800px;">
     <!-- BaZi Chart Section -->
     <div class="w-full">
      
-     <!-- Quick Test Presets -->
-     <div class="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-3 mb-4">
+     <!-- Quick Test Presets - TUI style: tight -->
+     <div class="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded p-1 sm:p-2 md:p-3 mb-2">
       <div class="flex items-center gap-2 mb-2">
        <span class="text-xs font-semibold text-gray-700">⚡ Quick Test:</span>
       </div>
@@ -47,12 +47,12 @@
       </div>
      </div>
      
-     <!-- BaZi Chart with Integrated Input -->
-     <div class="bg-white shadow-md p-6">
+     <!-- BaZi Chart with Integrated Input - TUI style: content focus -->
+     <div class="bg-white shadow-sm p-1 sm:p-2 md:p-3">
     <!-- Chart Grid with Input Fields -->
     <div class="w-full">
      <!-- Controls Row: Gender + Time Travel aligned with columns -->
-     <div class="flex gap-1 mb-2 overflow-x-auto">
+     <div class="flex gap-1 mb-2">
       <!-- Spacer for Hour column -->
       <div class="w-28 flex-shrink-0"></div>
       
@@ -88,7 +88,7 @@
      </div>
      
      <!-- Column Headers: Each input aligned with pillar below (9 columns max) -->
-     <div class="flex gap-1 mb-2 overflow-x-auto items-center">
+     <div class="flex gap-1 mb-2 flex-wrap items-center">
       
       <!-- Column 1: Hour (Natal) -->
       <div class="w-28 flex-shrink-0">
@@ -98,7 +98,7 @@
          v-if="!unknownHour"
          v-model="birthTime"
          type="time"
-         class="w-full pl-1 pr-6 py-1.5 text-xs border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-center hour-input-no-icon"
+         class="w-full pl-1 pr-5 py-1.5 text-xs border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-center hour-input-no-icon"
          @change="triggerChartUpdate"
         />
         <input
@@ -110,8 +110,8 @@
         <button
          @click="unknownHour = !unknownHour; handleUnknownHourChange()"
          :class="[
-          'absolute right-0.5 top-1/2 -translate-y-1/2 px-1 py-0.5 text-[10px] border transition-colors',
-          unknownHour 
+          'unknown-hour-btn border transition-colors',
+          unknownHour
            ? 'bg-blue-500 text-white border-blue-500'
            : 'bg-white text-gray-600 border-gray-300'
          ]"
@@ -131,7 +131,12 @@
         min="1"
         max="31"
         placeholder="DD"
-        class="w-full px-1 py-1.5 text-xs border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-center"
+        :class="[
+         'w-full px-1 py-1.5 text-xs border focus:outline-none focus:ring-1 text-center',
+         isValidBirthDate
+          ? 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
+          : 'border-red-400 bg-red-50 focus:border-red-500 focus:ring-red-500'
+        ]"
         @change="triggerChartUpdate"
        />
       </div>
@@ -145,7 +150,12 @@
         min="1"
         max="12"
         placeholder="MM"
-        class="w-full px-1 py-1.5 text-xs border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-center"
+        :class="[
+         'w-full px-1 py-1.5 text-xs border focus:outline-none focus:ring-1 text-center',
+         isValidBirthDate
+          ? 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
+          : 'border-red-400 bg-red-50 focus:border-red-500 focus:ring-red-500'
+        ]"
         @change="triggerChartUpdate"
        />
       </div>
@@ -159,11 +169,63 @@
         min="1900"
         max="2100"
         placeholder="YYYY"
-        class="w-full px-1 py-1.5 text-xs border border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-center"
+        :class="[
+         'w-full px-1 py-1.5 text-xs border focus:outline-none focus:ring-1 text-center',
+         isValidBirthDate
+          ? 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
+          : 'border-red-400 bg-red-50 focus:border-red-500 focus:ring-red-500'
+        ]"
         @change="triggerChartUpdate"
        />
       </div>
-      
+
+      <!-- Divider before Location -->
+      <div class="flex-shrink-0 flex flex-col justify-end mx-3">
+       <div class="w-0.5 h-12 bg-gradient-to-b from-transparent via-emerald-600 to-transparent opacity-80"></div>
+      </div>
+
+      <!-- Column 5: Location Toggle (地) -->
+      <div class="flex-shrink-0 flex flex-col justify-end">
+       <label class="block text-[10px] font-semibold text-gray-700 mb-1 text-center">地 Location</label>
+       <div class="flex items-center gap-1 px-2 py-1.5 border border-gray-300 rounded bg-gray-50 h-[34px]" style="min-width: 110px;">
+        <label class="cursor-pointer flex items-center gap-0.5">
+         <input
+          type="checkbox"
+          v-model="showLocation"
+          class="w-3 h-3 focus:ring-blue-500"
+          style="accent-color: #2563EB;"
+          @change="triggerChartUpdate"
+         />
+        </label>
+        <div class="flex gap-1" :class="{ 'opacity-40': !showLocation }">
+         <label class="cursor-pointer flex items-center gap-0.5" :class="{ 'pointer-events-none': !showLocation }">
+          <input
+           type="radio"
+           v-model="locationType"
+           value="overseas"
+           class="w-2.5 h-2.5"
+           style="accent-color: #2563EB;"
+           :disabled="!showLocation"
+           @change="triggerChartUpdate"
+          />
+          <span class="text-[10px] text-blue-700">海外</span>
+         </label>
+         <label class="cursor-pointer flex items-center gap-0.5" :class="{ 'pointer-events-none': !showLocation }">
+          <input
+           type="radio"
+           v-model="locationType"
+           value="birthplace"
+           class="w-2.5 h-2.5"
+           style="accent-color: #D97706;"
+           :disabled="!showLocation"
+           @change="triggerChartUpdate"
+          />
+          <span class="text-[10px] text-amber-700">鄉土</span>
+         </label>
+        </div>
+       </div>
+      </div>
+
       <!-- Left Partition Divider (before 10Y Luck) -->
       <div v-if="chartData?.analysis_info?.has_luck_pillar" 
          class="relative flex-shrink-0 mx-3 self-stretch" 
@@ -188,17 +250,17 @@
 
      <!-- BaZi Chart Display - ALWAYS VISIBLE -->
      <div class="relative">
-      <!-- NATAL CHART (Row 1) -->
-      <div class="relative overflow-x-auto" style="max-width: calc(4 * 7rem + 3 * 0.25rem + 2 * 7rem + 2 * (0.75rem + 2px));">
-       
+      <!-- NATAL CHART (Row 1) - No horizontal scroll on mobile -->
+      <div class="relative w-full">
+
        <!-- Heavenly Stems Row (Natal Only) -->
-       <div class="flex gap-1 items-center">
+       <div class="flex gap-1 items-center flex-wrap">
         <template v-for="(pillar, index) in natalPillarsOrdered" :key="`natal-stem-${index}`">
          <!-- Pillar Content -->
         <div class="relative w-28 flex-shrink-0">
-         <div 
+         <div
           :id="`stem-${index}`"
-          class="aspect-square p-3 transition-all duration-300 relative flex flex-col items-center justify-center"
+          class="aspect-square p-3 transition-all duration-300 relative flex flex-col items-center justify-center cursor-pointer"
           :class="[
            hoveredNode === `stem-${index}` ? 'shadow-lg scale-105' : 'border border-gray-300',
            getNodeHighlightClass(`stem-${index}`),
@@ -247,7 +309,7 @@
           </div>
           
           <!-- Pinyin name at top (hidden on mobile for compact view) -->
-          <div v-if="!pillar.isUnknown && pillar.stemName" class="text-xs text-gray-700 mb-1 mobile-hide">{{ pillar.stemName }}</div>
+          <div v-if="!pillar.isUnknown && pillar.stemName" class="text-xs text-gray-700 mb-1 hidden-mobile sm:block">{{ pillar.stemName }}</div>
           <!-- Chinese character (always show original from base) -->
           <div v-if="pillar.stem" class="text-2xl font-bold text-black">
            {{ pillar.stem.chinese }}
@@ -263,7 +325,7 @@
            </template>
           </div>
           <!-- Ten God or Day Master (hidden on mobile for compact view) -->
-          <div v-if="!pillar.isUnknown" class="text-xs mt-1 text-gray-900 mobile-hide">
+          <div v-if="!pillar.isUnknown" class="text-xs mt-1 text-gray-900 hidden-mobile sm:block">
            {{ index === 1 ? 'Day master' : (pillar.tenGod || '') }}
           </div>
           
@@ -320,9 +382,9 @@
         <template v-for="(pillar, index) in natalPillarsOrdered" :key="`natal-branch-${index}`">
          <!-- Pillar Content -->
         <div class="relative w-28 flex-shrink-0">
-         <div 
+         <div
           :id="`branch-${index}`"
-          class="pb-0 pt-2 px-3 transition-all duration-300 relative flex flex-col items-center justify-start"
+          class="pb-0 pt-2 px-3 transition-all duration-300 relative flex flex-col items-center justify-start cursor-pointer"
           :class="[
            hoveredNode === `branch-${index}` ? 'shadow-lg scale-105' : 'border border-gray-300',
            getNodeHighlightClass(`branch-${index}`),
@@ -332,7 +394,7 @@
           ]"
           :style="pillar.isUnknown ? { aspectRatio: '1/1.2' } : {
            ...(pillar.branch ? getNodeBgColor(pillar.branch.element, pillar.branch.color) : {}),
-           aspectRatio: '1/1.2' // 20% taller than square
+           aspectRatio: '1/1.2'
           }"
          >
           <!-- Negative Badges (top-left corner, stacked vertically) -->
@@ -376,7 +438,7 @@
           <!-- Main content with proper spacing from bottom -->
           <div class="flex-1 flex flex-col items-center justify-center pb-10">
            <!-- Branch pinyin name (hidden on mobile for compact view) -->
-           <div v-if="!pillar.isUnknown && pillar.branchName" class="text-xs text-gray-700 mb-1 mobile-hide">
+           <div v-if="!pillar.isUnknown && pillar.branchName" class="text-xs text-gray-700 mb-1 hidden-mobile sm:block">
             {{ pillar.branchName }}
            </div>
            <!-- Chinese character (always show original from base) -->
@@ -387,7 +449,7 @@
            <!-- Animal name (hidden on mobile for compact view) -->
            <div
             v-if="!pillar.isUnknown && pillar.branch && !['Fire', 'Water', 'Metal', 'Wood', 'Earth'].includes(pillar.branch.animal)"
-            class="text-xs text-gray-800 mobile-hide"
+            class="text-xs text-gray-800 hidden-mobile sm:block"
            >
             {{ pillar.branch.animal }}
            </div>
@@ -413,22 +475,54 @@
            </div>
           </div>
           
-          <!-- Hidden Heavenly Stems - Anchored to bottom -->
+          <!-- Wealth Storage Badges (bottom-left corner) -->
+          <div v-if="pillar.branchWealthStorage && pillar.branchWealthStorage.length > 0" 
+             class="absolute bottom-11 left-1 gap-0.5 z-20 flex flex-col items-start">
+           <div v-for="(ws, idx) in pillar.branchWealthStorage" 
+              :key="`branch-ws-${index}-${idx}`"
+              class="flex items-center justify-center font-bold transition-transform cursor-help"
+              :class="[
+               getWealthStorageSizeClass(ws),
+               isBadgeHighlighted(ws) ? 'scale-125 shadow-lg' : 'hover:scale-110'
+              ]"
+              :style="getWealthStorageBadgeStyle(ws)"
+              :title="getWealthStorageTooltip(ws)"
+              @mouseenter="handleBadgeHover(ws)"
+              @mouseleave="clearHighlight()">
+            <span class="leading-none">{{ getWealthStorageSymbol(ws) }}</span>
+           </div>
+          </div>
+          
+          <!-- Qi Display - Single row at bottom with Primary Qi (本氣) + Hidden Stems (藏干) -->
           <div v-if="pillar.hiddenStems || pillar.hiddenQi" class="absolute bottom-0 left-0 right-0 flex overflow-hidden h-10">
-           <div 
-            v-for="(qiData, stem) in getHiddenStemsWithWeights(pillar)" 
-            :key="stem"
+           <!-- Primary Qi (本氣) - index 0, shown with border-r separator -->
+           <div
+            v-if="getPrimaryQiData(pillar)"
+            class="flex flex-col items-center justify-start text-black overflow-hidden pt-1 pb-0.5 h-full border-r-2 border-white/50"
+            :style="{
+             ...getNodeBgColor(getStemElement(getPrimaryQiData(pillar).stem), getPrimaryQiData(pillar).color),
+             width: `${getPrimaryQiData(pillar).weight}%`
+            }"
+            :title="`Primary Qi (本氣): ${getPrimaryQiData(pillar).stem} - ${getPrimaryQiData(pillar).god ? getPrimaryQiData(pillar).god + ' - ' : ''}Score: ${getPrimaryQiData(pillar).score || 'N/A'} (${getPrimaryQiData(pillar).weight}%)`"
+           >
+            <div class="text-[8px] text-gray-600 leading-tight hidden-mobile sm:block">{{ getPrimaryQiData(pillar).stem }}</div>
+            <div class="text-[11px] font-bold text-black leading-tight">{{ stemMappings[getPrimaryQiData(pillar).stem] || getPrimaryQiData(pillar).stem }}</div>
+            <div class="text-[8px] text-gray-800 font-medium leading-tight hidden-mobile sm:block">{{ getPrimaryQiData(pillar).god || '' }}</div>
+           </div>
+           <!-- Hidden Stems (藏干) - index 1+, smaller display -->
+           <div
+            v-for="(hidden, idx) in getHiddenStemsData(pillar)"
+            :key="idx"
             class="flex flex-col items-center justify-start text-black overflow-hidden pt-1 pb-0.5 h-full"
             :style="{
-             ...getNodeBgColor(getStemElement(stem), qiData.color),
-             width: `${qiData.weight}%`
+             ...getNodeBgColor(getStemElement(hidden.stem), hidden.color),
+             width: `${hidden.weight}%`
             }"
-            :title="`${stem}: ${qiData.god ? qiData.god + ' - ' : ''}Score: ${qiData.score || 'N/A'} (${qiData.weight}%)`"
+            :title="`Hidden Stem (藏干): ${hidden.stem} - ${hidden.god ? hidden.god + ' - ' : ''}Score: ${hidden.score || 'N/A'} (${hidden.weight}%)`"
            >
-            <!-- Vertical layout: pinyin, char, ten god (pinyin and Ten God hidden on mobile) -->
-            <div class="text-[8px] text-gray-600 leading-tight mobile-hide">{{ stem }}</div>
-            <div class="text-[10px] text-black leading-tight">{{ stemMappings[stem] || stem }}</div>
-            <div class="text-[8px] text-gray-800 font-medium leading-tight mobile-hide">{{ qiData.god || '' }}</div>
+            <div class="text-[7px] text-gray-500 leading-tight hidden-mobile sm:block">{{ hidden.stem }}</div>
+            <div class="text-[9px] text-black leading-tight">{{ stemMappings[hidden.stem] || hidden.stem }}</div>
+            <div class="text-[7px] text-gray-700 leading-tight hidden-mobile sm:block">{{ hidden.god || '' }}</div>
            </div>
           </div>
           
@@ -444,11 +538,27 @@
         </div>
         </template>
        </div>
-       
+
+       <!-- Qi Phase Row (十二長生) -->
+       <div class="flex gap-1 mt-1">
+        <template v-for="(pillar, index) in natalPillarsOrdered" :key="`natal-qiphase-${index}`">
+         <div class="w-28 flex-shrink-0 text-center">
+          <div v-if="pillar.qiPhase"
+             class="text-[10px] px-1.5 py-0.5 rounded-full inline-flex items-center gap-0.5"
+             :class="getQiPhaseClass(pillar.qiPhase.strength)"
+             :title="`${pillar.qiPhase.id} (${pillar.qiPhase.english}): ${pillar.qiPhase.description}`">
+           <span class="font-semibold">{{ pillar.qiPhase.chinese }}</span>
+           <span class="text-gray-500 capitalize hidden-mobile sm:inline">{{ pillar.qiPhase.id }}</span>
+          </div>
+          <div v-else class="text-[10px] text-gray-400">-</div>
+         </div>
+        </template>
+       </div>
+
       </div>
 
-      
-      <!-- LUCK PILLARS HEADER ROW -->
+
+      <!-- LUCK PILLARS HEADER ROW - 5 items (4 luck + 10Y) -->
       <div class="mt-12 mb-2">
        <div class="flex gap-1 items-end">
         <!-- Hourly Luck Header (under Hour natal) -->
@@ -458,7 +568,7 @@
          <input v-model="analysisTime" type="time" placeholder="HH:MM"
           class="w-full px-1 py-1 text-xs border border-gray-300 rounded text-center" @change="triggerChartUpdate" />
         </div>
-        
+
         <!-- Daily Luck Header (under Day natal) -->
         <div class="w-28 flex-shrink-0 flex flex-col items-center gap-1">
          <input type="checkbox" v-model="includeDailyLuck" class="w-3 h-3" @change="triggerChartUpdate" />
@@ -466,7 +576,7 @@
          <input v-model.number="analysisDay" type="number" min="1" max="31" placeholder="DD"
           class="w-full px-1 py-1 text-xs border border-gray-300 rounded text-center" @change="triggerChartUpdate" />
         </div>
-        
+
         <!-- Monthly Luck Header (under Month natal) -->
         <div class="w-28 flex-shrink-0 flex flex-col items-center gap-1">
          <input type="checkbox" v-model="includeMonthlyLuck" class="w-3 h-3" @change="triggerChartUpdate" />
@@ -474,7 +584,7 @@
          <input v-model.number="analysisMonth" type="number" min="1" max="12" placeholder="MM"
           class="w-full px-1 py-1 text-xs border border-gray-300 rounded text-center" @change="triggerChartUpdate" />
         </div>
-        
+
         <!-- Annual Luck Header (under Year natal) -->
         <div class="w-28 flex-shrink-0 flex flex-col items-center gap-1">
          <input type="checkbox" v-model="includeAnnualLuck" class="w-3 h-3" @change="triggerChartUpdate" />
@@ -482,76 +592,30 @@
          <input v-model.number="analysisYear" type="number" :min="minAnalysisYear" :max="maxAnalysisYear" placeholder="YYYY"
           class="w-full px-1 py-1 text-xs border border-gray-300 rounded text-center" @change="triggerChartUpdate" />
         </div>
-        
+
         <!-- Left Purple Divider (before 10Y Luck) -->
-        <div v-if="chartData?.analysis_info?.has_luck_pillar" class="relative flex-shrink-0 mx-3 self-stretch" style="width: 2px;">
+        <div v-if="chartData?.analysis_info?.has_luck_pillar" class="luck-divider relative self-stretch">
          <div class="absolute inset-0 bg-gradient-to-b from-transparent via-purple-500 to-transparent opacity-70"></div>
         </div>
-        
+
         <!-- 10Y Luck Header with Time Travel Toggle -->
         <div class="w-28 flex-shrink-0 flex flex-col items-center gap-1">
          <!-- Time Travel Toggle (above 10Y) -->
          <div class="flex items-center gap-1 mb-2">
           <input type="checkbox" v-model="showAnalysisPeriod" class="w-3 h-3" @change="triggerChartUpdate" />
-          <span class="text-[10px]">🔮 Time Travel</span>
+          <span class="text-[10px]">🔮 Time</span>
          </div>
-         
+
          <!-- 10Y Luck Header (always show) -->
          <div class="text-xs font-semibold text-purple-700">運 10Y</div>
          <div v-if="currentLuckPillar?.timing" class="text-[10px] text-gray-600">
           {{ currentLuckPillar?.timing?.start_year || '?' }}-{{ currentLuckPillar?.timing?.end_year || '?' }}
          </div>
-           
-        </div>
-        
-        <!-- Right Purple Divider (after 10Y Luck) -->
-        <div v-if="chartData?.analysis_info?.has_luck_pillar" class="relative flex-shrink-0 mx-3 self-stretch" style="width: 2px;">
-         <div class="absolute inset-0 bg-gradient-to-b from-transparent via-purple-500 to-transparent opacity-70"></div>
-        </div>
-        
-        <!-- Location Section (地 - after 10Y Luck) -->
-        <div class="w-28 flex-shrink-0 flex flex-col items-center gap-1">
-           <div class="flex justify-center mb-1">
-            <label class="cursor-pointer flex items-center gap-1">
-             <input 
-              type="checkbox" 
-              v-model="showLocation" 
-              class="w-3 h-3 focus:ring-blue-500"
-              style="accent-color: #2563EB;"
-              @change="triggerChartUpdate"
-             />
-             <span class="text-xs font-medium text-gray-700">地</span>
-            </label>
-           </div>
-           <!-- Radio buttons for overseas/birthplace (only show when checked) -->
-           <div v-if="showLocation" class="flex justify-center gap-1">
-            <label class="cursor-pointer flex items-center gap-0.5">
-             <input
-              type="radio"
-              v-model="locationType"
-              value="overseas"
-              class="w-2.5 h-2.5"
-              style="accent-color: #2563EB;"
-              @change="triggerChartUpdate"
-             />
-             <span class="text-[10px] text-blue-700">海</span>
-            </label>
-            <label class="cursor-pointer flex items-center gap-0.5">
-             <input
-              type="radio"
-              v-model="locationType"
-              value="birthplace"
-              class="w-2.5 h-2.5"
-              style="accent-color: #D97706;"
-              @change="triggerChartUpdate"
-             />
-             <span class="text-[10px] text-amber-700">鄉</span>
-            </label>
-           </div>
+
         </div>
        </div>
       </div>
-      
+
       <!-- LUCK PILLARS (Stems and Branches) - ALWAYS visible -->
       <div>
        
@@ -560,18 +624,18 @@
         <template v-for="(pillar, index) in luckPillarsDisplay" :key="`luck-stem-${index}`">
          <!-- Empty slot for alignment -->
          <div v-if="!pillar" class="w-28 flex-shrink-0"></div>
-         
+
          <template v-else>
           <!-- Left Purple Divider (before 10Y Luck - index 4) -->
-          <div v-if="index === 4" class="relative flex-shrink-0 mx-3 self-stretch" style="width: 2px;">
+          <div v-if="index === 4" class="luck-divider relative self-stretch">
            <div class="absolute inset-0 bg-gradient-to-b from-transparent via-purple-500 to-transparent opacity-70"></div>
           </div>
-         
+
           <!-- Luck Stem Pillar -->
           <div class="relative w-28 flex-shrink-0">
-           <div 
+           <div
             :id="`stem-${getLuckPosition(index)}`"
-            class="aspect-square p-3 transition-all duration-300 relative flex flex-col items-center justify-center"
+            class="aspect-square p-3 transition-all duration-300 relative flex flex-col items-center justify-center cursor-pointer"
             :class="[
              pillar.isEmpty || !pillar.stem ? 'border border-dashed border-gray-300 bg-gray-50 opacity-40' : '',
              !pillar.isEmpty && (hoveredNode === `stem-${getLuckPosition(index)}` ? 'shadow-lg scale-105' : 'border border-gray-300'),
@@ -618,20 +682,20 @@
             </div>
             
             <!-- Content: pinyin hidden on mobile -->
-            <div v-if="pillar.stemName" class="text-xs text-gray-700 mb-1 mobile-hide">{{ pillar.stemName }}</div>
+            <div v-if="pillar.stemName" class="text-xs text-gray-700 mb-1 hidden-mobile sm:block">{{ pillar.stemName }}</div>
             <div v-if="pillar.stem" class="text-2xl font-bold text-black">{{ pillar.stem.chinese }}</div>
             <div v-else class="text-xl text-gray-400">-</div>
             <div v-if="pillar.stem" class="text-xs text-gray-700">
              {{ pillar.stem.element.replace('Yang ', '').replace('Yin ', '') }} {{ pillar.stem.element.includes('Yang') ? '+' : '-' }}
             </div>
-            <div class="text-xs mt-1 text-gray-900 mobile-hide">{{ pillar.tenGod || '' }}</div>
+            <div class="text-xs mt-1 text-gray-900 hidden-mobile sm:block">{{ pillar.tenGod || '' }}</div>
             
             <!-- Combination Badges -->
-            <div v-if="pillar.stemCombinations && pillar.stemCombinations.length > 0" 
+            <div v-if="pillar.stemCombinations && pillar.stemCombinations.length > 0"
                class="absolute bottom-1 right-1 gap-0.5 flex items-start content-start"
                :class="pillar.stemCombinations.length >= 3 ? 'flex-wrap-reverse flex-row justify-end' : 'flex-row items-end'"
                :style="pillar.stemCombinations.length >= 3 ? 'max-width: 40px;' : ''">
-             <div v-for="(comb, idx) in pillar.stemCombinations" 
+             <div v-for="(comb, idx) in pillar.stemCombinations"
                 :key="`luck-stem-comb-${index}-${idx}`"
                 class="flex items-center justify-center font-bold rounded-full transition-transform cursor-help"
                 :class="[getCombinationBadgeSizeClass(comb.strength), isBadgeHighlighted(comb) ? 'scale-125 shadow-lg' : 'hover:scale-110']"
@@ -642,7 +706,7 @@
               <span class="leading-none">{{ getTransformBadgeDisplay(comb.badge) }}</span>
              </div>
             </div>
-            
+
             <!-- Horizontal WuXing Flow -->
             <div v-if="viewMode !== 'base' && pillar.stem && luckPillarsDisplay[index + 1]?.stem && index < luckPillarsDisplay.length - 1 && getWuXingRelation(pillar.stem.element, luckPillarsDisplay[index + 1].stem.element)"
                class="absolute -right-3 top-1/2 -translate-y-1/2 text-lg font-bold z-30"
@@ -654,20 +718,32 @@
           </div>
           
           <!-- Right Purple Divider (after 10Y Luck - index 4) -->
-          <div v-if="index === 4" class="relative flex-shrink-0 mx-3 self-stretch" style="width: 2px;">
+          <div v-if="index === 4" class="luck-divider relative self-stretch">
            <div class="absolute inset-0 bg-gradient-to-b from-transparent via-purple-500 to-transparent opacity-70"></div>
           </div>
          </template>
         </template>
        </div>
-       
+
        <!-- Vertical Flow Indicators -->
        <div class="flex gap-1 -mt-1.5 -mb-1.5 relative z-40 items-center">
         <template v-for="(pillar, index) in luckPillarsDisplay" :key="`luck-flow-${index}`">
          <div v-if="!pillar" class="w-28 flex-shrink-0"></div>
          <template v-else>
-          <div v-if="index === 4" class="flex-shrink-0 mx-3" style="width: 2px;"></div>
-          <div class="flex justify-center items-center h-5 w-28 flex-shrink-0">
+          <div v-if="index === 4" class="luck-divider"></div>
+          <div class="flex justify-center items-center h-7 w-28 flex-shrink-0 gap-1">
+           <!-- Dong Gong Rating Badge (Daily Luck only) -->
+           <div v-if="pillar.isDailyLuck && !pillar.isEmpty && dongGongInfo && dongGongInfo.rating"
+              class="flex items-center justify-center w-6 h-6 rounded-full shadow-md cursor-help transition-transform hover:scale-110 font-bold text-xs"
+              :style="{
+               backgroundColor: getDongGongRatingColor(dongGongInfo.rating.id).bg,
+               border: `2px solid ${getDongGongRatingColor(dongGongInfo.rating.id).border}`,
+               color: getDongGongRatingColor(dongGongInfo.rating.id).text
+              }"
+              :title="getDongGongTooltip(dongGongInfo)">
+            <span class="leading-none">{{ getDongGongRatingSymbol(dongGongInfo.rating.id) }}</span>
+           </div>
+           <!-- Vertical WuXing Flow -->
            <div v-if="viewMode !== 'base' && pillar.stem && pillar.branch && getVerticalWuXingRelation(pillar.stem.element, pillar.branch.element)"
               class="text-lg font-bold"
               :class="getVerticalWuXingClass(pillar.stem.element, pillar.branch.element)"
@@ -675,28 +751,28 @@
             {{ getVerticalWuXingRelation(pillar.stem.element, pillar.branch.element) }}
            </div>
           </div>
-          <div v-if="index === 4" class="flex-shrink-0 mx-3" style="width: 2px;"></div>
+          <div v-if="index === 4" class="luck-divider"></div>
          </template>
         </template>
        </div>
-       
+
        <!-- Luck Earthly Branches Row -->
        <div class="flex gap-1 overflow-visible items-stretch">
         <template v-for="(pillar, index) in luckPillarsDisplay" :key="`luck-branch-${index}`">
          <!-- Empty slot for alignment -->
          <div v-if="!pillar" class="w-28 flex-shrink-0"></div>
-         
+
          <template v-else>
           <!-- Left Purple Divider (before 10Y Luck - index 4) -->
-          <div v-if="index === 4" class="relative flex-shrink-0 mx-3 self-stretch" style="width: 2px;">
+          <div v-if="index === 4" class="luck-divider relative self-stretch">
            <div class="absolute inset-0 bg-gradient-to-b from-transparent via-purple-500 to-transparent opacity-70"></div>
           </div>
-         
+
           <!-- Luck Branch Pillar -->
           <div class="relative w-28 flex-shrink-0">
-           <div 
+           <div
             :id="`branch-${getLuckPosition(index)}`"
-            class="pb-0 pt-2 px-3 transition-all duration-300 relative flex flex-col items-center justify-start"
+            class="pb-0 pt-2 px-3 transition-all duration-300 relative flex flex-col items-center justify-start cursor-pointer"
             :class="[
              pillar.isEmpty || !pillar.branch ? 'border border-dashed border-gray-300 bg-gray-50 opacity-40' : '',
              !pillar.isEmpty && (hoveredNode === `branch-${getLuckPosition(index)}` ? 'shadow-lg scale-105' : 'border border-gray-300'),
@@ -765,6 +841,24 @@
              </div>
             </div>
             
+            <!-- Wealth Storage Badges (bottom-left) -->
+            <div v-if="pillar.branchWealthStorage && pillar.branchWealthStorage.length > 0" 
+               class="absolute bottom-11 left-1 gap-0.5 z-20 flex flex-col items-start">
+             <div v-for="(ws, idx) in pillar.branchWealthStorage" 
+                :key="`luck-branch-ws-${index}-${idx}`"
+                class="flex items-center justify-center font-bold transition-transform cursor-help"
+                :class="[
+                 getWealthStorageSizeClass(ws),
+                 isBadgeHighlighted(ws) ? 'scale-125 shadow-lg' : 'hover:scale-110'
+                ]"
+                :style="getWealthStorageBadgeStyle(ws)"
+                :title="getWealthStorageTooltip(ws)"
+                @mouseenter="handleBadgeHover(ws)"
+                @mouseleave="clearHighlight()">
+              <span class="leading-none">{{ getWealthStorageSymbol(ws) }}</span>
+             </div>
+            </div>
+            
             <!-- Horizontal WuXing Flow -->
             <div v-if="viewMode !== 'base' && pillar.branch && luckPillarsDisplay[index + 1]?.branch && index < luckPillarsDisplay.length - 1 && getWuXingRelation(pillar.branch.element, luckPillarsDisplay[index + 1].branch.element)"
                class="absolute -right-3 top-1/3 -translate-y-1/2 text-lg font-bold z-50"
@@ -773,35 +867,68 @@
              {{ getWuXingRelation(pillar.branch.element, luckPillarsDisplay[index + 1].branch.element) }}
             </div>
             
-            <!-- Hidden Heavenly Stems (Proportional bars at bottom) -->
+            <!-- Qi Display - Single row at bottom with Primary Qi (本氣) + Hidden Stems (藏干) -->
             <div v-if="!pillar.isEmpty && (pillar.hiddenStems || pillar.hiddenQi)" class="absolute bottom-0 left-0 right-0 flex overflow-hidden h-10">
-             <div 
-              v-for="(qiData, stem) in getHiddenStemsWithWeights(pillar)" 
-              :key="stem"
+             <!-- Primary Qi (本氣) - index 0, shown with border-r separator -->
+             <div
+              v-if="getPrimaryQiData(pillar)"
+              class="flex flex-col items-center justify-start text-black overflow-hidden pt-1 pb-0.5 h-full border-r-2 border-white/50"
+              :style="{
+               ...getNodeBgColor(getStemElement(getPrimaryQiData(pillar).stem), getPrimaryQiData(pillar).color),
+               width: `${getPrimaryQiData(pillar).weight}%`
+              }"
+              :title="`Primary Qi (本氣): ${getPrimaryQiData(pillar).stem} - ${getPrimaryQiData(pillar).god ? getPrimaryQiData(pillar).god + ' - ' : ''}Score: ${getPrimaryQiData(pillar).score || 'N/A'} (${getPrimaryQiData(pillar).weight}%)`"
+             >
+              <div class="text-[8px] text-gray-600 leading-tight hidden-mobile sm:block">{{ getPrimaryQiData(pillar).stem }}</div>
+              <div class="text-[11px] font-bold text-black leading-tight">{{ stemMappings[getPrimaryQiData(pillar).stem] || getPrimaryQiData(pillar).stem }}</div>
+              <div class="text-[8px] text-gray-800 font-medium leading-tight hidden-mobile sm:block">{{ getPrimaryQiData(pillar).god || '' }}</div>
+             </div>
+             <!-- Hidden Stems (藏干) - index 1+, smaller display -->
+             <div
+              v-for="(hidden, idx) in getHiddenStemsData(pillar)"
+              :key="idx"
               class="flex flex-col items-center justify-start text-black overflow-hidden pt-1 pb-0.5 h-full"
               :style="{
-               ...getNodeBgColor(getStemElement(stem), qiData.color),
-               width: `${qiData.weight}%`
+               ...getNodeBgColor(getStemElement(hidden.stem), hidden.color),
+               width: `${hidden.weight}%`
               }"
-              :title="`${stem}: ${qiData.god ? qiData.god + ' - ' : ''}Score: ${qiData.score || 'N/A'} (${qiData.weight}%)`"
+              :title="`Hidden Stem (藏干): ${hidden.stem} - ${hidden.god ? hidden.god + ' - ' : ''}Score: ${hidden.score || 'N/A'} (${hidden.weight}%)`"
              >
-              <div class="text-[8px] text-gray-600 leading-tight mobile-hide">{{ stem }}</div>
-              <div class="text-[10px] text-black leading-tight">{{ stemMappings[stem] || stem }}</div>
-              <div class="text-[8px] text-gray-800 font-medium leading-tight mobile-hide">{{ qiData.god || '' }}</div>
+              <div class="text-[7px] text-gray-500 leading-tight hidden-mobile sm:block">{{ hidden.stem }}</div>
+              <div class="text-[9px] text-black leading-tight">{{ stemMappings[hidden.stem] || hidden.stem }}</div>
+              <div class="text-[7px] text-gray-700 leading-tight hidden-mobile sm:block">{{ hidden.god || '' }}</div>
              </div>
             </div>
            </div>
           </div>
           
           <!-- Right Purple Divider (after 10Y Luck - index 4) -->
-          <div v-if="index === 4" class="relative flex-shrink-0 mx-3 self-stretch" style="width: 2px;">
+          <div v-if="index === 4" class="luck-divider relative self-stretch">
            <div class="absolute inset-0 bg-gradient-to-b from-transparent via-purple-500 to-transparent opacity-70"></div>
           </div>
          </template>
         </template>
        </div>
+
+       <!-- Qi Phase Row for Luck Pillars (十二長生) -->
+       <div class="flex gap-1 mt-1">
+        <template v-for="(pillar, index) in luckPillarsDisplay" :key="`luck-qiphase-${index}`">
+         <div class="w-28 flex-shrink-0 text-center">
+          <div v-if="pillar.qiPhase"
+             class="text-[10px] px-1.5 py-0.5 rounded-full inline-flex items-center gap-0.5"
+             :class="getQiPhaseClass(pillar.qiPhase.strength)"
+             :title="`${pillar.qiPhase.id} (${pillar.qiPhase.english}): ${pillar.qiPhase.description}`">
+           <span class="font-semibold">{{ pillar.qiPhase.chinese }}</span>
+           <span class="text-gray-500 capitalize hidden-mobile sm:inline">{{ pillar.qiPhase.id }}</span>
+          </div>
+          <div v-else-if="!pillar.isEmpty" class="text-[10px] text-gray-400">-</div>
+         </div>
+         <!-- Empty div for purple divider spacing -->
+         <div v-if="index === 4" class="w-1"></div>
+        </template>
+       </div>
       </div>
-      
+
       <!-- Talisman Configuration - ALWAYS visible -->
       <div class="mt-12 mb-4">
        <div class="flex items-center gap-2 mb-3">
@@ -955,9 +1082,9 @@
          
          <!-- Talisman Stem Cell -->
          <div v-else class="relative w-28 flex-shrink-0">
-          <div 
+          <div
            :id="`talisman-stem-${index}`"
-           class="aspect-square p-3 transition-all duration-300 relative flex flex-col items-center justify-center border-2 border-teal-500"
+           class="aspect-square p-3 transition-all duration-300 relative flex flex-col items-center justify-center border-2 border-teal-500 cursor-pointer"
            :class="[
             pillar.isEmpty || !pillar.stem ? 'bg-gray-50 border-dashed opacity-40' : '',
             !pillar.isEmpty && (hoveredNode === `talisman-stem-${index}` ? 'shadow-lg scale-105' : ''),
@@ -1006,7 +1133,7 @@
            </div>
            
            <!-- Pinyin name (hidden on mobile for compact view) -->
-           <div v-if="!pillar.isUnknown && pillar.stemName" class="text-xs text-gray-700 mb-1 mobile-hide">{{ pillar.stemName }}</div>
+           <div v-if="!pillar.isUnknown && pillar.stemName" class="text-xs text-gray-700 mb-1 hidden-mobile sm:block">{{ pillar.stemName }}</div>
            <!-- Chinese character -->
            <div v-if="pillar.stem" class="text-2xl font-bold text-black">{{ pillar.stem.chinese }}</div>
            <div v-else class="text-xl text-gray-400">-</div>
@@ -1015,7 +1142,7 @@
             {{ pillar.stem.element.replace('Yang ', '').replace('Yin ', '') }} {{ pillar.stem.element.includes('Yang') ? '+' : '-' }}
            </div>
            <!-- Ten God (hidden on mobile for compact view) -->
-           <div v-if="!pillar.isUnknown" class="text-xs mt-1 text-gray-900 mobile-hide">{{ pillar.tenGod || '' }}</div>
+           <div v-if="!pillar.isUnknown" class="text-xs mt-1 text-gray-900 hidden-mobile sm:block">{{ pillar.tenGod || '' }}</div>
            
            <!-- Combination Badges (bottom-right) -->
            <div v-if="pillar.stemCombinations && pillar.stemCombinations.length > 0" 
@@ -1063,9 +1190,9 @@
          
          <!-- Talisman Branch Cell -->
          <div v-else class="relative w-28 flex-shrink-0">
-          <div 
+          <div
            :id="`talisman-branch-${index}`"
-           class="pb-0 pt-2 px-3 transition-all duration-300 relative flex flex-col items-center justify-start border-2 border-teal-500"
+           class="pb-0 pt-2 px-3 transition-all duration-300 relative flex flex-col items-center justify-start border-2 border-teal-500 cursor-pointer"
            :class="[
             pillar.isEmpty || !pillar.branch ? 'bg-gray-50 border-dashed opacity-40' : '',
             !pillar.isEmpty && (hoveredNode === `talisman-branch-${index}` ? 'shadow-lg scale-105' : ''),
@@ -1119,14 +1246,14 @@
            <!-- Main content -->
            <div class="flex-1 flex flex-col items-center justify-center pb-10">
            <!-- Branch pinyin name (hidden on mobile for compact view) -->
-           <div v-if="!pillar.isUnknown && pillar.branchName" class="text-xs text-gray-700 mb-1 mobile-hide">{{ pillar.branchName }}</div>
+           <div v-if="!pillar.isUnknown && pillar.branchName" class="text-xs text-gray-700 mb-1 hidden-mobile sm:block">{{ pillar.branchName }}</div>
             <!-- Chinese character -->
             <div v-if="pillar.branch" class="text-2xl font-bold text-black">{{ pillar.branch.chinese }}</div>
             <div v-else class="text-xl text-gray-400">-</div>
             <!-- Animal name (hidden on mobile for compact view) -->
             <div
              v-if="!pillar.isUnknown && pillar.branch && !['Fire', 'Water', 'Metal', 'Wood', 'Earth'].includes(pillar.branch.animal)"
-             class="text-xs text-gray-800 mobile-hide"
+             class="text-xs text-gray-800 hidden-mobile sm:block"
             >
              {{ pillar.branch.animal }}
             </div>
@@ -1152,35 +1279,66 @@
             </div>
            </div>
            
-           <!-- Hidden Heavenly Stems -->
+           <!-- Qi Display - Single row at bottom with Primary Qi (本氣) + Hidden Stems (藏干) -->
            <div v-if="pillar.hiddenStems || pillar.hiddenQi" class="absolute bottom-0 left-0 right-0 flex overflow-hidden h-10">
-            <div 
-             v-for="(qiData, stem) in getHiddenStemsWithWeights(pillar)" 
-             :key="stem"
+            <!-- Primary Qi (本氣) - index 0, shown with border-r separator -->
+            <div
+             v-if="getPrimaryQiData(pillar)"
+             class="flex flex-col items-center justify-start text-black overflow-hidden pt-1 pb-0.5 h-full border-r-2 border-white/50"
+             :style="{
+              ...getNodeBgColor(getStemElement(getPrimaryQiData(pillar).stem), getPrimaryQiData(pillar).color),
+              width: `${getPrimaryQiData(pillar).weight}%`
+             }"
+             :title="`Primary Qi (本氣): ${getPrimaryQiData(pillar).stem} - ${getPrimaryQiData(pillar).god ? getPrimaryQiData(pillar).god + ' - ' : ''}Score: ${getPrimaryQiData(pillar).score || 'N/A'} (${getPrimaryQiData(pillar).weight}%)`"
+            >
+             <div class="text-[8px] text-gray-600 leading-tight hidden-mobile sm:block">{{ getPrimaryQiData(pillar).stem }}</div>
+             <div class="text-[11px] font-bold text-black leading-tight">{{ stemMappings[getPrimaryQiData(pillar).stem] || getPrimaryQiData(pillar).stem }}</div>
+             <div class="text-[8px] text-gray-800 font-medium leading-tight hidden-mobile sm:block">{{ getPrimaryQiData(pillar).god || '' }}</div>
+            </div>
+            <!-- Hidden Stems (藏干) - index 1+, smaller display -->
+            <div
+             v-for="(hidden, idx) in getHiddenStemsData(pillar)"
+             :key="idx"
              class="flex flex-col items-center justify-start text-black overflow-hidden pt-1 pb-0.5 h-full"
              :style="{
-              ...getNodeBgColor(getStemElement(stem), qiData.color),
-              width: `${qiData.weight}%`
+              ...getNodeBgColor(getStemElement(hidden.stem), hidden.color),
+              width: `${hidden.weight}%`
              }"
-             :title="`${stem}: ${qiData.god ? qiData.god + ' - ' : ''}Score: ${qiData.score || 'N/A'} (${qiData.weight}%)`"
+             :title="`Hidden Stem (藏干): ${hidden.stem} - ${hidden.god ? hidden.god + ' - ' : ''}Score: ${hidden.score || 'N/A'} (${hidden.weight}%)`"
             >
-             <div class="text-[8px] text-gray-600 leading-tight mobile-hide">{{ stem }}</div>
-             <div class="text-[10px] text-black leading-tight">{{ stemMappings[stem] || stem }}</div>
-             <div class="text-[8px] text-gray-800 font-medium leading-tight mobile-hide">{{ qiData.god || '' }}</div>
+             <div class="text-[7px] text-gray-500 leading-tight hidden-mobile sm:block">{{ hidden.stem }}</div>
+             <div class="text-[9px] text-black leading-tight">{{ stemMappings[hidden.stem] || hidden.stem }}</div>
+             <div class="text-[7px] text-gray-700 leading-tight hidden-mobile sm:block">{{ hidden.god || '' }}</div>
             </div>
            </div>
           </div>
          </div>
         </template>
        </div>
+
+       <!-- Qi Phase Row for Talisman Pillars (十二長生) -->
+       <div class="flex gap-1 mt-1">
+        <template v-for="(pillar, index) in talismanPillarsDisplay" :key="`talisman-qiphase-${index}`">
+         <div class="w-28 flex-shrink-0 text-center">
+          <div v-if="pillar.qiPhase"
+             class="text-[10px] px-1.5 py-0.5 rounded-full inline-flex items-center gap-0.5"
+             :class="getQiPhaseClass(pillar.qiPhase.strength)"
+             :title="`${pillar.qiPhase.id} (${pillar.qiPhase.english}): ${pillar.qiPhase.description}`">
+           <span class="font-semibold">{{ pillar.qiPhase.chinese }}</span>
+           <span class="text-gray-500 capitalize hidden-mobile sm:inline">{{ pillar.qiPhase.id }}</span>
+          </div>
+          <div v-else-if="pillar.stem || pillar.branch" class="text-[10px] text-gray-400">-</div>
+         </div>
+        </template>
+       </div>
       </div>
      </div>
-     
+
       <!-- Location Pillars Display (地) - Display location nodes WITHOUT badges -->
-      <div v-if="showLocation && locationPillarsOrdered.length > 0" class="relative overflow-x-auto max-w-full mt-6 mb-4">
+      <div v-if="showLocation && locationPillarsOrdered.length > 0" class="relative max-w-full mb-4">
        <div class="mb-2">
         <span class="text-sm font-semibold" :class="locationType === 'overseas' ? 'text-blue-700' : 'text-amber-700'">
-         地 Location: {{ locationType === 'overseas' ? '海外 Overseas' : '鄉土 Birthplace' }}
+         {{ locationType === 'overseas' ? '海外 Overseas' : '鄉土 Birthplace' }}
         </span>
        </div>
        
@@ -1188,9 +1346,9 @@
        <div class="flex gap-1 items-center">
         <template v-for="(pillar, index) in locationPillarsOrdered" :key="`location-stem-${index}`">
          <div class="relative w-28 flex-shrink-0">
-          <div 
+          <div
            :id="`location-stem-${index}`"
-           class="aspect-square p-3 transition-all duration-300 relative flex flex-col items-center justify-center border-2"
+           class="aspect-square p-3 transition-all duration-300 relative flex flex-col items-center justify-center border-2 cursor-pointer"
            :class="[
             hoveredNode === `location-stem-${index}` ? 'shadow-lg scale-105' : 'border-gray-300',
             pillar.locationBorderColor,
@@ -1201,7 +1359,7 @@
           >
            <!-- NO BADGES - just content -->
             <!-- Pinyin name (hidden on mobile for compact view) -->
-            <div v-if="pillar.stemName" class="text-xs text-gray-700 mb-1 mobile-hide">{{ pillar.stemName }}</div>
+            <div v-if="pillar.stemName" class="text-xs text-gray-700 mb-1 hidden-mobile sm:block">{{ pillar.stemName }}</div>
            <!-- Chinese character -->
            <div v-if="pillar.stem" class="text-2xl font-bold text-black">{{ pillar.stem.chinese }}</div>
            <div v-else class="text-xl text-gray-400">-</div>
@@ -1210,7 +1368,7 @@
             {{ pillar.stem.element.replace('Yang ', '').replace('Yin ', '') }} {{ pillar.stem.element.includes('Yang') ? '+' : '-' }}
            </div>
            <!-- Ten God -->
-            <div class="text-xs mt-1 text-gray-900 mobile-hide">{{ pillar.tenGod || '' }}</div>
+            <div class="text-xs mt-1 text-gray-900 hidden-mobile sm:block">{{ pillar.tenGod || '' }}</div>
           </div>
          </div>
         </template>
@@ -1234,9 +1392,9 @@
        <div class="flex gap-1 overflow-visible items-stretch">
         <template v-for="(pillar, index) in locationPillarsOrdered" :key="`location-branch-${index}`">
          <div class="relative w-28 flex-shrink-0">
-          <div 
+          <div
            :id="`location-branch-${index}`"
-           class="pb-0 pt-2 px-3 transition-all duration-300 relative flex flex-col items-center justify-start border-2"
+           class="pb-0 pt-2 px-3 transition-all duration-300 relative flex flex-col items-center justify-start border-2 cursor-pointer"
            :class="[
             hoveredNode === `location-branch-${index}` ? 'shadow-lg scale-105' : 'border-gray-300',
             pillar.locationBorderColor,
@@ -1252,14 +1410,14 @@
            <!-- Main content -->
            <div class="flex-1 flex flex-col items-center justify-center pb-10">
             <!-- Branch pinyin name (hidden on mobile for compact view) -->
-            <div v-if="pillar.branchName" class="text-xs text-gray-700 mb-1 mobile-hide">{{ pillar.branchName }}</div>
+            <div v-if="pillar.branchName" class="text-xs text-gray-700 mb-1 hidden-mobile sm:block">{{ pillar.branchName }}</div>
             <!-- Chinese character -->
             <div v-if="pillar.branch" class="text-2xl font-bold text-black">{{ pillar.branch.chinese }}</div>
             <div v-else class="text-xl text-gray-400">-</div>
             <!-- Animal name (hidden on mobile for compact view) -->
             <div
              v-if="pillar.branch && !['Fire', 'Water', 'Metal', 'Wood', 'Earth'].includes(pillar.branch.animal)"
-             class="text-xs text-gray-800 mobile-hide"
+             class="text-xs text-gray-800 hidden-mobile sm:block"
             >
              {{ pillar.branch.animal }}
             </div>
@@ -1278,7 +1436,7 @@
                 :title="`${stem}: ${god || 'Unknown'} - ${pillar.hiddenQi ? pillar.hiddenQi[stem] || 'N/A' : 'N/A'}`"
              >
               <div class="text-black font-medium">{{ stemMappings[stem] || stem }}</div>
-              <div v-if="god" class="ml-0.5 text-gray-600 mobile-hide">{{ god }}</div>
+              <div v-if="god" class="ml-0.5 text-gray-600 hidden-mobile sm:block">{{ god }}</div>
              </div>
             </div>
            </div>
@@ -1308,6 +1466,60 @@
       </div>
      </div>
      
+      <!-- Wealth/Influence Storage Analysis -->
+      <div v-if="chartData?.wealth_storage_analysis?.storages?.length > 0" class="mt-2 p-3 bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-300 max-w-2xl">
+       <div class="text-[10px] font-semibold text-amber-900 mb-1">💰 Storage Analysis (财库/官库)</div>
+       <div class="text-[10px] text-gray-700">
+        {{ chartData.wealth_storage_analysis.summary }}
+       </div>
+       <div v-for="(storage, idx) in chartData.wealth_storage_analysis.storages" :key="idx"
+          class="mt-2 p-2 bg-white/50 rounded border"
+          :class="storage.storage_type === 'wealth' ? 'border-yellow-200' : 'border-purple-200'">
+        <div class="flex items-center gap-2">
+         <!-- Icon based on storage SIZE only (💎 large, 🪙 small) -->
+         <span class="text-xl" :style="getStorageIconStyle(storage)">{{ getStorageAnalysisIcon(storage) }}</span>
+         <div>
+          <div class="text-[10px] font-semibold" :class="storage.storage_type === 'wealth' ? 'text-amber-800' : 'text-purple-800'">
+           {{ storage.branch_chinese }} ({{ storage.branch }}) @ {{ storage.position.toUpperCase() }}
+           <!-- Storage size badge -->
+           <span class="ml-1 px-1 py-0.5 rounded text-[8px]"
+              :class="storage.storage_size === 'large' ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-700'">
+            {{ storage.storage_size === 'large' ? '大财库' : '小财库' }}
+           </span>
+           <!-- Activation status badge with border color indicating state -->
+           <span class="ml-1 px-1.5 py-0.5 rounded text-[8px]"
+              :class="storage.is_opened && storage.is_filled
+                ? 'bg-yellow-300 text-yellow-900 font-bold border border-yellow-500'
+                : storage.is_opened
+                  ? 'bg-green-100 text-green-800 border border-green-400'
+                  : storage.is_filled
+                    ? 'bg-blue-100 text-blue-800 border border-blue-400'
+                    : 'bg-gray-100 text-gray-600 border border-dashed border-gray-400'">
+            {{ storage.is_opened && storage.is_filled ? '✨ Maximum' : storage.is_opened ? '🔓 Opened' : storage.is_filled ? '💧 Filled' : '⏳ Latent' }}
+           </span>
+          </div>
+          <div class="text-[9px] text-gray-600">
+           Stores {{ storage.stored_element }} • Pillar: {{ storage.pillar_chinese }}
+          </div>
+          <!-- Opener status -->
+          <div v-if="storage.is_opened" class="text-[9px] text-green-700 mt-0.5">
+           ✓ Opened by {{ storage.opener_branch }} ({{ storage.opener_positions?.join(', ') }})
+          </div>
+          <div v-else class="text-[9px] text-gray-500 mt-0.5">
+           ○ Needs {{ storage.opener_branch }} to open
+          </div>
+          <!-- Filler status -->
+          <div v-if="storage.is_filled" class="text-[9px] text-blue-700 mt-0.5">
+           ✓ Filled from {{ storage.filler_positions?.join(', ') }}
+          </div>
+          <div v-else class="text-[9px] text-gray-500 mt-0.5">
+           ○ Needs {{ storage.filler_stems?.join('/') }} ({{ storage.storage_type === 'wealth' ? 'DW/IW' : 'DO/7K' }}) to fill
+          </div>
+         </div>
+        </div>
+       </div>
+      </div>
+      
      <!-- Analysis Period Info -->
      <div v-if="chartData?.analysis_info && (chartData.analysis_info.has_luck_pillar || chartData.analysis_info.has_annual || chartData.analysis_info.has_monthly || chartData.analysis_info.has_daily || chartData.analysis_info.has_hourly)" class="mt-2 p-3 bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 max-w-2xl">
       <div class="text-[10px] font-semibold text-indigo-900 mb-1">📅 Analysis Period</div>
@@ -1379,93 +1591,622 @@
        No major interactions (harmonies/clashes) detected with natal chart.
       </div>
      </div>
+
+      <!-- Unit Tracker Timeline (Qi Story Tracking) -->
+      <div v-if="chartData?.unit_tracker"
+         class="mt-4 p-4 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 max-w-2xl rounded-lg">
+       <div class="flex items-center justify-between mb-3 cursor-pointer" @click="showUnitTracker = !showUnitTracker">
+        <div class="flex items-center gap-2">
+         <div class="text-sm font-bold text-emerald-800">⚔️ Qi Story Timeline</div>
+         <span class="text-[10px] px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded">
+          {{ chartData.unit_tracker.day_master_chinese }} ({{ chartData.unit_tracker.day_master }}) Day Master
+         </span>
+        </div>
+        <div class="flex items-center gap-2">
+         <span class="text-[10px] text-emerald-600">
+          {{ chartData.unit_tracker.summary?.total_interactions }} interactions • {{ Math.round(chartData.unit_tracker.summary?.final_total_qi) }} qi
+         </span>
+         <span class="text-emerald-600 transition-transform" :class="showUnitTracker ? 'rotate-180' : ''">▼</span>
+        </div>
+       </div>
+
+       <!-- Timeline Content (Collapsible) -->
+       <div v-show="showUnitTracker" class="space-y-3">
+        <!-- Phase Timeline -->
+        <div v-for="(phase, phaseIdx) in chartData.unit_tracker.timeline" :key="phaseIdx"
+           class="border border-emerald-200 rounded-lg overflow-hidden bg-white">
+         <!-- Phase Header -->
+         <div class="flex items-center justify-between p-2 bg-emerald-100 cursor-pointer"
+            @click="togglePhase(phase.phase)">
+          <div class="flex items-center gap-2">
+           <span class="text-[10px] font-bold text-emerald-800">{{ phase.phase_label }}</span>
+           <span class="text-[9px] px-1.5 py-0.5 bg-emerald-200 text-emerald-700 rounded">
+            {{ phase.event_count }} interactions
+           </span>
+          </div>
+          <div class="flex items-center gap-2">
+           <span class="text-[9px] text-emerald-600">Total: {{ Math.round(phase.running_total) }} qi</span>
+           <span class="text-emerald-600 text-xs transition-transform" :class="expandedPhases[phase.phase] ? 'rotate-180' : ''">▼</span>
+          </div>
+         </div>
+
+         <!-- Phase Events (Collapsible) -->
+         <div v-show="expandedPhases[phase.phase]" class="p-2 space-y-1.5 bg-white">
+          <template v-for="(event, eventIdx) in phase.events" :key="eventIdx">
+           <!-- Interaction Event -->
+           <div v-if="event.type === 'interaction'"
+              class="p-2 rounded border text-[9px]"
+              :class="event.interaction_type === 'control' ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'">
+            <div class="flex items-center justify-between mb-1">
+             <span class="font-bold" :class="event.interaction_type === 'control' ? 'text-red-700' : 'text-green-700'">
+              {{ event.interaction_type === 'control' ? '⚔️ Control (克)' : '🌱 Generation (生)' }}
+             </span>
+             <span class="text-gray-500">Step {{ event.step + 1 }}</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+             <!-- Source -->
+             <div class="p-1.5 bg-white rounded border border-gray-200">
+              <div class="font-semibold text-gray-800">
+               <!-- Pillar unity: stem info -->
+               <template v-if="event.source?.stem_chinese">
+                {{ event.source?.stem_chinese }} {{ event.source?.stem }}
+                <span class="text-[8px] px-1 py-0.5 bg-gray-100 text-gray-600 ml-1">{{ event.source?.ten_god }}</span>
+               </template>
+               <!-- Cross-pillar: element info -->
+               <template v-else>
+                {{ event.source?.element }}
+                <span class="text-[8px] px-1 py-0.5 bg-gray-100 text-gray-600 ml-1">{{ event.source?.node }}</span>
+               </template>
+              </div>
+              <div class="text-gray-600">
+               {{ event.source?.qi_before?.toFixed?.(1) || event.source?.qi_before }} → {{ event.source?.qi_after?.toFixed?.(1) || event.source?.qi_after }}
+               <span :class="event.source?.qi_change < 0 ? 'text-red-600' : 'text-green-600'">
+                ({{ event.source?.qi_change > 0 ? '+' : '' }}{{ event.source?.qi_change?.toFixed(1) }})
+               </span>
+              </div>
+             </div>
+             <!-- Target -->
+             <div class="p-1.5 bg-white rounded border border-gray-200">
+              <div class="font-semibold text-gray-800">
+               <!-- Pillar unity: stem info -->
+               <template v-if="event.target?.stem_chinese">
+                {{ event.target?.stem_chinese }} {{ event.target?.stem }}
+                <span class="text-[8px] px-1 py-0.5 bg-gray-100 text-gray-600 ml-1">{{ event.target?.ten_god }}</span>
+               </template>
+               <!-- Cross-pillar: element info -->
+               <template v-else>
+                {{ event.target?.element }}
+                <span class="text-[8px] px-1 py-0.5 bg-gray-100 text-gray-600 ml-1">{{ event.target?.node }}</span>
+               </template>
+              </div>
+              <div class="text-gray-600">
+               {{ event.target?.qi_before?.toFixed?.(1) || event.target?.qi_before }} → {{ event.target?.qi_after?.toFixed?.(1) || event.target?.qi_after }}
+               <span :class="event.target?.qi_change < 0 ? 'text-red-600' : 'text-green-600'">
+                ({{ event.target?.qi_change > 0 ? '+' : '' }}{{ event.target?.qi_change?.toFixed(1) }})
+               </span>
+              </div>
+             </div>
+            </div>
+            <!-- Math Formula Display -->
+            <div v-if="event.math_formula" class="mt-1.5 flex items-center gap-2">
+             <code class="text-[8px] font-mono bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">
+              {{ event.math_formula }}
+             </code>
+             <span v-if="event.distance && event.distance > 1"
+                 class="text-[7px] px-1 py-0.5 bg-amber-100 text-amber-700 rounded">
+              d={{ event.distance }} (×{{ event.distance_multiplier }})
+             </span>
+            </div>
+           </div>
+
+           <!-- Seasonal Adjustment Event -->
+           <div v-else-if="event.type === 'seasonal'"
+              class="p-2 rounded border text-[9px]"
+              :class="event.multiplier > 1 ? 'bg-green-50 border-green-200' : 'bg-orange-50 border-orange-200'">
+            <div class="flex items-center justify-between mb-1">
+             <span class="font-bold" :class="event.multiplier > 1 ? 'text-green-700' : 'text-orange-700'">
+              {{ event.multiplier > 1 ? '🌿 Boosted' : '🍂 Weakened' }}
+             </span>
+             <span :class="[
+               'px-1.5 py-0.5 rounded text-[8px] font-medium',
+               event.multiplier > 1 ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'
+             ]">
+              {{ event.seasonal_state }}
+             </span>
+            </div>
+            <div class="flex items-center flex-wrap gap-1.5">
+             <!-- Stem with polarity and element -->
+             <span class="font-semibold">
+              {{ event.polarity }} {{ event.element }}
+              <span class="text-gray-500">({{ event.stem_chinese }} {{ event.stem }})</span>
+             </span>
+             <!-- Location -->
+             <span class="text-gray-600 text-[8px]">in</span>
+             <span class="px-1 py-0.5 bg-gray-100 rounded text-[8px] font-medium text-gray-700">
+              {{ event.location || event.node }}
+             </span>
+            </div>
+            <div class="flex items-center gap-2 mt-1 text-[8px]">
+             <span class="text-gray-600">×{{ event.multiplier?.toFixed(3) }}</span>
+             <span :class="event.qi_change > 0 ? 'text-green-600' : 'text-orange-600'">
+              {{ event.qi_before?.toFixed(1) }} → {{ event.qi_after?.toFixed(1) }}
+              ({{ event.qi_change > 0 ? '+' : '' }}{{ event.qi_change?.toFixed(1) }})
+             </span>
+            </div>
+           </div>
+
+           <!-- Combination Event -->
+           <div v-else-if="event.type === 'combination'"
+              class="p-2 rounded border text-[9px] bg-blue-50 border-blue-200">
+            <div class="flex items-center justify-between mb-1">
+             <span class="font-bold text-blue-700">
+              {{ event.is_transformed ? '✨ Transformation' : '🔗 Combination' }}
+             </span>
+             <span class="text-gray-500">Step {{ event.step + 1 }}</span>
+            </div>
+            <div class="flex items-center flex-wrap gap-2">
+             <span class="px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded text-[8px] font-medium">
+              {{ event.combination_type?.replace(/_/g, ' ') }}
+             </span>
+             <span class="font-mono text-[8px] text-gray-700">{{ event.pattern }}</span>
+             <span v-if="event.is_transformed" class="text-purple-600">→ {{ event.element }}</span>
+             <span class="text-green-600 font-medium">+{{ event.boost_amount?.toFixed(1) }}</span>
+            </div>
+
+            <!-- Calculation Details (Always Visible) -->
+            <div v-if="event.calculation_details" class="mt-2 p-2 bg-white rounded border border-blue-200 space-y-2">
+
+             <!-- Combination Type Header -->
+             <div class="flex items-center gap-2 pb-1.5 border-b border-blue-100">
+              <span class="text-[8px] text-gray-500">📐</span>
+              <span class="font-bold text-blue-800">{{ event.calculation_details.combination_type_chinese }}</span>
+              <span class="text-gray-500">{{ event.calculation_details.combination_type?.replace(/_/g, ' ') }}</span>
+             </div>
+
+             <!-- Step-by-Step Calculation -->
+             <div class="space-y-1.5">
+              <template v-for="(calcStep, stepIdx) in event.calculation_details.steps" :key="stepIdx">
+               <div class="p-1.5 bg-gray-50 rounded">
+                <div class="flex items-center gap-2 mb-0.5">
+                 <span class="w-4 h-4 flex items-center justify-center bg-blue-500 text-white text-[7px] font-bold rounded-full">
+                  {{ calcStep.step }}
+                 </span>
+                 <span class="font-medium text-gray-700">{{ calcStep.operation }}</span>
+                </div>
+
+                <!-- Node Qi Values (Step 1) -->
+                <div v-if="calcStep.values" class="ml-5 mt-1">
+                 <div v-for="(nodeInfo, nIdx) in calcStep.values" :key="nIdx"
+                    class="flex items-center gap-2 text-[8px] py-0.5">
+                  <span class="px-1 py-0.5 bg-gray-200 rounded text-[7px]">{{ nodeInfo.node_id }}</span>
+                  <span v-if="nodeInfo.branch" class="text-gray-600">{{ nodeInfo.branch }}</span>
+                  <span class="text-gray-400">→</span>
+                  <span class="font-medium">
+                   {{ nodeInfo.primary_qi_stem_chinese || nodeInfo.stem_chinese }}
+                   ({{ nodeInfo.primary_qi_element || nodeInfo.element }})
+                  </span>
+                  <span class="text-gray-400">:</span>
+                  <span class="font-mono text-blue-600">{{ nodeInfo.current_qi }}</span>
+                 </div>
+                </div>
+
+                <!-- Formula (Steps 2+) -->
+                <div v-if="calcStep.formula" class="ml-5 mt-1">
+                 <code class="font-mono text-[8px] text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded">
+                  {{ calcStep.formula }} = {{ calcStep.result }}
+                 </code>
+                </div>
+
+                <!-- Multiplier Explanation -->
+                <div v-if="calcStep.explanation" class="ml-5 mt-0.5 text-[7px] text-gray-500 italic">
+                 {{ calcStep.explanation }}
+                </div>
+               </div>
+              </template>
+             </div>
+
+             <!-- Final Result Summary -->
+             <div class="pt-1.5 border-t border-blue-100 flex items-center justify-between">
+              <span class="text-gray-600">Final Score:</span>
+              <span class="font-bold text-green-600">+{{ event.calculation_details.final_score }}</span>
+             </div>
+
+             <!-- Transformation Status -->
+             <div class="text-[7px] text-gray-500 italic">
+              {{ event.calculation_details.transformation_reason }}
+             </div>
+            </div>
+           </div>
+
+           <!-- Conflict Event -->
+           <div v-else-if="event.type === 'conflict'"
+              class="p-2 rounded border text-[9px] bg-red-50 border-red-200">
+            <div class="flex items-center justify-between mb-1">
+             <span class="font-bold text-red-700">⚠️ {{ event.conflict_type }}</span>
+             <span class="text-gray-500">Step {{ event.step + 1 }}</span>
+            </div>
+            <div class="flex items-center flex-wrap gap-2">
+             <span class="font-mono text-[8px] text-gray-700">{{ event.pattern }}</span>
+             <span v-if="event.severity" class="text-[8px] text-gray-500">({{ event.severity }})</span>
+             <span v-if="event.victim" class="text-red-600 font-medium">
+              -{{ event.victim?.damage?.toFixed(1) }}
+             </span>
+            </div>
+           </div>
+          </template>
+
+          <!-- No interactions message -->
+          <div v-if="phase.event_count === 0" class="text-[9px] text-gray-500 italic p-2">
+           No Wu Xing interactions in this phase
+          </div>
+
+          <!-- Element Totals at End of Phase -->
+          <div v-if="phase.element_totals" class="mt-2 pt-2 border-t border-gray-200">
+           <div class="text-[9px] text-gray-500 mb-1">Element Totals after this phase:</div>
+           <div class="flex gap-1 flex-wrap">
+            <span v-for="(value, elem) in phase.element_totals" :key="elem"
+               class="px-1.5 py-0.5 rounded text-[8px] font-medium"
+               :class="{
+                'bg-green-100 text-green-800': elem === 'Wood',
+                'bg-red-100 text-red-800': elem === 'Fire',
+                'bg-yellow-100 text-yellow-800': elem === 'Earth',
+                'bg-gray-200 text-gray-800': elem === 'Metal',
+                'bg-blue-100 text-blue-800': elem === 'Water'
+               }">
+             {{ elem }}: {{ value }}
+            </span>
+           </div>
+          </div>
+         </div>
+        </div>
+
+        <!-- Unit Stories Section (Enhanced with Mini-Pillar Visualization) -->
+        <div class="border border-teal-200 rounded-lg overflow-hidden bg-white mt-3">
+         <div class="flex items-center justify-between p-2 bg-teal-100 cursor-pointer"
+            @click="showUnitStories = !showUnitStories">
+          <span class="text-[10px] font-bold text-teal-800">📖 Unit Narratives</span>
+          <span class="text-teal-600 text-xs transition-transform" :class="showUnitStories ? 'rotate-180' : ''">▼</span>
+         </div>
+         <div v-show="showUnitStories" class="p-2 space-y-3">
+          <template v-for="(stories, nodeId) in chartData.unit_tracker.unit_stories" :key="nodeId">
+           <div v-for="story in stories" :key="story.stem"
+              class="p-3 bg-gradient-to-br from-gray-50 to-white rounded-lg border border-gray-200 shadow-sm">
+
+            <!-- Header with Mini-Pillar Visualization -->
+            <div class="flex items-start gap-3 mb-3">
+             <!-- Mini Pillar Chart (4 pillars, focused one highlighted) -->
+             <div class="flex gap-0.5 p-1.5 bg-gray-100 rounded-md flex-shrink-0">
+              <template v-for="(pillarKey, pIdx) in ['h', 'd', 'm', 'y']" :key="pIdx">
+               <div class="flex flex-col gap-0.5">
+                <!-- Mini HS cell -->
+                <div
+                 class="w-6 h-6 rounded-sm flex items-center justify-center text-[8px] font-bold transition-all"
+                 :class="[
+                  nodeId === `hs_${pillarKey}` ? 'ring-2 ring-blue-500 shadow-md scale-110 z-10' : 'opacity-40 blur-[0.5px]'
+                 ]"
+                 :style="getMiniPillarStyle(pillarKey, 'hs', nodeId)">
+                 {{ getMiniPillarChinese(pillarKey, 'hs') }}
+                </div>
+                <!-- Mini EB cell with hidden stems support -->
+                <div class="flex flex-col gap-0.5">
+                 <!-- EB branch cell -->
+                 <div
+                  class="w-6 h-6 rounded-sm flex items-center justify-center text-[8px] font-bold transition-all"
+                  :class="[
+                   nodeId === `eb_${pillarKey}` && story.hidden_position === undefined ? 'ring-2 ring-blue-500 shadow-md scale-110 z-10' :
+                   nodeId === `eb_${pillarKey}` && story.hidden_position !== undefined ? 'opacity-70' : 'opacity-40 blur-[0.5px]'
+                  ]"
+                  :style="getMiniPillarStyle(pillarKey, 'eb', nodeId)">
+                  {{ getMiniPillarChinese(pillarKey, 'eb') }}
+                 </div>
+                 <!-- Hidden stems row (only show for matching EB pillar with hidden stems) -->
+                 <div v-if="nodeId === `eb_${pillarKey}` && story.hidden_position !== undefined"
+                    class="flex gap-0.5 justify-center">
+                  <template v-for="(qi, qiIdx) in getEbHiddenStems(pillarKey)" :key="qiIdx">
+                   <div
+                    class="w-4 h-4 rounded-sm flex items-center justify-center text-[6px] font-bold transition-all"
+                    :class="[
+                     qiIdx === story.hidden_position ? 'ring-2 ring-blue-500 shadow-md scale-110 z-10' : 'opacity-50'
+                    ]"
+                    :style="{ backgroundColor: qi.hex_color, color: '#1f2937' }"
+                    :title="`${qi.stem_chinese} ${qi.stem} (${qi.element})`">
+                    {{ qi.stem_chinese }}
+                   </div>
+                  </template>
+                 </div>
+                </div>
+               </div>
+              </template>
+             </div>
+
+             <!-- Unit Info -->
+             <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+               <span class="text-lg font-bold" :style="{ color: getElementHexColor(story.element) }">
+                {{ story.stem_chinese }}
+               </span>
+               <span class="text-sm text-gray-700">{{ story.stem }}</span>
+               <span class="px-1.5 py-0.5 rounded text-[9px] font-medium"
+                  :class="getTenGodBadgeClass(story.ten_god_id)">
+                {{ story.ten_god }} {{ story.ten_god_english }}
+               </span>
+              </div>
+              <div class="text-[10px] text-gray-500 mt-0.5">
+               {{ getNodeLabel(nodeId) }}{{ story.hidden_position !== undefined ? ' Hidden Stem' : '' }} · {{ story.element }} {{ story.polarity }}
+              </div>
+             </div>
+
+             <!-- Qi Summary -->
+             <div class="text-right flex-shrink-0">
+              <div class="text-sm font-bold" :class="story.final_qi >= story.initial_qi ? 'text-green-600' : 'text-red-600'">
+               {{ story.final_qi?.toFixed(1) }}
+              </div>
+              <div class="text-[9px] text-gray-500">
+               from {{ story.initial_qi?.toFixed(1) }}
+              </div>
+              <div class="text-[9px]" :class="(story.final_qi - story.initial_qi) >= 0 ? 'text-green-500' : 'text-red-500'">
+               {{ (story.final_qi - story.initial_qi) >= 0 ? '+' : '' }}{{ (story.final_qi - story.initial_qi)?.toFixed(1) }}
+              </div>
+             </div>
+            </div>
+
+            <!-- Event Timeline -->
+            <div v-if="story.events && story.events.length > 0" class="mt-2 border-t border-gray-100 pt-2">
+             <div class="text-[9px] text-gray-500 mb-1.5 font-medium">Event Timeline ({{ story.events.length }} events)</div>
+             <div class="relative pl-3 space-y-1.5">
+              <!-- Timeline line -->
+              <div class="absolute left-[5px] top-1 bottom-1 w-[2px] bg-gradient-to-b from-gray-300 via-gray-200 to-gray-100 rounded-full"></div>
+
+              <div v-for="(event, evtIdx) in story.events" :key="evtIdx"
+                 class="relative flex items-start gap-2 text-[9px]">
+               <!-- Timeline dot -->
+               <div class="absolute left-[-8px] top-1 w-2 h-2 rounded-full border-2 border-white shadow-sm"
+                  :class="getEventDotClass(event)"></div>
+
+               <!-- Event content -->
+               <div class="flex-1 pl-2 py-0.5 rounded bg-gray-50/50">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                 <!-- Event type icon -->
+                 <span class="font-medium" :class="getEventTypeClass(event)">
+                  {{ getEventIcon(event) }}
+                 </span>
+                 <!-- Event description -->
+                 <span class="text-gray-700">{{ getEventDescription(event) }}</span>
+                </div>
+                <!-- Qi change -->
+                <div v-if="event.qi_change !== undefined && event.qi_change !== 0"
+                   class="text-[8px] mt-0.5"
+                   :class="event.qi_change >= 0 ? 'text-green-600' : 'text-red-600'">
+                 {{ event.qi_change >= 0 ? '+' : '' }}{{ event.qi_change?.toFixed(1) }} qi
+                 <span v-if="event.qi_before !== undefined" class="text-gray-400">
+                  ({{ event.qi_before?.toFixed(1) }} → {{ event.qi_after?.toFixed(1) }})
+                 </span>
+                </div>
+               </div>
+              </div>
+             </div>
+            </div>
+
+            <!-- Narrative Summary -->
+            <div v-if="story.narrative" class="mt-2 pt-2 border-t border-gray-100">
+             <div class="text-[9px] text-gray-600 italic leading-relaxed">{{ story.narrative }}</div>
+            </div>
+           </div>
+          </template>
+         </div>
+        </div>
+       </div>
+      </div>
+
+      <!-- Palace Danger/Fortune Analysis (宮位吉凶分析) -->
+      <div v-if="chartData?.palace_summary && chartData.palace_summary.length > 0" 
+         class="mt-4 p-4 bg-gradient-to-r from-slate-50 to-gray-50 border border-slate-200 max-w-2xl rounded-lg">
+       <div class="flex items-center justify-between mb-3">
+        <div class="text-sm font-bold text-gray-800">🏛️ 宮位吉凶 Palace Analysis</div>
+        <div class="text-[10px] text-gray-500">Life areas affected by current period</div>
+       </div>
+       
+       <!-- Palace Cards Grid -->
+       <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+        <div v-for="palace in chartData.palace_summary" 
+           :key="palace.palace"
+           class="p-2 rounded-lg border-2 transition-all hover:shadow-md cursor-pointer"
+           :class="getPalaceCardClass(palace)"
+           @click="togglePalaceDetail(palace.palace)">
+         
+         <!-- Palace Header -->
+         <div class="flex items-center justify-between mb-1">
+          <span class="text-lg font-bold" :class="getPalaceTextClass(palace)">
+           {{ getPalaceEmoji(palace.palace) }}
+          </span>
+          <span class="text-lg font-bold" :class="getPalaceStatusTextClass(palace)">
+           {{ palace.status_chinese }}
+          </span>
+         </div>
+         
+         <!-- Palace Name -->
+         <div class="text-xs font-semibold text-gray-800 capitalize">{{ palace.palace }}</div>
+         
+         <!-- Primary Person -->
+         <div class="text-[10px] text-gray-600 capitalize">{{ palace.primary_person }}</div>
+         
+         <!-- Score Bar -->
+         <div class="mt-1.5 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+          <div 
+           class="h-full rounded-full transition-all"
+           :class="getScoreBarClass(palace.net_score)"
+           :style="{ width: getScoreBarWidth(palace.net_score) }">
+          </div>
+         </div>
+         
+         <!-- Score Value -->
+         <div class="text-[9px] mt-0.5" :class="palace.net_score >= 0 ? 'text-green-600' : 'text-red-600'">
+          {{ palace.net_score >= 0 ? '+' : '' }}{{ palace.net_score }}
+         </div>
+        </div>
+       </div>
+       
+       <!-- Expanded Palace Details -->
+       <div v-if="expandedPalace && chartData.palace_analysis" class="mt-3 pt-3 border-t border-slate-200">
+        <div v-if="chartData.palace_analysis[expandedPalace]" class="space-y-2">
+         <!-- Palace Header -->
+         <div class="flex items-center gap-2">
+          <span class="text-xl">{{ getPalaceEmoji(expandedPalace) }}</span>
+          <div>
+           <div class="text-sm font-bold capitalize">{{ expandedPalace }} Palace</div>
+           <div class="text-[10px] text-gray-600">
+            {{ chartData.palace_analysis[expandedPalace].chinese }} - 
+            {{ chartData.palace_analysis[expandedPalace].people_affected.primary }}
+           </div>
+          </div>
+         </div>
+         
+         <!-- Warnings -->
+         <div v-if="chartData.palace_analysis[expandedPalace].insights.warnings.length > 0" 
+            class="space-y-1">
+          <div v-for="(warning, idx) in chartData.palace_analysis[expandedPalace].insights.warnings" 
+             :key="'warn-' + idx"
+             class="p-2 rounded text-[10px]"
+             :class="warning.severity === 'critical' ? 'bg-red-100 border border-red-300' : 'bg-yellow-50 border border-yellow-300'">
+           <div class="flex items-start gap-1">
+            <span class="text-sm">{{ warning.severity === 'critical' ? '🚨' : '⚠️' }}</span>
+            <div>
+             <div class="font-bold" :class="warning.severity === 'critical' ? 'text-red-700' : 'text-yellow-700'">
+              {{ warning.chinese }} {{ warning.message }}
+             </div>
+             <div v-if="warning.health_implication" class="mt-0.5 text-gray-700">
+              💊 {{ warning.health_implication }}
+             </div>
+             <div v-if="warning.detail" class="mt-0.5 text-gray-600 italic">
+              {{ warning.detail }}
+             </div>
+            </div>
+           </div>
+          </div>
+         </div>
+         
+         <!-- Opportunities -->
+         <div v-if="chartData.palace_analysis[expandedPalace].insights.opportunities.length > 0"
+            class="space-y-1">
+          <div v-for="(opp, idx) in chartData.palace_analysis[expandedPalace].insights.opportunities"
+             :key="'opp-' + idx"
+             class="p-2 rounded bg-green-50 border border-green-300 text-[10px]">
+           <div class="flex items-start gap-1">
+            <span class="text-sm">✨</span>
+            <div>
+             <div class="font-bold text-green-700">{{ opp.chinese }} {{ opp.message }}</div>
+             <div v-if="opp.benefit" class="mt-0.5 text-gray-700">{{ opp.benefit }}</div>
+            </div>
+           </div>
+          </div>
+         </div>
+         
+         <!-- Transformation Events -->
+         <div v-if="chartData.palace_analysis[expandedPalace].transformation_events.length > 0"
+            class="space-y-1">
+          <div class="text-[10px] font-semibold text-gray-700">Transformation Events:</div>
+          <div v-for="(trans, idx) in chartData.palace_analysis[expandedPalace].transformation_events"
+             :key="'trans-' + idx"
+             class="p-2 rounded bg-purple-50 border border-purple-300 text-[10px]">
+           <div class="font-bold text-purple-700">{{ trans.chinese }} {{ trans.pattern }}</div>
+           <div class="text-gray-600">{{ trans.message }}</div>
+          </div>
+         </div>
+         
+         <!-- Summary -->
+         <div v-if="chartData.palace_analysis[expandedPalace].insights.summary.length > 0"
+            class="pt-2 border-t border-slate-200">
+          <div v-for="(sum, idx) in chartData.palace_analysis[expandedPalace].insights.summary"
+             :key="'sum-' + idx"
+             class="p-2 rounded text-[10px]"
+             :class="getSummaryClass(sum.level)">
+           <div class="font-bold">{{ sum.message }}</div>
+           <div class="mt-0.5 text-gray-700">{{ sum.recommendation }}</div>
+          </div>
+         </div>
+        </div>
+       </div>
+       
+       <!-- Click hint -->
+       <div class="mt-2 text-[9px] text-gray-400 text-center">
+        Click a palace card to see detailed analysis
+       </div>
+      </div>
     </div>
    </div>
     </div>
    </div>
   
-   <!-- Wu Xing Element Chart - Sticky bar that becomes footer at page bottom -->
+   <!-- Wu Xing Element Chart - Sticky bottom panel (future: tabbed for multiple analyses) -->
    <div
     v-if="chartData?.daymaster_analysis"
     class="wuxing-footer sticky bottom-0"
    >
-   <div class="mx-auto" style="max-width: 800px;">
+   <div class="wuxing-footer-inner">
     <div class="flex items-center justify-between mb-1.5">
      <h3 class="text-xs font-semibold text-gray-800">五行 Wu Xing Elements</h3>
-     <!-- View Mode Toggle -->
-     <div class="flex items-center gap-2">
-      <span class="text-xs text-gray-600">View:</span>
-      <div class="flex bg-gray-100 p-0.5">
-       <button
-        @click="viewMode = 'base'"
-        :class="[
-         'px-2 py-0.5 text-xs transition-all',
-         viewMode === 'base' 
-          ? 'bg-white text-gray-900 shadow-sm' 
-          : 'text-gray-600 hover:text-gray-900'
-        ]"
-       >
-        Base
-       </button>
-       <button
-        @click="viewMode = 'post'"
-        :class="[
-         'px-2 py-0.5 text-xs transition-all',
-         viewMode === 'post' 
-          ? 'bg-white text-gray-900 shadow-sm' 
-          : 'text-gray-600 hover:text-gray-900'
-        ]"
-       >
-        Post Interaction
-       </button>
-      </div>
-     </div>
     </div>
-    <div class="flex items-center justify-between text-[10px] text-gray-500 mb-1">
+    <!-- Side-by-side Natal vs Post comparison -->
+    <div class="grid grid-cols-2 gap-3">
+     <!-- Natal Column -->
      <div>
-      <span v-if="viewMode === 'base'" class="text-blue-700 font-medium">Base: 8 natal nodes, no interactions</span>
-      <span v-else class="text-indigo-700 font-medium">Post: All nodes (natal + luck + talisman + location) with interactions</span>
-     </div>
-     <div>Total: {{ Math.round(viewMode === 'base' ? naiveTotal : finalTotal) }}%</div>
-    </div>
-    <div class="space-y-1">
-     <div v-for="element in fiveElementsWithRelations" :key="element.name">
-      <div class="flex justify-between items-center text-[10px] mb-0.5">
-       <div class="flex items-center gap-1">
-        <span :class="getElementColor(element.name)" class="font-medium">{{ element.name }}</span>
-        <span v-if="element.relationship" class="text-[8px] px-0.5 py-0 bg-gray-100 text-gray-600">{{ element.relationship }}</span>
-        <span v-if="viewMode === 'post' && element.change > 0" class="text-[8px] px-0.5 py-0 bg-green-50 text-green-600 opacity-80">↑</span>
-        <span v-else-if="viewMode === 'post' && element.change < 0" class="text-[8px] px-0.5 py-0 bg-red-50 text-red-600 opacity-80">↓</span>
-       </div>
-       <span class="text-gray-600 text-[10px]">
-        <template v-if="viewMode === 'base'">{{ Math.round(element.naiveRaw) }}pts ({{ Math.round(element.naive) }}%)</template>
-        <template v-else>{{ Math.round(element.naiveRaw) }}→{{ Math.round(element.finalRaw) }}pts ({{ Math.round(element.naive) }}→{{ Math.round(element.final) }}%<span :class="element.change > 0 ? 'text-green-600 font-medium' : element.change < 0 ? 'text-red-600 font-medium' : 'text-gray-400'">{{ element.change > 0 ? '+' : '' }}{{ Math.round(element.change) }}%</span>)</template>
-       </span>
+      <div class="flex items-center justify-between text-[10px] text-purple-700 mb-1">
+       <span class="font-medium">Natal</span>
+       <span class="text-gray-500">{{ Math.round(natalTotal) }}%</span>
       </div>
-      <div class="relative h-4 bg-gray-100 overflow-hidden">
-       <div class="absolute inset-0 flex"><div class="w-1/5 border-r border-gray-200"></div><div class="w-1/5 border-r border-gray-200"></div><div class="w-1/5 border-r border-gray-200"></div><div class="w-1/5 border-r border-gray-200"></div><div class="w-1/5"></div></div>
-       <template v-if="viewMode === 'base'">
-        <div class="absolute top-0 left-0 h-full transition-all duration-500" :class="getElementBgColor(element.name)" :style="`width: ${Math.min((element.naive / maxElementScore) * 100, 100)}%`"></div>
-        <div class="absolute top-0 h-full flex items-center transition-all duration-500" :style="`left: ${Math.min((element.naive / maxElementScore) * 100, 100)}%`"><span class="ml-1 text-[8px] font-medium text-gray-700">{{ Math.round((element.naive / maxElementScore) * 100) }}%</span></div>
-       </template>
-       <template v-else>
-        <template v-if="element.change > 0">
-         <div class="absolute top-0 left-0 h-full rounded-l transition-all duration-500" :class="getElementBgColor(element.name)" :style="`width: ${Math.min((element.naive / maxElementScore) * 100, 100)}%`"></div>
-         <div class="absolute top-0 h-full rounded-r transition-all duration-500" :class="getElementBgColor(element.name)" :style="`left: ${Math.min((element.naive / maxElementScore) * 100, 100)}%; width: ${Math.min(((element.final - element.naive) / maxElementScore) * 100, 100 - (element.naive / maxElementScore) * 100)}%; background-image: repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255,255,255,0.2) 2px, rgba(255,255,255,0.2) 4px);`"></div>
-        </template>
-        <template v-else>
-         <div class="absolute top-0 left-0 h-full transition-all duration-500" :class="[element.change < 0 ? 'border border-dotted' : 'border', getElementBorderColor(element.name)]" :style="`width: ${Math.min((element.naive / maxElementScore) * 100, 100)}%; background-color: transparent;`"></div>
-         <div class="absolute top-0 left-0 h-full transition-all duration-700" :class="[getElementBgColor(element.name), element.change < 0 ? 'opacity-80' : '']" :style="`width: ${Math.min((element.final / maxElementScore) * 100, 100)}%`"></div>
-        </template>
-        <div class="absolute top-0 h-full flex items-center transition-all duration-500" :style="`left: ${Math.min((element.final / maxElementScore) * 100, 100)}%`"><span class="ml-1 text-[8px] font-medium text-gray-700">{{ Math.round((element.final / maxElementScore) * 100) }}%</span></div>
-       </template>
+      <div class="space-y-1">
+       <div v-for="element in fiveElementsWithRelations" :key="'natal-' + element.name">
+        <div class="flex justify-between items-center text-[10px] mb-0.5">
+         <div class="flex items-center gap-1">
+          <span :style="getElementTextStyle(element.name)" class="font-medium">{{ element.name }}</span>
+          <span v-if="element.relationship" class="text-[8px] px-0.5 py-0 bg-gray-100 text-gray-600">{{ element.relationship }}</span>
+         </div>
+         <span class="text-gray-500 text-[9px]">{{ Math.round(element.natal) }}%</span>
+        </div>
+        <div class="relative h-3 bg-gray-100 overflow-hidden">
+         <div class="absolute inset-0 flex"><div class="w-1/5 border-r border-gray-200"></div><div class="w-1/5 border-r border-gray-200"></div><div class="w-1/5 border-r border-gray-200"></div><div class="w-1/5 border-r border-gray-200"></div><div class="w-1/5"></div></div>
+         <!-- Yang bar (solid, darker) -->
+         <div class="absolute top-0 left-0 h-full transition-all duration-500" :style="{ ...getYangBgStyle(element.name), width: `${Math.min((element.yangNatal / maxElementScore) * 100, 100)}%` }" :title="`Yang: ${Math.round(element.yangNatalRaw)}`"></div>
+         <!-- Yin bar (striped, lighter) stacked after Yang -->
+         <div v-if="element.yinNatal > 0" class="absolute top-0 h-full transition-all duration-500" :style="{ ...getYinBgStyle(element.name), left: `${Math.min((element.yangNatal / maxElementScore) * 100, 100)}%`, width: `${Math.min((element.yinNatal / maxElementScore) * 100, 100)}%` }" :title="`Yin: ${Math.round(element.yinNatalRaw)}`"></div>
+        </div>
+       </div>
+      </div>
+     </div>
+     <!-- Post Column -->
+     <div>
+      <div class="flex items-center justify-between text-[10px] text-indigo-700 mb-1">
+       <span class="font-medium">Post</span>
+       <span class="text-gray-500">{{ Math.round(finalTotal) }}%</span>
+      </div>
+      <div class="space-y-1">
+       <div v-for="element in fiveElementsWithRelations" :key="'post-' + element.name">
+        <div class="flex justify-between items-center text-[10px] mb-0.5">
+         <div class="flex items-center gap-1">
+          <span :style="getElementTextStyle(element.name)" class="font-medium">{{ element.name }}</span>
+          <!-- Change indicator -->
+          <span v-if="element.postChange > 0" class="text-[8px] px-0.5 py-0 bg-green-50 text-green-600">+{{ Math.round(element.postChange) }}%</span>
+          <span v-else-if="element.postChange < 0" class="text-[8px] px-0.5 py-0 bg-red-50 text-red-600">{{ Math.round(element.postChange) }}%</span>
+         </div>
+         <span class="text-gray-500 text-[9px]">{{ Math.round(element.final) }}%</span>
+        </div>
+        <div class="relative h-3 bg-gray-100 overflow-hidden">
+         <div class="absolute inset-0 flex"><div class="w-1/5 border-r border-gray-200"></div><div class="w-1/5 border-r border-gray-200"></div><div class="w-1/5 border-r border-gray-200"></div><div class="w-1/5 border-r border-gray-200"></div><div class="w-1/5"></div></div>
+         <!-- Show natal as ghost bar for comparison -->
+         <div class="absolute top-0 left-0 h-full transition-all duration-500 opacity-20" :style="{ ...getElementBgStyle(element.name), width: `${Math.min((element.natal / maxElementScore) * 100, 100)}%` }"></div>
+         <!-- Yang bar (solid, darker) -->
+         <div class="absolute top-0 left-0 h-full transition-all duration-500" :style="{ ...getYangBgStyle(element.name), width: `${Math.min((element.yangFinal / maxElementScore) * 100, 100)}%` }" :title="`Yang: ${Math.round(element.yangFinalRaw)}`"></div>
+         <!-- Yin bar (striped, lighter) stacked after Yang -->
+         <div v-if="element.yinFinal > 0" class="absolute top-0 h-full transition-all duration-500" :style="{ ...getYinBgStyle(element.name), left: `${Math.min((element.yangFinal / maxElementScore) * 100, 100)}%`, width: `${Math.min((element.yinFinal / maxElementScore) * 100, 100)}%` }" :title="`Yin: ${Math.round(element.yinFinalRaw)}`"></div>
+        </div>
+       </div>
       </div>
      </div>
     </div>
    </div>
    </div>
   </main>
-  
+
  </div>
 </template>
 
@@ -1547,7 +2288,13 @@ const testPresets = [
  { date: '1985-03-20', time: '23:00', gender: 'female' },
  { date: '1995-02-10', time: '10:10', gender: 'female' },
  { date: '1946-08-12', time: '07:00', gender: 'male', note: 'Suharsa' },
- { date: '1962-11-03', time: '11:45', gender: 'male', note: 'Malaysian - Mata Ikan' }
+ { date: '1962-11-03', time: '11:45', gender: 'male', note: 'Malaysian - Mata Ikan' },
+ { date: '1954-02-09', time: '09:30', gender: 'female' },
+ { date: '1949-12-19', time: '08:00', gender: 'male' },
+ { date: '1955-10-18', time: '20:00', gender: 'female' },
+ { date: '1992-12-25', time: '', gender: 'female', unknownHour: true },
+ { date: '1945-03-26', time: '18:00', gender: 'male', note: 'batubara, hutan, punya tanah, pulau' },
+ { date: '1969-04-07', time: '18:30', gender: 'female', note: 'Wu Chen wealth storage' }
 ]
 
 // Heavenly Stems for dropdowns (10 stems)
@@ -1648,10 +2395,30 @@ const JIAZI_60 = [
 function isValidJiaziPair(hs, eb) {
   // If either is null, it's valid (partial selection allowed)
   if (!hs || !eb) return true
-  
+
   // Check if the combination exists in JIAZI_60
   return JIAZI_60.some(pair => pair.stem === hs && pair.branch === eb)
 }
+
+// Validation: Check if a date is valid (handles leap years, month lengths)
+function isValidDate(year, month, day) {
+  // Basic range checks
+  if (!year || !month || !day) return false
+  if (month < 1 || month > 12) return false
+  if (day < 1 || day > 31) return false
+  if (year < 1900 || year > 2100) return false
+
+  // Create date and check if it's valid
+  const date = new Date(year, month - 1, day)
+  return date.getFullYear() === year &&
+         date.getMonth() === month - 1 &&
+         date.getDate() === day
+}
+
+// Computed: Check if current birth date inputs are valid
+const isValidBirthDate = computed(() => {
+  return isValidDate(yearInput.value, monthInput.value, dayInput.value)
+})
 
 // Helper: Map luck pillar display index to backend position for node IDs
 // Display: [0=HourLuck, 1=DayLuck, 2=MonthLuck, 3=AnnualLuck, 4=10YLuck]
@@ -1720,6 +2487,251 @@ const talismanHourEB = ref(savedData?.talismanHourEB || null)
 // Location (overseas/birthplace) - Residence status
 const showLocation = ref(savedData?.showLocation || false)
 const locationType = ref(savedData?.locationType || null) // 'overseas' or 'birthplace'
+
+// Unit Tracker Timeline UI state
+const showUnitTracker = ref(false)  // Main timeline collapsed by default
+const showUnitStories = ref(false)  // Unit narratives collapsed by default
+const expandedPhases = ref({})      // Track which phases are expanded
+const expandedCalculations = ref({}) // Track which calculation details are expanded
+
+// Toggle phase expansion
+function togglePhase(phaseId) {
+  expandedPhases.value[phaseId] = !expandedPhases.value[phaseId]
+}
+
+// Toggle calculation details expansion
+function toggleCalculationDetails(calcId) {
+  expandedCalculations.value[calcId] = !expandedCalculations.value[calcId]
+}
+
+// Get Ten God badge styling - uses API mappings
+function getTenGodBadgeStyle(tenGodId) {
+  const styling = chartData.value?.mappings?.ten_gods_styling?.[tenGodId]
+  if (styling) {
+    const style = {
+      backgroundColor: styling.bg_hex,
+      color: styling.hex_color,
+    }
+    // Add border for Day Master
+    if (tenGodId === 'DM') {
+      style.border = `1px solid ${styling.hex_color}`
+    }
+    return style
+  }
+  // Fallback
+  return { backgroundColor: '#f3f4f6', color: '#4b5563' }
+}
+
+// Get Ten God badge class (legacy, for gradual migration)
+function getTenGodBadgeClass(tenGodId) {
+  // Return minimal class since we now use inline styles via getTenGodBadgeStyle
+  return ''
+}
+
+// ========== Mini-Pillar Visualization Helpers (Unit Narratives) ==========
+
+// Get mini pillar style (background color based on element)
+function getMiniPillarStyle(pillarKey, type, focusedNodeId) {
+  if (!chartData.value?.mappings) return { backgroundColor: '#e5e7eb' }
+
+  const nodeId = `${type}_${pillarKey}`
+  let stemName = null
+
+  // Get stem name from chart data
+  if (type === 'hs') {
+    stemName = chartData.value?.[nodeId]?.id
+  } else {
+    // For EB, get the branch name and use its element color
+    const branchName = chartData.value?.[nodeId]?.id
+    const branchData = chartData.value?.mappings?.earthly_branches?.[branchName]
+    return {
+      backgroundColor: branchData?.hex_color || '#e5e7eb',
+      color: '#1f2937'
+    }
+  }
+
+  const stemData = chartData.value?.mappings?.heavenly_stems?.[stemName]
+  return {
+    backgroundColor: stemData?.hex_color || '#e5e7eb',
+    color: '#1f2937'
+  }
+}
+
+// Get mini pillar Chinese character
+function getMiniPillarChinese(pillarKey, type) {
+  if (!chartData.value) return '-'
+
+  const nodeId = `${type}_${pillarKey}`
+  const nodeName = chartData.value?.[nodeId]?.id
+
+  if (!nodeName) return '-'
+
+  if (type === 'hs') {
+    return chartData.value?.mappings?.heavenly_stems?.[nodeName]?.chinese || nodeName.charAt(0)
+  } else {
+    return chartData.value?.mappings?.earthly_branches?.[nodeName]?.chinese || nodeName.charAt(0)
+  }
+}
+
+// Get hidden stems (qi list) for an EB pillar
+function getEbHiddenStems(pillarKey) {
+  if (!chartData.value?.mappings) return []
+
+  const nodeId = `eb_${pillarKey}`
+  const branchName = chartData.value?.[nodeId]?.id
+
+  if (!branchName) return []
+
+  const branchData = chartData.value?.mappings?.earthly_branches?.[branchName]
+  return branchData?.qi || []
+}
+
+// Get node label for display
+function getNodeLabel(nodeId) {
+  const labels = {
+    'hs_y': 'Year Stem',
+    'hs_m': 'Month Stem',
+    'hs_d': 'Day Stem',
+    'hs_h': 'Hour Stem',
+    'eb_y': 'Year Branch',
+    'eb_m': 'Month Branch',
+    'eb_d': 'Day Branch',
+    'eb_h': 'Hour Branch',
+    'hs_10yl': '10Y Luck Stem',
+    'eb_10yl': '10Y Luck Branch',
+    'hs_yl': 'Annual Stem',
+    'eb_yl': 'Annual Branch'
+  }
+  return labels[nodeId] || nodeId
+}
+
+// Get element hex color for display - uses API mappings
+function getElementHexColor(element) {
+  // Use API-provided element colors if available
+  const elementData = chartData.value?.mappings?.elements?.[element]
+  if (elementData?.hex_color) {
+    return elementData.hex_color
+  }
+  // Fallback to gray if element not found
+  return '#6b7280'
+}
+
+// Get event type data from API mappings
+function getEventTypeData(event) {
+  if (!event) return null
+  const type = (event.event_type || event.type || event.interaction_type || '').toLowerCase()
+  return chartData.value?.mappings?.event_types?.[type] || null
+}
+
+// Get event timeline dot style based on event type - uses API mappings
+function getEventDotStyle(event) {
+  const eventData = getEventTypeData(event)
+  if (eventData?.hex_color) {
+    return { backgroundColor: eventData.hex_color }
+  }
+  return { backgroundColor: '#9ca3af' } // gray-400 fallback
+}
+
+// Get event timeline dot class based on event type (legacy, for gradual migration)
+function getEventDotClass(event) {
+  // Return empty string since we now use inline styles via getEventDotStyle
+  return ''
+}
+
+// Get event type styling - uses API mappings
+function getEventTypeStyle(event) {
+  const eventData = getEventTypeData(event)
+  if (eventData?.hex_color) {
+    return { color: eventData.hex_color }
+  }
+  return { color: '#4b5563' } // gray-600 fallback
+}
+
+// Get event type styling class (legacy, for gradual migration)
+function getEventTypeClass(event) {
+  // Return empty string since we now use inline styles via getEventTypeStyle
+  return ''
+}
+
+// Get event icon based on type - uses API mappings
+function getEventIcon(event) {
+  const eventData = getEventTypeData(event)
+  if (eventData?.icon) {
+    return eventData.icon
+  }
+  return '•'
+}
+
+// Get event description
+function getEventDescription(event) {
+  if (!event) return ''
+
+  // Use description if available
+  if (event.description) return event.description
+
+  const type = event.event_type || event.type || event.interaction_type
+
+  // Build description from event data
+  if (type === 'registration') {
+    return `Initialized with ${event.qi || event.initial_qi || 100} qi`
+  }
+
+  if (type === 'seasonal') {
+    const state = event.seasonal_state || 'Unknown'
+    const mult = event.multiplier || 1
+    return `${state} (×${mult.toFixed(3)})`
+  }
+
+  if (type === 'controlled') {
+    const partner = event.partner_stem || 'source'
+    const tenGod = event.partner_ten_god ? ` (${event.partner_ten_god})` : ''
+    return `Controlled by ${partner}${tenGod}, lost ${Math.abs(event.qi_change || 0).toFixed(1)}`
+  }
+
+  if (type === 'controlling' || type === 'control' || type === 'CONTROLLING') {
+    const partner = event.partner_stem || event.target?.stem || 'target'
+    const tenGod = event.partner_ten_god ? ` (${event.partner_ten_god})` : ''
+    return `Controlled ${partner}${tenGod}, cost ${Math.abs(event.qi_change || 0).toFixed(1)}`
+  }
+
+  if (type === 'produced') {
+    const partner = event.partner_stem || 'source'
+    const tenGod = event.partner_ten_god ? ` (${event.partner_ten_god})` : ''
+    return `Produced by ${partner}${tenGod}, gained ${(event.qi_change || 0).toFixed(1)}`
+  }
+
+  if (type === 'producing' || type === 'generation' || type === 'GENERATING') {
+    const partner = event.partner_stem || event.target?.stem || 'target'
+    const tenGod = event.partner_ten_god ? ` (${event.partner_ten_god})` : ''
+    return `Produced ${partner}${tenGod}, cost ${Math.abs(event.qi_change || 0).toFixed(1)}`
+  }
+
+  if (type === 'combination') {
+    const comboType = event.combination_type?.replace(/_/g, ' ') || 'Combination'
+    const element = event.element || ''
+    const status = event.is_transformed ? '(Transformed)' : '(Combined)'
+    return `${comboType}: ${event.pattern || ''} → ${element} ${status}`
+  }
+
+  if (type === 'conflict_aggressor' || type === 'conflict_victim') {
+    const conflictType = event.conflict_type || 'Conflict'
+    const pattern = event.pattern || ''
+    const severity = event.severity ? ` (${event.severity})` : ''
+    return `${conflictType}: ${pattern}${severity}`
+  }
+
+  if (type === 'conflict') {
+    return `Conflict: ${event.pattern || ''}`
+  }
+
+  if (type === 'same_element') {
+    const relType = event.same_element_type || 'connection'
+    const strength = event.strength || 'normal'
+    return `${strength} ${relType}`
+  }
+
+  return event.phase || type || 'Event'
+}
 
 // Calculate grid columns for luck pillars (backward compatibility)
 const luckPillarCount = computed(() => {
@@ -1799,10 +2811,16 @@ function handleInputChange() {
 function triggerChartUpdate() {
  updateDateFromPillars()
  saveToStorage()
- 
+
+ // Validate date before generating chart
+ if (!isValidDate(yearInput.value, monthInput.value, dayInput.value)) {
+  // Don't generate chart for invalid dates - the UI will show validation state
+  return
+ }
+
  // Save current scroll position
  savedScrollPosition = window.scrollY
- 
+
  // Generate chart IMMEDIATELY - no delays
  generateChart()
 }
@@ -1822,7 +2840,7 @@ function loadPreset(preset) {
  birthDate.value = preset.date
  birthTime.value = preset.time
  gender.value = preset.gender
- unknownHour.value = false
+ unknownHour.value = preset.unknownHour || false
  
  // Update individual pillar inputs
  const [year, month, day] = preset.date.split('-')
@@ -1902,6 +2920,17 @@ function clearAnalysisPeriod() {
 onMounted(() => {
  console.log('Component mounted, initializing...')
  initializePillarInputs()
+
+ // Validate stored date - if invalid, reset to defaults
+ if (!isValidDate(yearInput.value, monthInput.value, dayInput.value)) {
+  console.log('Invalid stored date, resetting to defaults')
+  yearInput.value = 1992
+  monthInput.value = 7
+  dayInput.value = 6
+  updateDateFromPillars()
+  saveToStorage()
+ }
+
  // Generate initial chart after component mounts
  setTimeout(() => {
   console.log('Calling generateChart from onMounted')
@@ -1919,13 +2948,26 @@ const activeConnections = ref([])
 const showConnections = ref(true)
 const tooltipContent = ref(null)
 const tooltipPosition = ref({ x: 0, y: 0 })
+const expandedPalace = ref(null) // Palace analysis expansion state
 
-// View mode state: 'base' or 'post' - default to 'post' to show energy flow
-// This controls both the interaction view and Wu Xing element graph
-// Base = natal chart only (8 nodes, no interactions)
-// Post = all nodes with all interactions
-const viewMode = ref(savedData?.viewMode || 'post')
-const showTransformed = computed(() => viewMode.value === 'post')
+// Get pillar label based on index and type
+function getPillarLabel(index, pillarType) {
+  if (pillarType === 'natal') {
+    return ['Hour', 'Day', 'Month', 'Year'][index] || ''
+  } else if (pillarType === 'luck') {
+    return ['Hourly', 'Daily', 'Monthly', 'Annual', '10Y'][index] || ''
+  } else if (pillarType === 'talisman') {
+    return ['Hour', 'Day', 'Month', 'Year'][index] || ''
+  } else if (pillarType === 'location') {
+    return `Location ${index + 1}`
+  }
+  return ''
+}
+
+// View mode state - now always 'post' since Wu Xing shows both Natal and Post side-by-side
+// This controls interaction badges and hidden qi display on pillars
+const viewMode = ref('post')
+const showTransformed = computed(() => true)  // Always show interactions
 
 // Interactions display state
 const highlightedInteraction = ref(null)
@@ -2286,6 +3328,7 @@ const pillars = computed(() => {
   const branchTransformations = branchBadges.filter(b => b.type === 'transformation').map(b => enrichBadgeWithInteraction(b))
   const branchCombinations = branchBadges.filter(b => b.type === 'combination').map(b => enrichBadgeWithInteraction(b))
   const branchNegatives = branchBadges.filter(b => ['clash', 'harm', 'punishment', 'destruction', 'stem_conflict'].includes(b.type)).map(b => enrichBadgeWithInteraction(b))
+  const branchWealthStorage = branchBadges.filter(b => b.type === 'wealth_storage').map(b => enrichBadgeWithInteraction(b))
   
   // Check if branch transformed to pure element (Fire, Water, etc)
   const isElementTransformation = usePost && ['Fire', 'Water', 'Metal', 'Wood', 'Earth'].includes(branchId)
@@ -2295,11 +3338,11 @@ const pillars = computed(() => {
   if (isElementTransformation) {
    // Handle pure element transformation - use emphasized colors
    const elementMap = {
-    'Fire': { chinese: '火', color: '#ff6b6b' },
-    'Water': { chinese: '水', color: '#4dabf7' },
-    'Metal': { chinese: '金', color: '#868e96' },
-    'Wood': { chinese: '木', color: '#51cf66' },
-    'Earth': { chinese: '土', color: '#fab005' }
+    'Wood': { chinese: '木', color: '#c2d4be' },  // matches Jia (Yang Wood)
+    'Fire': { chinese: '火', color: '#f3adae' },  // matches Bing (Yang Fire)
+    'Earth': { chinese: '土', color: '#e6ceb7' }, // matches Wu (Yang Earth)
+    'Metal': { chinese: '金', color: '#ccd8e6' }, // matches Geng (Yang Metal)
+    'Water': { chinese: '水', color: '#b9cbff' }  // matches Ren (Yang Water)
    }
    branchChinese = elementMap[branchId]?.chinese || branchId
    branchAnimal = branchId // Show element name instead of animal
@@ -2339,7 +3382,10 @@ const pillars = computed(() => {
   }
   
   // Hidden stems from eb.qi - use post_interaction_qi for post view, base_qi for base view
-  const hiddenQi = usePost ? (ebNode?.post_interaction_qi || {}) : (ebNode?.base_qi || {})
+  // Check for non-empty objects to properly fall back when one is empty
+  const postQi = ebNode?.post_interaction_qi && Object.keys(ebNode.post_interaction_qi).length > 0 ? ebNode.post_interaction_qi : null
+  const baseQi = ebNode?.base_qi && Object.keys(ebNode.base_qi).length > 0 ? ebNode.base_qi : null
+  const hiddenQi = usePost ? (postQi || baseQi || {}) : (baseQi || {})
   
   // Map hidden stems to Ten Gods using frontend mappings
   const hiddenStems = {}
@@ -2361,6 +3407,9 @@ const pillars = computed(() => {
    stemTenGod = tenGodData?.abbreviation || tenGodData?.id || null
   }
   
+  // Qi Phase (十二長生) - lifecycle stage of stem in this branch
+  const qiPhase = hsNode?.qi_phase || ebNode?.qi_phase || null
+
   return {
    label,
    stem,
@@ -2373,16 +3422,20 @@ const pillars = computed(() => {
    hiddenQi,
    tenGod: stemTenGod,
    isUnknown: !hsNode && !ebNode,
+   // Qi Phase (十二長生)
+   qiPhase,
    // Transformation badges
    stemTransformations,
    branchTransformations,
    // Combination badges
    stemCombinations,
    branchCombinations,
-   // Negative badges
-   stemNegatives,
-   branchNegatives
-  }
+    // Negative badges
+    stemNegatives,
+    branchNegatives,
+    // Wealth storage badges
+    branchWealthStorage
+   }
  }
  
  const yearPillar = buildPillar('hs_y', 'eb_y', 'Year 年')
@@ -2456,7 +3509,10 @@ const luckPillarsOrdered = computed(() => {
   
   // Map hidden stems to Ten Gods using frontend mappings (use post_interaction_qi in post view, base_qi in base view)
   const usePost = viewMode.value === 'post' || viewMode.value === 'transformed'
-  const luckQi = usePost ? (ebLuckNode?.post_interaction_qi || ebLuckNode?.base_qi || {}) : (ebLuckNode?.base_qi || {})
+  // Check for non-empty objects to properly fall back when one is empty
+  const luckPostQi = ebLuckNode?.post_interaction_qi && Object.keys(ebLuckNode.post_interaction_qi).length > 0 ? ebLuckNode.post_interaction_qi : null
+  const luckBaseQi = ebLuckNode?.base_qi && Object.keys(ebLuckNode.base_qi).length > 0 ? ebLuckNode.base_qi : null
+  const luckQi = usePost ? (luckPostQi || luckBaseQi || {}) : (luckBaseQi || {})
   const hiddenStems = {}
   if (luckQi && mappings.ten_gods) {
    for (const stemName of Object.keys(luckQi)) {
@@ -2492,8 +3548,10 @@ const luckPillarsOrdered = computed(() => {
    branchCombinations: (ebLuckNode?.badges || []).filter(b => b.type === 'combination').map(b => enrichBadgeWithInteraction(b)),
    stemNegatives: (hsLuckNode?.badges || []).filter(b => ['clash', 'harm', 'punishment', 'destruction', 'stem_conflict'].includes(b.type)).map(b => enrichBadgeWithInteraction(b)),
    branchNegatives: (ebLuckNode?.badges || []).filter(b => ['clash', 'harm', 'punishment', 'destruction', 'stem_conflict'].includes(b.type)).map(b => enrichBadgeWithInteraction(b)),
+   branchWealthStorage: (ebLuckNode?.badges || []).filter(b => b.type === 'wealth_storage').map(b => enrichBadgeWithInteraction(b)),
    isLuckPillar: true,
-   timing: currentLuckPillar.value.timing
+   timing: currentLuckPillar.value.timing,
+   qiPhase: hsLuckNode?.qi_phase || ebLuckNode?.qi_phase || null
   })
  }
  
@@ -2517,7 +3575,10 @@ const luckPillarsOrdered = computed(() => {
   
   // Map hidden stems to Ten Gods using frontend mappings (use post.qi in post view, base.qi in base view)
   const usePost = viewMode.value === 'post' || viewMode.value === 'transformed'
-  const annualQi = usePost ? (ebAnnualNode?.post_interaction_qi || ebAnnualNode?.base_qi || {}) : (ebAnnualNode?.base_qi || {})
+  // Check for non-empty objects to properly fall back when one is empty
+  const annualPostQi = ebAnnualNode?.post_interaction_qi && Object.keys(ebAnnualNode.post_interaction_qi).length > 0 ? ebAnnualNode.post_interaction_qi : null
+  const annualBaseQi = ebAnnualNode?.base_qi && Object.keys(ebAnnualNode.base_qi).length > 0 ? ebAnnualNode.base_qi : null
+  const annualQi = usePost ? (annualPostQi || annualBaseQi || {}) : (annualBaseQi || {})
   const hiddenStems = {}
   if (annualQi && mappings.ten_gods) {
    for (const stemName of Object.keys(annualQi)) {
@@ -2553,8 +3614,10 @@ const luckPillarsOrdered = computed(() => {
    branchCombinations: (ebAnnualNode?.badges || []).filter(b => b.type === 'combination').map(b => enrichBadgeWithInteraction(b)),
    stemNegatives: (hsAnnualNode?.badges || []).filter(b => ['clash', 'harm', 'punishment', 'destruction', 'stem_conflict'].includes(b.type)).map(b => enrichBadgeWithInteraction(b)),
    branchNegatives: (ebAnnualNode?.badges || []).filter(b => ['clash', 'harm', 'punishment', 'destruction', 'stem_conflict'].includes(b.type)).map(b => enrichBadgeWithInteraction(b)),
+   branchWealthStorage: (ebAnnualNode?.badges || []).filter(b => b.type === 'wealth_storage').map(b => enrichBadgeWithInteraction(b)),
    isAnnualLuck: true,
-   year: annualLuckPillar.value.year
+   year: annualLuckPillar.value.year,
+   qiPhase: hsAnnualNode?.qi_phase || ebAnnualNode?.qi_phase || null
   })
  }
  
@@ -2575,7 +3638,10 @@ const luckPillarsOrdered = computed(() => {
    
    // Map hidden stems to Ten Gods using frontend mappings (use post_interaction_qi in post view, base_qi in base view)
    const usePost = viewMode.value === 'post' || viewMode.value === 'transformed'
-   const monthlyQi = usePost ? (ebMonthlyNode?.post_interaction_qi || ebMonthlyNode?.base_qi || {}) : (ebMonthlyNode?.base_qi || {})
+   // Check for non-empty objects to properly fall back when one is empty
+   const monthlyPostQi = ebMonthlyNode?.post_interaction_qi && Object.keys(ebMonthlyNode.post_interaction_qi).length > 0 ? ebMonthlyNode.post_interaction_qi : null
+   const monthlyBaseQi = ebMonthlyNode?.base_qi && Object.keys(ebMonthlyNode.base_qi).length > 0 ? ebMonthlyNode.base_qi : null
+   const monthlyQi = usePost ? (monthlyPostQi || monthlyBaseQi || {}) : (monthlyBaseQi || {})
    const hiddenStems = {}
    if (monthlyQi && mappings.ten_gods) {
     for (const stemName of Object.keys(monthlyQi)) {
@@ -2611,7 +3677,9 @@ const luckPillarsOrdered = computed(() => {
     branchCombinations: (ebMonthlyNode?.badges || []).filter(b => b.type === 'combination').map(b => enrichBadgeWithInteraction(b)),
     stemNegatives: (hsMonthlyNode?.badges || []).filter(b => ['clash', 'harm', 'punishment', 'destruction', 'stem_conflict'].includes(b.type)).map(b => enrichBadgeWithInteraction(b)),
     branchNegatives: (ebMonthlyNode?.badges || []).filter(b => ['clash', 'harm', 'punishment', 'destruction', 'stem_conflict'].includes(b.type)).map(b => enrichBadgeWithInteraction(b)),
-    isMonthlyLuck: true
+    branchWealthStorage: (ebMonthlyNode?.badges || []).filter(b => b.type === 'wealth_storage').map(b => enrichBadgeWithInteraction(b)),
+    isMonthlyLuck: true,
+    qiPhase: hsMonthlyNode?.qi_phase || ebMonthlyNode?.qi_phase || null
    })
   }
  }
@@ -2633,7 +3701,10 @@ const luckPillarsOrdered = computed(() => {
    
    // Map hidden stems to Ten Gods using frontend mappings (use post_interaction_qi in post view, base_qi in base view)
    const usePost = viewMode.value === 'post' || viewMode.value === 'transformed'
-   const dailyQi = usePost ? (ebDailyNode?.post_interaction_qi || ebDailyNode?.base_qi || {}) : (ebDailyNode?.base_qi || {})
+   // Check for non-empty objects to properly fall back when one is empty
+   const dailyPostQi = ebDailyNode?.post_interaction_qi && Object.keys(ebDailyNode.post_interaction_qi).length > 0 ? ebDailyNode.post_interaction_qi : null
+   const dailyBaseQi = ebDailyNode?.base_qi && Object.keys(ebDailyNode.base_qi).length > 0 ? ebDailyNode.base_qi : null
+   const dailyQi = usePost ? (dailyPostQi || dailyBaseQi || {}) : (dailyBaseQi || {})
    const hiddenStems = {}
    if (dailyQi && mappings.ten_gods) {
     for (const stemName of Object.keys(dailyQi)) {
@@ -2669,7 +3740,9 @@ const luckPillarsOrdered = computed(() => {
     branchCombinations: (ebDailyNode?.badges || []).filter(b => b.type === 'combination').map(b => enrichBadgeWithInteraction(b)),
     stemNegatives: (hsDailyNode?.badges || []).filter(b => ['clash', 'harm', 'punishment', 'destruction', 'stem_conflict'].includes(b.type)).map(b => enrichBadgeWithInteraction(b)),
     branchNegatives: (ebDailyNode?.badges || []).filter(b => ['clash', 'harm', 'punishment', 'destruction', 'stem_conflict'].includes(b.type)).map(b => enrichBadgeWithInteraction(b)),
-    isDailyLuck: true
+    branchWealthStorage: (ebDailyNode?.badges || []).filter(b => b.type === 'wealth_storage').map(b => enrichBadgeWithInteraction(b)),
+    isDailyLuck: true,
+    qiPhase: hsDailyNode?.qi_phase || ebDailyNode?.qi_phase || null
    })
   }
  }
@@ -2691,7 +3764,10 @@ const luckPillarsOrdered = computed(() => {
    
    // Map hidden stems to Ten Gods using frontend mappings (use post_interaction_qi in post view, base_qi in base view)
    const usePost = viewMode.value === 'post' || viewMode.value === 'transformed'
-   const hourlyQi = usePost ? (ebHourlyNode?.post_interaction_qi || ebHourlyNode?.base_qi || {}) : (ebHourlyNode?.base_qi || {})
+   // Check for non-empty objects to properly fall back when one is empty
+   const hourlyPostQi = ebHourlyNode?.post_interaction_qi && Object.keys(ebHourlyNode.post_interaction_qi).length > 0 ? ebHourlyNode.post_interaction_qi : null
+   const hourlyBaseQi = ebHourlyNode?.base_qi && Object.keys(ebHourlyNode.base_qi).length > 0 ? ebHourlyNode.base_qi : null
+   const hourlyQi = usePost ? (hourlyPostQi || hourlyBaseQi || {}) : (hourlyBaseQi || {})
    const hiddenStems = {}
    if (hourlyQi && mappings.ten_gods) {
     for (const stemName of Object.keys(hourlyQi)) {
@@ -2727,7 +3803,9 @@ const luckPillarsOrdered = computed(() => {
     branchCombinations: (ebHourlyNode?.badges || []).filter(b => b.type === 'combination').map(b => enrichBadgeWithInteraction(b)),
     stemNegatives: (hsHourlyNode?.badges || []).filter(b => ['clash', 'harm', 'punishment', 'destruction', 'stem_conflict'].includes(b.type)).map(b => enrichBadgeWithInteraction(b)),
     branchNegatives: (ebHourlyNode?.badges || []).filter(b => ['clash', 'harm', 'punishment', 'destruction', 'stem_conflict'].includes(b.type)).map(b => enrichBadgeWithInteraction(b)),
-    isHourlyLuck: true
+    branchWealthStorage: (ebHourlyNode?.badges || []).filter(b => b.type === 'wealth_storage').map(b => enrichBadgeWithInteraction(b)),
+    isHourlyLuck: true,
+    qiPhase: hsHourlyNode?.qi_phase || ebHourlyNode?.qi_phase || null
    })
   }
  }
@@ -2758,7 +3836,10 @@ const talismanPillarsOrdered = computed(() => {
   
   // Hidden stems from eb.qi - use post_interaction_qi for post view, base_qi for base view (EXACT same as natal)
   const usePost = viewMode.value === 'post'
-  const hiddenQi = usePost ? (ebNode?.post_interaction_qi || {}) : (ebNode?.base_qi || {})
+  // Check for non-empty objects to properly fall back when one is empty
+  const talismanPostQi = ebNode?.post_interaction_qi && Object.keys(ebNode.post_interaction_qi).length > 0 ? ebNode.post_interaction_qi : null
+  const talismanBaseQi = ebNode?.base_qi && Object.keys(ebNode.base_qi).length > 0 ? ebNode.base_qi : null
+  const hiddenQi = usePost ? (talismanPostQi || talismanBaseQi || {}) : (talismanBaseQi || {})
   
   // Map hidden stems to Ten Gods using frontend mappings (EXACT same as natal)
   const hiddenStems = {}
@@ -2796,10 +3877,12 @@ const talismanPillarsOrdered = computed(() => {
    branchCombinations: (ebNode?.badges || []).filter(b => b.type === 'combination').map(b => enrichBadgeWithInteraction(b)),
    stemNegatives: (hsNode?.badges || []).filter(b => ['clash', 'harm', 'punishment', 'destruction', 'stem_conflict'].includes(b.type)).map(b => enrichBadgeWithInteraction(b)),
    branchNegatives: (ebNode?.badges || []).filter(b => ['clash', 'harm', 'punishment', 'destruction', 'stem_conflict'].includes(b.type)).map(b => enrichBadgeWithInteraction(b)),
+   branchWealthStorage: (ebNode?.badges || []).filter(b => b.type === 'wealth_storage').map(b => enrichBadgeWithInteraction(b)),
    isTalismanYear: isYear,
    isTalismanMonth: isMonth,
    isTalismanDay: isDay,
-   isTalismanHour: isHour
+   isTalismanHour: isHour,
+   qiPhase: hsNode?.qi_phase || ebNode?.qi_phase || null
   }
  }
  
@@ -2842,7 +3925,10 @@ const locationPillarsOrdered = computed(() => {
   
   // Hidden stems from eb.qi - use post_interaction_qi for post view, base_qi for base view
   const usePost = viewMode.value === 'post'
-  const hiddenQi = usePost ? (ebNode?.post_interaction_qi || {}) : (ebNode?.base_qi || {})
+  // Check for non-empty objects to properly fall back when one is empty
+  const locationPostQi = ebNode?.post_interaction_qi && Object.keys(ebNode.post_interaction_qi).length > 0 ? ebNode.post_interaction_qi : null
+  const locationBaseQi = ebNode?.base_qi && Object.keys(ebNode.base_qi).length > 0 ? ebNode.base_qi : null
+  const hiddenQi = usePost ? (locationPostQi || locationBaseQi || {}) : (locationBaseQi || {})
   
   // Map hidden stems to Ten Gods
   const hiddenStems = {}
@@ -2882,7 +3968,8 @@ const locationPillarsOrdered = computed(() => {
    stemCombinations: [],
    branchCombinations: [],
    stemNegatives: [],
-   branchNegatives: []
+   branchNegatives: [],
+   branchWealthStorage: []
   }
  }
  
@@ -3006,21 +4093,86 @@ const luckPillarsDisplay = computed(() => {
  return display
 })
 
+// Dong Gong Date Selection info (from API response)
+const dongGongInfo = computed(() => {
+ if (!chartData.value?.dong_gong) return null
+ return chartData.value.dong_gong
+})
+
+// Dong Gong rating colors and styles
+const getDongGongRatingColor = (rating) => {
+ const colors = {
+  'excellent': { bg: '#FEF08A', border: '#EAB308', text: '#854D0E' },    // Gold/Yellow
+  'auspicious': { bg: '#BBF7D0', border: '#22C55E', text: '#166534' },   // Green
+  'fair': { bg: '#E5E7EB', border: '#9CA3AF', text: '#374151' },         // Gray
+  'inauspicious': { bg: '#FED7AA', border: '#F97316', text: '#9A3412' }, // Orange
+  'dire': { bg: '#FECACA', border: '#EF4444', text: '#991B1B' }          // Red
+ }
+ return colors[rating] || colors['fair']
+}
+
+const getDongGongRatingSymbol = (rating) => {
+ const symbols = {
+  'excellent': '★',
+  'auspicious': '✓',
+  'fair': '●',
+  'inauspicious': '▲',
+  'dire': '✗'
+ }
+ return symbols[rating] || '●'
+}
+
+const getDongGongTooltip = (dongGong) => {
+ if (!dongGong) return ''
+ const parts = []
+
+ // Day Officer
+ if (dongGong.officer) {
+  parts.push(`${dongGong.officer.chinese} ${dongGong.officer.english} Day`)
+ }
+
+ // Rating
+ if (dongGong.rating) {
+  parts.push(`Rating: ${dongGong.rating.chinese} (${dongGong.rating.id})`)
+ }
+
+ // Good for
+ if (dongGong.good_for && dongGong.good_for.length > 0) {
+  parts.push(`Good for: ${dongGong.good_for.join(', ')}`)
+ }
+
+ // Bad for
+ if (dongGong.bad_for && dongGong.bad_for.length > 0) {
+  parts.push(`Avoid: ${dongGong.bad_for.join(', ')}`)
+ }
+
+ // Description
+ if (dongGong.description_english) {
+  parts.push(dongGong.description_english)
+ }
+
+ return parts.join('\n')
+}
+
 // Old manual pillar building logic removed - now using luckPillarsOrdered
 // (Simplified from 150+ lines to just using luckPillarsOrdered above)
 
 const tenElements = computed(() => {
- // Base = natal chart only (8 nodes, no interactions): natal_base_elements
- // Post = all nodes with all interactions: advanced_post_elements
- // Shows the journey from pure birth chart → current state with everything
+ // 3-tier element scoring: Base → Natal → Post
+ // Base = natal chart only (8 nodes, no interactions)
+ // Natal = natal chart only (8 nodes, WITH interactions) - internal dynamics
+ // Post = all nodes (natal + luck + talisman + location) with all interactions
  if (!chartData.value) return []
- 
+
  // Base: Pure natal chart (8 nodes, no interactions)
  const baseScores = chartData.value.natal_base_elements || chartData.value.base_element_score || {}
- 
+
+ // Natal: Natal chart only (8 nodes, WITH interactions) - internal dynamics
+ const natalScores = chartData.value.natal_element_score || {}
+
  // Post: All nodes (natal + luck + talisman + location) with all interactions
  const postScores = chartData.value.advanced_post_elements || chartData.value.post_element_score || {}
- 
+
  // Map stem IDs to display names
  const stemToDisplay = {
   'Jia': 'Yang Wood',
@@ -3034,72 +4186,106 @@ const tenElements = computed(() => {
   'Ren': 'Yang Water',
   'Gui': 'Yin Water'
  }
- 
+
  return Object.entries(stemToDisplay).map(([stem, displayName]) => ({
   name: displayName,
   naive: baseScores[stem] || 0,
+  natal: natalScores[stem] || 0,
   final: postScores[stem] || 0,
-  change: (postScores[stem] || 0) - (baseScores[stem] || 0)
+  change: (postScores[stem] || 0) - (baseScores[stem] || 0),
+  natalChange: (natalScores[stem] || 0) - (baseScores[stem] || 0),
+  postChange: (postScores[stem] || 0) - (natalScores[stem] || 0)
  }))
 })
 
 const fiveElements = computed(() => {
- // Base = natal chart only (8 nodes, no interactions): natal_base_elements
- // Post = all nodes with all interactions: advanced_post_elements
- // Shows the journey from pure birth chart → current state with everything
+ // 3-tier element scoring: Base → Natal → Post
+ // Base = natal chart only (8 nodes, no interactions)
+ // Natal = natal chart only (8 nodes, WITH interactions) - internal dynamics
+ // Post = all nodes (natal + luck + talisman + location) with all interactions
  if (!chartData.value) return []
- 
+
  // Base: Pure natal chart (8 nodes, no interactions)
  const baseScores = chartData.value.natal_base_elements || chartData.value.base_element_score || {}
- 
+
+ // Natal: Natal chart only (8 nodes, WITH interactions) - internal dynamics
+ const natalScores = chartData.value.natal_element_score || {}
+
  // Post: All nodes (natal + luck + talisman + location) with all interactions
  const postScores = chartData.value.advanced_post_elements || chartData.value.post_element_score || {}
- 
- // Map stems to elements and sum them up
- const stemToElement = {
-  'Jia': 'Wood', 'Yi': 'Wood',
-  'Bing': 'Fire', 'Ding': 'Fire',
-  'Wu': 'Earth', 'Ji': 'Earth',
-  'Geng': 'Metal', 'Xin': 'Metal',
-  'Ren': 'Water', 'Gui': 'Water'
+
+ // Map stems to elements with Yang/Yin distinction
+ const yangStems = {
+  'Wood': 'Jia',
+  'Fire': 'Bing',
+  'Earth': 'Wu',
+  'Metal': 'Geng',
+  'Water': 'Ren'
  }
- 
- const naiveByElement = {}
- const finalByElement = {}
+ const yinStems = {
+  'Wood': 'Yi',
+  'Fire': 'Ding',
+  'Earth': 'Ji',
+  'Metal': 'Xin',
+  'Water': 'Gui'
+ }
+
  const elements = ['Wood', 'Fire', 'Earth', 'Metal', 'Water']
- 
- // Initialize
- elements.forEach(elem => {
-  naiveByElement[elem] = 0
-  finalByElement[elem] = 0
- })
- 
- // Sum up scores by element
- Object.entries(stemToElement).forEach(([stem, element]) => {
-  naiveByElement[element] += baseScores[stem] || 0
-  finalByElement[element] += postScores[stem] || 0
- })
- 
- // Calculate totals for normalization to 100%
- const naiveTotal = Object.values(naiveByElement).reduce((sum, val) => sum + val, 0)
- const finalTotal = Object.values(finalByElement).reduce((sum, val) => sum + val, 0)
- 
- // Normalize to percentages (0-100) and keep raw points
+
+ // Calculate grand totals for percentage normalization
+ const naiveTotal = Object.values(baseScores).reduce((sum, val) => sum + (val || 0), 0)
+ const natalTotal = Object.values(natalScores).reduce((sum, val) => sum + (val || 0), 0)
+ const finalTotal = Object.values(postScores).reduce((sum, val) => sum + (val || 0), 0)
+
+ // Build element data with Yang/Yin breakdown
  return elements.map(name => {
-  const naiveRaw = naiveByElement[name] || 0
-  const finalRaw = finalByElement[name] || 0
-  
-  // Convert raw scores to percentages that sum to 100
+  const yangStem = yangStems[name]
+  const yinStem = yinStems[name]
+
+  // Raw scores for Yang and Yin
+  const yangNaiveRaw = baseScores[yangStem] || 0
+  const yinNaiveRaw = baseScores[yinStem] || 0
+  const yangNatalRaw = natalScores[yangStem] || 0
+  const yinNatalRaw = natalScores[yinStem] || 0
+  const yangFinalRaw = postScores[yangStem] || 0
+  const yinFinalRaw = postScores[yinStem] || 0
+
+  // Combined raw scores
+  const naiveRaw = yangNaiveRaw + yinNaiveRaw
+  const natalRaw = yangNatalRaw + yinNatalRaw
+  const finalRaw = yangFinalRaw + yinFinalRaw
+
+  // Convert raw scores to percentages (of grand total)
   const naive = naiveTotal > 0 ? (naiveRaw / naiveTotal) * 100 : 0
+  const natal = natalTotal > 0 ? (natalRaw / natalTotal) * 100 : 0
   const final = finalTotal > 0 ? (finalRaw / finalTotal) * 100 : 0
-  
+
+  // Yang/Yin percentages (of grand total for bar display)
+  const yangNatal = natalTotal > 0 ? (yangNatalRaw / natalTotal) * 100 : 0
+  const yinNatal = natalTotal > 0 ? (yinNatalRaw / natalTotal) * 100 : 0
+  const yangFinal = finalTotal > 0 ? (yangFinalRaw / finalTotal) * 100 : 0
+  const yinFinal = finalTotal > 0 ? (yinFinalRaw / finalTotal) * 100 : 0
+
   return {
    name,
    naive,
+   natal,
    final,
-   change: final - naive,
-   naiveRaw,  // Keep raw points
-   finalRaw   // Keep raw points
+   change: final - naive,        // Change from base to post (legacy)
+   natalChange: natal - naive,   // Change from base to natal
+   postChange: final - natal,    // Change from natal to post
+   naiveRaw,   // Keep raw points
+   natalRaw,   // Keep raw points
+   finalRaw,   // Keep raw points
+   // Yang/Yin breakdown for stacked bar display
+   yangNatal,
+   yinNatal,
+   yangFinal,
+   yinFinal,
+   yangNatalRaw,
+   yinNatalRaw,
+   yangFinalRaw,
+   yinFinalRaw
   }
  })
 })
@@ -3128,6 +4314,11 @@ const fiveElementsWithRelations = computed(() => {
 const naiveTotal = computed(() => {
  if (!fiveElements.value.length) return 100
  return fiveElements.value.reduce((sum, e) => sum + e.naive, 0)
+})
+
+const natalTotal = computed(() => {
+ if (!fiveElements.value.length) return 100
+ return fiveElements.value.reduce((sum, e) => sum + e.natal, 0)
 })
 
 const finalTotal = computed(() => {
@@ -3221,7 +4412,7 @@ const luckPillarInteractions = computed(() => {
     'STEM_COMBINATION': '天干合',
     'STEM_CONFLICT': '天干沖',
     'THREE_COMBINATIONS': '三合',
-    'HALF_COMBINATION': '半合',
+    'ARCHED_COMBINATION': '拱合',
     'DESTRUCTION': '相破'
    }
    const label = labelMap[type] || type
@@ -3442,77 +4633,107 @@ async function generateChart() {
  }
 }
 
+// ============= COLOR FUNCTIONS =============
+
+// Returns inline style object for text color using API mappings
+function getElementTextStyle(element) {
+ const mappings = chartData.value?.mappings
+
+ // Handle polarized elements like "Yang Wood"
+ if (element && element.includes(' ')) {
+  const [polarity, elemName] = element.split(' ')
+  const colorKey = polarity === 'Yang' ? 'hex_color_yang' : 'hex_color_yin'
+  const color = mappings?.elements?.[elemName]?.[colorKey] || mappings?.elements?.[elemName]?.hex_color || '#4b5563'
+  return { color }
+ }
+
+ // Handle simple elements like "Wood"
+ const color = mappings?.elements?.[element]?.hex_color || '#4b5563'
+ return { color }
+}
+
+// Legacy function - DEPRECATED, use getElementTextStyle
 function getElementColor(element) {
- const colorMap = {
-  'Wood': 'text-green-600',
-  'Yang Wood': 'text-green-700',
-  'Yin Wood': 'text-green-500',
-  'Fire': 'text-red-600',
-  'Yang Fire': 'text-red-700',
-  'Yin Fire': 'text-red-500',
-  'Earth': 'text-yellow-600',
-  'Yang Earth': 'text-yellow-700',
-  'Yin Earth': 'text-yellow-500',
-  'Metal': 'text-gray-600',
-  'Yang Metal': 'text-gray-700',
-  'Yin Metal': 'text-gray-500',
-  'Water': 'text-blue-600',
-  'Yang Water': 'text-blue-700',
-  'Yin Water': 'text-blue-500'
- }
- return colorMap[element] || 'text-gray-600'
+ return ''  // Return empty, use getElementTextStyle instead
 }
 
-// Removed cyber color functions - now using getElementColor
+// Returns inline style object using API mappings
+function getElementBgStyle(element) {
+ const mappings = chartData.value?.mappings
+ const color = mappings?.elements?.[element]?.hex_color || '#9ca3af'
+ return { backgroundColor: color }
+}
 
+// Legacy function - DEPRECATED, use getElementBgStyle
 function getElementBgColor(element) {
- const colorMap = {
-  'Wood': 'bg-green-500',
-  'Fire': 'bg-red-500',
-  'Earth': 'bg-yellow-500',
-  'Metal': 'bg-gray-500',
-  'Water': 'bg-blue-500'
- }
- return colorMap[element] || 'bg-gray-400'
+ return ''  // Return empty, use getElementBgStyle instead
 }
 
-// Get node background color using hex colors from API
+// Yang element colors for Wu Xing chart (solid darker colors)
+// Returns inline style object using API mappings
+function getYangBgStyle(element) {
+ const mappings = chartData.value?.mappings
+ const color = mappings?.elements?.[element]?.hex_color_yang || '#4b5563'
+ return { backgroundColor: color }
+}
+
+// Legacy function for backward compatibility - DEPRECATED
+function getYangBgColor(element) {
+ return ''  // Return empty, use getYangBgStyle instead
+}
+
+// Yin element colors for Wu Xing chart (lighter colors with stripe pattern)
+function getYinBgStyle(element) {
+ // Get Yin element color from API mappings
+ const mappings = chartData.value?.mappings
+ const color = mappings?.elements?.[element]?.hex_color_yin || '#d1d5db'
+ // Diagonal stripes pattern for Yin distinction
+ return {
+  background: `repeating-linear-gradient(
+   45deg,
+   ${color},
+   ${color} 2px,
+   transparent 2px,
+   transparent 4px
+  ), ${color}`
+ }
+}
+
+// Get node background color from API hex color
 function getNodeBgColor(elementWithPolarity, apiHexColor = null) {
  // If API provided a hex color, use it directly
  if (apiHexColor) {
   // Handle pure element colors (gradient object)
   if (typeof apiHexColor === 'object' && apiHexColor.bg) {
-   // For pure elements, return a special gradient
    if (apiHexColor.bg.includes('gradient')) {
-    return { 
+    return {
      background: 'linear-gradient(to right, #ef4444, #a855f7, #ec4899)',
      border: '2px solid #9333ea'
     }
    }
   }
-  
   // Use hex color directly from API
   if (typeof apiHexColor === 'string' && apiHexColor.startsWith('#')) {
    return { backgroundColor: apiHexColor }
   }
  }
- 
- // Fallback to element-based colors
- const colorMap = {
-  'Yang Wood': '#c2d4be',
-  'Yin Wood': '#d6e2bb',
-  'Yang Fire': '#f3adae',
-  'Yin Fire': '#f5d3b0',
-  'Yang Earth': '#e6ceb7',
-  'Yin Earth': '#efe3cc',
-  'Yang Metal': '#ccd8e6',
-  'Yin Metal': '#e6e8f7',
-  'Yang Water': '#b9cbff',
-  'Yin Water': '#e0e9ff'
+
+ // Fallback color map - matches API STEMS colors (soft pastels)
+ // These should match api/library/core.py STEMS colors
+ const polarizedHex = {
+  'Yang Wood': '#c2d4be', 'Yin Wood': '#d6e2bb',  // Jia, Yi
+  'Yang Fire': '#f3adae', 'Yin Fire': '#f9d3ad',  // Bing, Ding
+  'Yang Earth': '#e6ceb7', 'Yin Earth': '#efe3cc', // Wu, Ji
+  'Yang Metal': '#ccd8e6', 'Yin Metal': '#e6e8f7', // Geng, Xin
+  'Yang Water': '#b9cbff', 'Yin Water': '#e0e9ff'  // Ren, Gui
  }
- 
- const bgColor = colorMap[elementWithPolarity] || '#f9fafb'
- return { backgroundColor: bgColor }
+
+ if (polarizedHex[elementWithPolarity]) {
+  return { backgroundColor: polarizedHex[elementWithPolarity] }
+ }
+
+ // Fallback
+ return { backgroundColor: '#f9fafb' }
 }
 
 // Get element for a stem name
@@ -3532,19 +4753,21 @@ function getStemElement(stemName) {
 function getHiddenStemsWithWeights(pillar) {
  // Get the appropriate qi data based on view mode
  const ebNode = nodes.value?.[pillar.branchKey]
- 
- // Use base_qi in base mode, post_interaction_qi in other modes
+
+ // Both natal and post views use post_interaction_qi (with interactions applied)
+ // Check for non-empty objects using Object.keys() to properly handle {}
  let qiData = null
- if (viewMode.value === 'base' && ebNode?.base_qi) {
-  // Use initial qi for base view
-  qiData = ebNode.base_qi
- } else if (ebNode?.post_interaction_qi) {
-  // Use post_interaction_qi for post-interaction and transformed views
+ const hasPostQi = ebNode?.post_interaction_qi && Object.keys(ebNode.post_interaction_qi).length > 0
+ const hasBaseQi = ebNode?.base_qi && Object.keys(ebNode.base_qi).length > 0
+ const hasPillarQi = pillar.hiddenQi && (Array.isArray(pillar.hiddenQi) ? pillar.hiddenQi.length > 0 : Object.keys(pillar.hiddenQi).length > 0)
+
+ if (hasPostQi) {
+  // Use post_interaction_qi for natal and post views
   qiData = ebNode.post_interaction_qi
- } else if (ebNode?.base_qi) {
-  // Fallback to base_qi if post_interaction_qi not available
+ } else if (hasBaseQi) {
+  // Fallback to base_qi if post_interaction_qi not available or empty
   qiData = ebNode.base_qi
- } else if (pillar.hiddenQi) {
+ } else if (hasPillarQi) {
   // Fallback to pillar.hiddenQi (could be object or array)
   qiData = pillar.hiddenQi
  }
@@ -3576,10 +4799,10 @@ function getHiddenStemsWithWeights(pillar) {
    const tenGod = typeof tenGodData === 'string' 
     ? tenGodData 
     : tenGodData?.abbreviation || tenGodData?.id || ''
-   // Use hex color from API if available, fallback to color, then null
-   const stemColor = qi.hex_color || qi.color || null
-   result[qi.stem] = { 
-    god: tenGod, 
+   // Use hex color from API mappings as source of truth
+   const stemColor = qi.hex_color || qi.color || chartData.value?.mappings?.heavenly_stems?.[qi.stem]?.hex_color || null
+   result[qi.stem] = {
+    god: tenGod,
     weight: percentage,
     score: qi.score,
     count: qi.count,
@@ -3590,49 +4813,162 @@ function getHiddenStemsWithWeights(pillar) {
  }
  }
  
- // Fallback to old method using hiddenStems with hardcoded percentages
+ // Fallback: use API mappings for qi percentages instead of hardcoding
  if (!pillar.hiddenStems) return {}
- 
- // Hardcoded hidden stem percentages based on BaZi traditional values
- // These match the backend's EARTHLY_BRANCH_HIDDEN_QI definitions
- const hiddenStemPercentages = {
-  'Zi': { 'Gui': 100 },
-  'Chou': { 'Ji': 60, 'Gui': 30, 'Xin': 10 },
-  'Yin': { 'Jia': 60, 'Bing': 30, 'Wu': 10 },
-  'Mao': { 'Yi': 100 },
-  'Chen': { 'Wu': 60, 'Yi': 30, 'Gui': 10 },
-  'Si': { 'Bing': 60, 'Wu': 30, 'Geng': 10 },
-  'Wu': { 'Ding': 70, 'Ji': 30 },
-  'Wei': { 'Ji': 60, 'Ding': 30, 'Yi': 10 },
-  'Shen': { 'Geng': 60, 'Ren': 30, 'Wu': 10 },
-  'You': { 'Xin': 100 },
-  'Xu': { 'Wu': 60, 'Xin': 30, 'Ding': 10 },
-  'Hai': { 'Ren': 70, 'Jia': 30 }
- }
- 
- // Get the original branch name (before any transformation)
+
+ // Get branch name and fetch qi data from API mappings
  const branchName = pillar.branchName
- const branchPercentages = hiddenStemPercentages[branchName]
- 
- if (!branchPercentages) {
-  // Fallback: distribute evenly if branch not found
-  const stems = Object.entries(pillar.hiddenStems)
+ const branchData = chartData.value?.mappings?.earthly_branches?.[branchName]
+
+ if (branchData?.qi && branchData.qi.length > 0) {
+  // Use API-provided qi data
+  const totalScore = branchData.qi.reduce((sum, qi) => sum + qi.score, 0)
   const result = {}
-  const evenWeight = Math.floor(100 / stems.length)
-  for (const [stem, tenGod] of stems) {
-   result[stem] = { god: tenGod, weight: evenWeight }
+  for (const qi of branchData.qi) {
+   const percentage = Math.round((qi.score / totalScore) * 100)
+   const tenGodData = pillar.hiddenStems?.[qi.stem]
+   const tenGod = typeof tenGodData === 'string'
+    ? tenGodData
+    : tenGodData?.abbreviation || tenGodData?.id || ''
+   result[qi.stem] = {
+    god: tenGod,
+    weight: percentage,
+    score: qi.score,
+    color: qi.hex_color || null
+   }
   }
   return result
  }
- 
- // Use the hardcoded percentages
+
+ // Final fallback: distribute evenly if API qi not available
+ const stems = Object.entries(pillar.hiddenStems)
  const result = {}
- for (const [stem, tenGod] of Object.entries(pillar.hiddenStems)) {
-  const percentage = branchPercentages[stem] || 33 // Default if not found
-  result[stem] = { god: tenGod, weight: percentage }
+ const evenWeight = Math.floor(100 / stems.length)
+ for (const [stem, tenGod] of stems) {
+  result[stem] = { god: tenGod, weight: evenWeight }
  }
- 
  return result
+}
+
+// Get Primary Qi (本氣) - the main energy at index 0
+// Weight is proportional to TOTAL qi (Primary + Hidden combined)
+function getPrimaryQiData(pillar) {
+ const ebNode = nodes.value?.[pillar.branchKey]
+
+ // Get qi data (same logic as getHiddenStemsWithWeights)
+ let qiData = null
+ const hasPostQi = ebNode?.post_interaction_qi && Object.keys(ebNode.post_interaction_qi).length > 0
+ const hasBaseQi = ebNode?.base_qi && Object.keys(ebNode.base_qi).length > 0
+ const hasPillarQi = pillar.hiddenQi && (Array.isArray(pillar.hiddenQi) ? pillar.hiddenQi.length > 0 : Object.keys(pillar.hiddenQi).length > 0)
+
+ if (hasPostQi) {
+  qiData = ebNode.post_interaction_qi
+ } else if (hasBaseQi) {
+  qiData = ebNode.base_qi
+ } else if (hasPillarQi) {
+  qiData = pillar.hiddenQi
+ }
+
+ if (!qiData) return null
+
+ // Convert to array format
+ let qiArray = []
+ if (Array.isArray(qiData)) {
+  qiArray = qiData
+ } else if (typeof qiData === 'object') {
+  qiArray = Object.entries(qiData).map(([stem, score]) => ({
+   stem,
+   score,
+   count: 1
+  }))
+ }
+
+ if (qiArray.length === 0) return null
+
+ // Calculate TOTAL qi for percentage
+ const totalScore = qiArray.reduce((sum, qi) => sum + qi.score, 0)
+
+ // Primary Qi is index 0
+ const primaryQi = qiArray[0]
+ const percentage = Math.round((primaryQi.score / totalScore) * 100)
+
+ // Get ten god
+ const tenGodData = pillar.hiddenStems?.[primaryQi.stem]
+ const tenGod = typeof tenGodData === 'string'
+  ? tenGodData
+  : tenGodData?.abbreviation || tenGodData?.id || ''
+
+ // Get color - use API mappings as source of truth
+ const stemColor = primaryQi.hex_color || primaryQi.color || chartData.value?.mappings?.heavenly_stems?.[primaryQi.stem]?.hex_color || null
+
+ return {
+  stem: primaryQi.stem,
+  god: tenGod,
+  weight: percentage,
+  score: primaryQi.score,
+  color: stemColor
+ }
+}
+
+// Get Hidden Stems (藏干) - secondary/tertiary energies at index 1+
+// Weights are proportional to TOTAL qi (Primary + Hidden combined)
+function getHiddenStemsData(pillar) {
+ const ebNode = nodes.value?.[pillar.branchKey]
+
+ // Get qi data (same logic as getHiddenStemsWithWeights)
+ let qiData = null
+ const hasPostQi = ebNode?.post_interaction_qi && Object.keys(ebNode.post_interaction_qi).length > 0
+ const hasBaseQi = ebNode?.base_qi && Object.keys(ebNode.base_qi).length > 0
+ const hasPillarQi = pillar.hiddenQi && (Array.isArray(pillar.hiddenQi) ? pillar.hiddenQi.length > 0 : Object.keys(pillar.hiddenQi).length > 0)
+
+ if (hasPostQi) {
+  qiData = ebNode.post_interaction_qi
+ } else if (hasBaseQi) {
+  qiData = ebNode.base_qi
+ } else if (hasPillarQi) {
+  qiData = pillar.hiddenQi
+ }
+
+ if (!qiData) return []
+
+ // Convert to array format
+ let qiArray = []
+ if (Array.isArray(qiData)) {
+  qiArray = qiData
+ } else if (typeof qiData === 'object') {
+  qiArray = Object.entries(qiData).map(([stem, score]) => ({
+   stem,
+   score,
+   count: 1
+  }))
+ }
+
+ // Need at least 2 entries to have hidden stems
+ if (qiArray.length < 2) return []
+
+ // Calculate TOTAL qi for percentage
+ const totalScore = qiArray.reduce((sum, qi) => sum + qi.score, 0)
+
+ // Hidden Stems are index 1+
+ const hiddenStems = qiArray.slice(1)
+
+ return hiddenStems.map(qi => {
+  const percentage = Math.round((qi.score / totalScore) * 100)
+  const tenGodData = pillar.hiddenStems?.[qi.stem]
+  const tenGod = typeof tenGodData === 'string'
+   ? tenGodData
+   : tenGodData?.abbreviation || tenGodData?.id || ''
+  // Get color - use API mappings as source of truth
+  const stemColor = qi.hex_color || qi.color || chartData.value?.mappings?.heavenly_stems?.[qi.stem]?.hex_color || null
+
+  return {
+   stem: qi.stem,
+   god: tenGod,
+   weight: percentage,
+   score: qi.score,
+   color: stemColor
+  }
+ })
 }
 
 function getElementBorderColor(element) {
@@ -3677,9 +5013,8 @@ function formatInteractionType(type) {
   'PUNISHMENTS': '相刑 Punishments',
   'THREE_COMBINATIONS': '三合 Three Combinations',
   'SIX_HARMONIES': '六合 Six Harmonies',
-  'HALF_COMBINATIONS': '半合 Half Combinations',
-  'HALF_COMBINATION': '半合 Half Combination',
   'ARCHED_COMBINATIONS': '拱合 Arched Combinations',
+  'ARCHED_COMBINATION': '拱合 Arched Combination',
   'CLASHES': '沖 Clashes',
   'HARMS': '害 Harms',
   'DESTRUCTIONS': '破 Destructions',
@@ -3982,40 +5317,30 @@ function getTransformBadgeDisplay(badge) {
 
 function getTransformBadgeStyle(badge) {
  if (!badge) return {}
- 
- // Map stem IDs and elements to their hex colors from the mappings
- const badgeColors = {
-  // Heavenly Stems colors
-  'Jia': '#c2d4be',  // Yang Wood - Light sage green
-  'Yi': '#d6e2bb',   // Yin Wood - Light lime green
-  'Bing': '#f3adae',  // Yang Fire - Light coral red
-  'Ding': '#f5d3b0',  // Yin Fire - Light peach
-  'Wu': '#e6ceb7',   // Yang Earth - Light tan
-  'Ji': '#efe3cc',   // Yin Earth - Light cream
-  'Geng': '#ccd8e6',  // Yang Metal - Light steel blue
-  'Xin': '#e6e8f7',  // Yin Metal - Light lavender
-  'Ren': '#b9cbff',  // Yang Water - Light sky blue
-  'Gui': '#e0e9ff',  // Yin Water - Light powder blue
-  // Pure Elements
-  'Wood': '#c9dcc4',  // Average of wood colors
-  'Fire': '#f4c0af',  // Average of fire colors
-  'Earth': '#ead9c2', // Average of earth colors
-  'Metal': '#d9e0f2', // Average of metal colors
-  'Water': '#cdd5ff', // Average of water colors
-  // Yang/Yin Elements
-  'Yang Wood': '#c2d4be',
-  'Yin Wood': '#d6e2bb',
-  'Yang Fire': '#f3adae',
-  'Yin Fire': '#f5d3b0',
-  'Yang Earth': '#e6ceb7',
-  'Yin Earth': '#efe3cc',
-  'Yang Metal': '#ccd8e6',
-  'Yin Metal': '#e6e8f7',
-  'Yang Water': '#b9cbff',
-  'Yin Water': '#e0e9ff'
+
+ const mappings = chartData.value?.mappings
+
+ // Get color from API mappings - source of truth
+ let bgColor = null
+
+ // Try stem color from API mappings
+ if (badge && mappings?.heavenly_stems?.[badge]?.hex_color) {
+  bgColor = mappings.heavenly_stems[badge].hex_color
  }
- 
- const bgColor = badgeColors[badge] || '#fbbf24' // Default to yellow if not found
+ // Try element color from API mappings
+ else if (badge && mappings?.elements?.[badge]?.hex_color) {
+  bgColor = mappings.elements[badge].hex_color
+ }
+ // Try polarized element (e.g., "Yang Wood") - parse and look up
+ else if (badge && badge.includes(' ')) {
+  const [polarity, element] = badge.split(' ')
+  const colorKey = polarity === 'Yang' ? 'hex_color_yang' : 'hex_color_yin'
+  bgColor = mappings?.elements?.[element]?.[colorKey] || mappings?.elements?.[element]?.hex_color
+ }
+ // Fallback to default
+ if (!bgColor) {
+  bgColor = '#fbbf24'
+ }
  
  // Calculate a darker text color for contrast
  const textColor = getLightnessPercent(bgColor) > 70 ? '#1f2937' : '#ffffff'
@@ -4049,32 +5374,25 @@ function adjustBrightness(hexColor, percent) {
 // NEW: Multi-transformation badge functions with strength-based styling
 function getTransformationBadgeStyles(transformation) {
  if (!transformation) return {}
- 
+
  const { badge, strength, element } = transformation
- 
- // Badge colors - same as backend mappings hex_color
- const badgeColors = {
-  // Heavenly Stems (from backend mappings)
-  'Jia': '#c2d4be',  // Yang Wood - Light sage green
-  'Yi': '#d6e2bb',   // Yin Wood - Light lime green
-  'Bing': '#f3adae',  // Yang Fire - Light coral red
-  'Ding': '#f5d3b0',  // Yin Fire - Light peach
-  'Wu': '#e6ceb7',   // Yang Earth - Light tan
-  'Ji': '#efe3cc',   // Yin Earth - Light cream
-  'Geng': '#ccd8e6',  // Yang Metal - Light steel blue
-  'Xin': '#e6e8f7',  // Yin Metal - Light lavender
-  'Ren': '#b9cbff',  // Yang Water - Light sky blue
-  'Gui': '#e0e9ff',  // Yin Water - Light powder blue
-  
-  // Pure Elements (averaged colors for direct transformations)
-  'Wood': '#c9dcc4',  // Average of wood colors
-  'Fire': '#f4c0af',  // Average of fire colors
-  'Earth': '#ead9c2', // Average of earth colors
-  'Metal': '#d9e0f2', // Average of metal colors
-  'Water': '#cdd5ff'  // Average of water colors
+ const mappings = chartData.value?.mappings
+
+ // Get color from API mappings - source of truth
+ let baseBgColor = null
+
+ // First try stem color from API mappings
+ if (badge && mappings?.heavenly_stems?.[badge]?.hex_color) {
+  baseBgColor = mappings.heavenly_stems[badge].hex_color
  }
- 
- const baseBgColor = badgeColors[badge] || badgeColors[element] || '#fbbf24'
+ // Then try element color from API mappings
+ else if (element && mappings?.elements?.[element]?.hex_color) {
+  baseBgColor = mappings.elements[element].hex_color
+ }
+ // Fallback to default
+ else {
+  baseBgColor = '#fbbf24'
+ }
  const textColor = getLightnessPercent(baseBgColor) > 70 ? '#1f2937' : '#ffffff'
  const borderColor = adjustBrightness(baseBgColor, -20)
  
@@ -4155,19 +5473,25 @@ function getCombinationBadgeSizeClass(strength) {
 // Combination badge styling
 function getCombinationBadgeStyle(combination) {
  if (!combination) return {}
- 
+
  const { badge, element } = combination
- 
- // Use same base colors with subtle styling for combinations
- const badgeColors = {
-  'Jia': '#c2d4be', 'Yi': '#d6e2bb', 'Bing': '#f3adae', 'Ding': '#f5d3b0',
-  'Wu': '#e6ceb7', 'Ji': '#efe3cc', 'Geng': '#ccd8e6', 'Xin': '#e6e8f7',
-  'Ren': '#b9cbff', 'Gui': '#e0e9ff',
-  'Wood': '#c9dcc4', 'Fire': '#f4c0af', 'Earth': '#ead9c2',
-  'Metal': '#d9e0f2', 'Water': '#cdd5ff'
+ const mappings = chartData.value?.mappings
+
+ // Get color from API mappings - source of truth
+ let baseBgColor = null
+
+ // First try stem color from API mappings
+ if (badge && mappings?.heavenly_stems?.[badge]?.hex_color) {
+  baseBgColor = mappings.heavenly_stems[badge].hex_color
  }
- 
- const baseBgColor = badgeColors[badge] || badgeColors[element] || '#e5e7eb'
+ // Then try element color from API mappings
+ else if (element && mappings?.elements?.[element]?.hex_color) {
+  baseBgColor = mappings.elements[element].hex_color
+ }
+ // Fallback to default
+ else {
+  baseBgColor = '#e5e7eb'
+ }
  const textColor = '#6b7280' // Gray-500 for subtle effect
  
  return {
@@ -4190,7 +5514,6 @@ function getCombinationTooltip(combination) {
   THREE_MEETINGS: '三會 (Three Meetings)',
   THREE_COMBINATIONS: '三合 (Three Combinations)',
   SIX_HARMONIES: '六合 (Six Harmonies)',
-  HALF_COMBINATIONS: '半合 (Half Combinations)',
   ARCHED_COMBINATIONS: '拱合 (Arched Combinations)',
   STEM_COMBINATION: '天干合 (Stem Combination)'
  }
@@ -4298,35 +5621,33 @@ function getNegativeBadgeSizeClass(strength) {
 
 function getNegativeBadgeStyle(negative) {
  if (!negative) return {}
- 
+
  const { badge, type, strength } = negative
- 
- // Use the same color mapping as transformations - exact hex from mappings
- const badgeColors = {
-  // Heavenly Stems (from backend mappings)
-  'Jia': '#c2d4be',  'Yi': '#d6e2bb',
-  'Bing': '#f3adae', 'Ding': '#f5d3b0',
-  'Wu': '#e6ceb7',   'Ji': '#efe3cc',
-  'Geng': '#ccd8e6', 'Xin': '#e6e8f7',
-  'Ren': '#b9cbff',  'Gui': '#e0e9ff',
-  
-  // Earthly Branches
-  'Zi': '#b9cbff',   'Chou': '#e6ceb7',
-  'Yin': '#c2d4be',  'Mao': '#d6e2bb',
-  'Chen': '#e6ceb7', 'Si': '#f3adae',
-  'Wu': '#f3adae',   'Wei': '#efe3cc',
-  'Shen': '#ccd8e6', 'You': '#e6e8f7',
-  'Xu': '#e6ceb7',   'Hai': '#e0e9ff',
-  
-  // Pure Elements (fallback)
-  'Wood': '#c9dcc4', 'Fire': '#f4c0af', 'Earth': '#ead9c2',
-  'Metal': '#d9e0f2', 'Water': '#cdd5ff',
-  
-  // Special negative interaction symbols
-  'KE': 'transparent'  // Stem conflict - neutral transparent for control/restrain
+ const mappings = chartData.value?.mappings
+
+ // Get color from API mappings - source of truth
+ let baseBgColor = null
+
+ // Special handling for KE (stem conflict) - transparent
+ if (badge === 'KE') {
+  baseBgColor = 'transparent'
  }
- 
- const baseBgColor = badgeColors[badge] || badgeColors['Earth'] || '#fbbf24'
+ // Try stem color from API mappings
+ else if (badge && mappings?.heavenly_stems?.[badge]?.hex_color) {
+  baseBgColor = mappings.heavenly_stems[badge].hex_color
+ }
+ // Try branch color from API mappings
+ else if (badge && mappings?.earthly_branches?.[badge]?.hex_color) {
+  baseBgColor = mappings.earthly_branches[badge].hex_color
+ }
+ // Try element color from API mappings
+ else if (mappings?.elements?.Earth?.hex_color) {
+  baseBgColor = mappings.elements.Earth.hex_color
+ }
+ // Fallback to default
+ else {
+  baseBgColor = '#fbbf24'
+ }
  // Special handling for transparent KE badge - use black text
  const textColor = badge === 'KE' ? '#000000' : (getLightnessPercent(baseBgColor) > 70 ? '#1f2937' : '#ffffff')
  const borderColor = badge === 'KE' ? '#000000' : adjustBrightness(baseBgColor, -20)
@@ -4433,7 +5754,7 @@ function getFullInteractionData(badge) {
   
   // Check if it's a compound type like THREE_MEETINGS, STEM_COMBINATION, etc.
   let typeEndIndex = 1
-  const compoundTypes = ['THREE_MEETINGS', 'THREE_COMBINATIONS', 'SIX_HARMONIES', 'HALF_COMBINATIONS', 
+  const compoundTypes = ['THREE_MEETINGS', 'THREE_COMBINATIONS', 'SIX_HARMONIES',
               'ARCHED_COMBINATIONS', 'STEM_COMBINATION', 'STEM_CONFLICT']
   
   for (const compoundType of compoundTypes) {
@@ -4559,6 +5880,245 @@ function getNegativeBadgeTooltip(negative) {
  return tooltip
 }
 
+// Wealth Storage badge functions
+function getWealthStorageSymbol(ws) {
+ if (!ws) return '📦'
+
+ // Get detailed storage info from analysis
+ const analysis = chartData.value?.wealth_storage_analysis
+ let storageInfo = analysis?.storages?.find(s => s.interaction_id === ws.interaction_id)
+ if (!storageInfo) {
+  storageInfo = analysis?.pillar_storages?.find(s => s.interaction_id === ws.interaction_id)
+ }
+
+ const isLarge = (storageInfo?.storage_size === 'large') || (ws?.storage_size === 'large')
+
+ // Simple icon based on storage SIZE only
+ // Status (filled/opened) is shown via transparency, border, highlight
+ // Large storage (大财库): 💎 treasure/gem
+ // Small storage (小财库): 🪙 coin
+ return isLarge ? '💎' : '🪙'
+}
+
+// Helper for Storage Analysis section (uses storage object directly, not badge)
+function getStorageAnalysisIcon(storage) {
+ if (!storage) return '📦'
+
+ const isLarge = storage.storage_size === 'large' || storage.size === 'large'
+
+ // Simple icon based on storage SIZE only
+ // Status (filled/opened) is shown via transparency, border, highlight
+ return isLarge ? '💎' : '🪙'
+}
+
+// Style for storage icon based on filled/opened state
+function getStorageIconStyle(storage) {
+ if (!storage) return {}
+
+ const isOpened = storage.is_opened || false
+ const isFilled = storage.is_filled || false
+
+ // 4 distinct visual states via opacity, filter, and text-shadow
+ if (isOpened && isFilled) {
+  // Maximum - full brightness, golden glow
+  return {
+   opacity: '1',
+   filter: 'drop-shadow(0 0 6px #ffd700) drop-shadow(0 0 10px rgba(255, 215, 0, 0.5))',
+   transform: 'scale(1.1)'
+  }
+ } else if (isOpened) {
+  // Opened but not filled - bright, green glow
+  return {
+   opacity: '0.9',
+   filter: 'drop-shadow(0 0 4px #22c55e)',
+   transform: 'scale(1.0)'
+  }
+ } else if (isFilled) {
+  // Filled but not opened - bright, blue glow
+  return {
+   opacity: '0.85',
+   filter: 'drop-shadow(0 0 3px #3b82f6)',
+   transform: 'scale(1.0)'
+  }
+ } else {
+  // Latent - low opacity, grayscale, no glow
+  return {
+   opacity: '0.4',
+   filter: 'grayscale(50%)',
+   transform: 'scale(0.9)'
+  }
+ }
+}
+
+function getWealthStorageSizeClass(ws) {
+ if (!ws) return 'w-6 h-6 text-sm'
+
+ // Get detailed storage info to determine exact activation level
+ const analysis = chartData.value?.wealth_storage_analysis
+ // Check both storages and pillar_storages
+ let storageInfo = analysis?.storages?.find(s => s.interaction_id === ws.interaction_id)
+ if (!storageInfo) {
+  storageInfo = analysis?.pillar_storages?.find(s => s.interaction_id === ws.interaction_id)
+ }
+
+ const isOpened = storageInfo?.is_opened || false
+ const isFilled = storageInfo?.is_filled || false
+ const isLarge = (storageInfo?.storage_size === 'large') || (ws?.storage_size === 'large')
+
+ // Size based on activation level AND storage size
+ if (isOpened && isFilled) {
+  return isLarge ? 'w-8 h-8 text-lg' : 'w-7 h-7 text-base' // Maximum
+ } else if (isOpened || isFilled) {
+  return isLarge ? 'w-7 h-7 text-base' : 'w-6 h-6 text-sm' // Partially activated
+ } else {
+  return isLarge ? 'w-6 h-6 text-sm' : 'w-5 h-5 text-xs'   // Latent
+ }
+}
+
+function getWealthStorageBadgeStyle(ws) {
+ if (!ws) return {}
+
+ // Get detailed storage info to determine exact activation level
+ const analysis = chartData.value?.wealth_storage_analysis
+ // Check both storages and pillar_storages
+ let storageInfo = analysis?.storages?.find(s => s.interaction_id === ws.interaction_id)
+ if (!storageInfo) {
+  storageInfo = analysis?.pillar_storages?.find(s => s.interaction_id === ws.interaction_id)
+ }
+
+ const isOpened = storageInfo?.is_opened || false
+ const isFilled = storageInfo?.is_filled || false
+ 
+ // Colors based on wealth element - using backend core.py colors (Yang polarity)
+ const wealthColors = {
+  'Wood': { bg: '#c2d4be', border: '#9ab894' },  // matches Jia (Yang Wood)
+  'Fire': { bg: '#f3adae', border: '#e08384' },  // matches Bing (Yang Fire)
+  'Earth': { bg: '#e6ceb7', border: '#c9a987' }, // matches Wu (Yang Earth)
+  'Metal': { bg: '#ccd8e6', border: '#a3b8cc' }, // matches Geng (Yang Metal)
+  'Water': { bg: '#b9cbff', border: '#8aa5e6' }  // matches Ren (Yang Water)
+ }
+ 
+ // Get wealth element from interaction data
+ const wealthElem = analysis?.wealth_element || 'Metal'
+ const colors = wealthColors[wealthElem] || wealthColors.Metal
+ 
+ // Base style
+ const baseStyle = {
+  backgroundColor: colors.bg,
+  borderRadius: '6px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center'
+ }
+ 
+ // Four distinct visual states based on filled + opened
+ if (isOpened && isFilled) {
+  // MAXIMUM (filled + opened) - gold border, strong glow, full opacity
+  return {
+   ...baseStyle,
+   border: `3px solid #ffd700`,
+   opacity: 1,
+   boxShadow: `0 0 12px #ffd70080, 0 0 20px rgba(255, 215, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.2)`
+  }
+ } else if (isOpened) {
+  // OPENED but not filled - solid green border, medium glow, high opacity
+  return {
+   ...baseStyle,
+   border: `2px solid #22c55e`,
+   opacity: 0.9,
+   boxShadow: `0 0 8px rgba(34, 197, 94, 0.5), 0 2px 4px rgba(0, 0, 0, 0.1)`
+  }
+ } else if (isFilled) {
+  // FILLED but not opened - solid blue border, subtle glow, high opacity
+  return {
+   ...baseStyle,
+   border: `2px solid #3b82f6`,
+   opacity: 0.85,
+   boxShadow: `0 0 6px rgba(59, 130, 246, 0.4), 0 1px 3px rgba(0, 0, 0, 0.1)`
+  }
+ } else {
+  // LATENT (not filled, not opened) - dashed gray border, no glow, low opacity
+  return {
+   ...baseStyle,
+   border: `2px dashed #9ca3af`,
+   opacity: 0.4,
+   boxShadow: 'none'
+  }
+ }
+}
+
+function getWealthStorageTooltip(ws) {
+ if (!ws) return ''
+
+ const analysis = chartData.value?.wealth_storage_analysis
+ // Check both storages and pillar_storages
+ let storageInfo = analysis?.storages?.find(s => s.interaction_id === ws.interaction_id)
+ if (!storageInfo) {
+  storageInfo = analysis?.pillar_storages?.find(s => s.interaction_id === ws.interaction_id)
+ }
+
+ const isOpened = storageInfo?.is_opened || false
+ const isFilled = storageInfo?.is_filled || false
+ const isLarge = (storageInfo?.storage_size === 'large') || (ws?.storage_size === 'large')
+ const storageType = storageInfo?.storage_type || ws.storage_type || 'wealth'
+
+ // Determine status text and icon
+ const sizeLabel = isLarge ? '大财库 (Large)' : '小财库 (Small)'
+ const statusIcon = isLarge ? '💎' : '🪙'
+
+ let statusText = ''
+ if (isOpened && isFilled) {
+  statusText = 'Maximum (已开已填)'
+ } else if (isOpened) {
+  statusText = 'Opened (已开未填)'
+ } else if (isFilled) {
+  statusText = 'Filled (已填未开)'
+ } else {
+  statusText = 'Latent (潜在)'
+ }
+ 
+ const typeLabel = storageType === 'wealth' ? '财库 (Wealth Storage)' : '官库 (Influence Storage)'
+ let tooltip = `${statusIcon} ${sizeLabel} - ${typeLabel}\n`
+ tooltip += `Stores: ${storageInfo?.stored_element || 'Unknown'}\n`
+ tooltip += `Status: ${statusText}\n`
+ 
+ if (storageInfo?.branch_chinese) {
+  tooltip += `Branch: ${storageInfo.branch_chinese} (${storageInfo.branch})\n`
+ }
+ 
+ // Activation details
+ tooltip += `\n━━━ Activation Requirements ━━━`
+ 
+ if (storageInfo) {
+  // Opener status
+  if (isOpened) {
+   tooltip += `\n✓ Opened by: ${storageInfo.opener_branch} (${storageInfo.opener_positions?.join(', ')})`
+  } else {
+   tooltip += `\n○ Needs opener: ${storageInfo.opener_branch || 'clash branch'} to unlock`
+  }
+  
+  // Filler status - use storage-specific filler stems
+  if (isFilled) {
+   tooltip += `\n✓ Filled from: ${storageInfo.filler_positions?.join(', ')}`
+  } else {
+   const fillerStems = storageInfo.filler_stems?.join('/') || (storageType === 'wealth' ? 'wealth stems' : 'influence stems')
+   const fillerLabel = storageType === 'wealth' ? 'DW/IW' : 'DO/7K'
+   tooltip += `\n○ Needs filler: ${fillerStems} (${fillerLabel}) in other pillars`
+  }
+ }
+ 
+ // Summary tip
+ if (isOpened && isFilled) {
+  tooltip += `\n\n✨ Maximum ${storageType} storage power!`
+ } else if (isOpened || isFilled) {
+  tooltip += `\n\n💡 Partially activated - ${isOpened ? 'needs filler' : 'needs opener clash'}`
+ } else {
+  tooltip += `\n\n💡 Latent - needs both opener and filler to activate`
+ }
+ 
+ return tooltip
+}
+
 function getTransformationTooltip(transformation) {
  if (!transformation) return ''
  
@@ -4569,7 +6129,6 @@ function getTransformationTooltip(transformation) {
   THREE_MEETINGS: '三會 (Three Meetings)',
   THREE_COMBINATIONS: '三合 (Three Combinations)',
   SIX_HARMONIES: '六合 (Six Harmonies)',
-  HALF_COMBINATIONS: '半合 (Half Combinations)',
   ARCHED_COMBINATIONS: '拱合 (Arched Combinations)',
   STEM_COMBINATION: '天干合 (Stem Combination)'
  }
@@ -4829,6 +6388,21 @@ function getWuXingRelationClass(element1, element2) {
  }
 }
 
+// Qi Phase (十二長生) styling based on strength category
+function getQiPhaseClass(strength) {
+ const classes = {
+  'peak': 'bg-green-100 text-green-800 border border-green-300',      // 帝旺 - Emperor
+  'strong': 'bg-lime-100 text-lime-800 border border-lime-300',       // 長生/臨官 - Birth/Official
+  'growing': 'bg-emerald-50 text-emerald-700 border border-emerald-200', // 冠帶 - Capping
+  'declining': 'bg-amber-100 text-amber-800 border border-amber-300', // 衰 - Decline
+  'weak': 'bg-orange-100 text-orange-800 border border-orange-300',   // 沐浴/病 - Bathing/Sickness
+  'dead': 'bg-red-100 text-red-800 border border-red-300',           // 死/絕 - Death/Extinction
+  'stored': 'bg-purple-100 text-purple-800 border border-purple-300', // 墓 - Tomb
+  'nascent': 'bg-cyan-100 text-cyan-800 border border-cyan-300'       // 胎/養 - Embryo/Nurturing
+ }
+ return classes[strength] || 'bg-gray-100 text-gray-700 border border-gray-200'
+}
+
 
 function getVerticalWuXingRelation(stemElement, branchElement) {
  // Extract base element names (remove Yang/Yin)
@@ -4896,7 +6470,6 @@ function formatShortInteraction(interaction) {
   'PUNISHMENTS': '刑',
   'THREE_COMBINATIONS': '三合',
   'SIX_HARMONIES': '六合',
-  'HALF_COMBINATIONS': '半合',
   'ARCHED_COMBINATIONS': '拱合',
   'CLASHES': '沖',
   'HARMS': '害',

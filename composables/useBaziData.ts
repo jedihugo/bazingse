@@ -46,7 +46,18 @@ export const useBaziData = () => {
   }
 
   // Helper function to convert ten god names to abbreviations
-  const getTenGodAbbreviation = (tenGod: string): string => {
+  // Uses API-provided abbreviation when available, falls back to pattern matching
+  const getTenGodAbbreviation = (tenGod: string | { abbreviation?: string, id?: string }): string => {
+    // If tenGod is already an object with abbreviation, use it
+    if (typeof tenGod === 'object' && tenGod !== null) {
+      return tenGod.abbreviation || tenGod.id || 'Unknown'
+    }
+    // If it's a short string (already an abbreviation), return as-is
+    if (typeof tenGod === 'string' && tenGod.length <= 3) {
+      return tenGod
+    }
+    // Fallback pattern matching for legacy string format
+    // NOTE: These should ideally come from API mappings.ten_gods
     const abbreviations: { [key: string]: string } = {
       'Friend': 'F',
       'Rob Wealth': 'RW',
@@ -56,11 +67,12 @@ export const useBaziData = () => {
       'Indirect Wealth': 'IW',
       'Direct Officer': 'DO',
       '7 Killings': '7K',
+      'Seven Killings': '7K',
       'Direct Resource': 'DR',
       'Indirect Resource': 'IR',
-      'Day Master': 'Day Master'
+      'Day Master': 'DM'
     }
-    return abbreviations[tenGod] || tenGod
+    return abbreviations[tenGod as string] || (tenGod as string)
   }
 
   // Helper function to transform new API response to legacy format
@@ -137,56 +149,14 @@ export const useBaziData = () => {
           }
     }
 
-    // Generate mock luck pillars (since the natal chart endpoint doesn't provide them)
-    // In a real implementation, you'd need to call a separate endpoint for luck pillars
-    const mockLuckPillars: LuckPillar[] = generateMockLuckPillars(apiResponse.birth_info.date, dayMaster, mappings)
-
+    // Luck pillars should come from the API via fetchLuckPillar()
+    // Return empty array here - actual luck pillars are fetched separately
+    // and stored in currentLuckPillar
     return {
       natal_chart: natalChart,
-      luck_pillars: mockLuckPillars,
-      selected_luck_pillar: mockLuckPillars[3] || mockLuckPillars[0] // Default to 4th pillar or first
+      luck_pillars: [], // Populated from API via fetchLuckPillar
+      selected_luck_pillar: null as any
     }
-  }
-
-  // Generate mock luck pillars (temporary until we integrate the luck pillar endpoint)
-  const generateMockLuckPillars = (birthDate: string, dayMaster: string, mappings: any): LuckPillar[] => {
-    const birthYear = new Date(birthDate).getFullYear()
-    
-    // Sample luck pillars data structure
-    const samplePillars = [
-      { hs: 'Geng', eb: 'Zi', startAge: 3 },
-      { hs: 'Xin', eb: 'Chou', startAge: 13 },
-      { hs: 'Ren', eb: 'Yin', startAge: 23 },
-      { hs: 'Gui', eb: 'Mao', startAge: 33 },
-      { hs: 'Jia', eb: 'Chen', startAge: 43 },
-      { hs: 'Yi', eb: 'Si', startAge: 53 },
-      { hs: 'Bing', eb: 'Wu', startAge: 63 },
-      { hs: 'Ding', eb: 'Wei', startAge: 73 }
-    ]
-
-    return samplePillars.map((pillarData, idx) => {
-      const tenGodsHidden: { [key: string]: string } = {}
-      
-      // Add some default hidden stems based on the earthly branch
-      // This is simplified - the real API would provide accurate data
-      if (mappings?.earthly_branches?.[pillarData.eb]) {
-        // Add placeholder ten gods
-        tenGodsHidden['Sample'] = 'DR'
-      }
-
-      return {
-        pillar: `${pillarData.hs} ${pillarData.eb}`,
-        year: `~${birthYear + pillarData.startAge}-${birthYear + pillarData.startAge + 9}`,
-        age: `~${pillarData.startAge}-${pillarData.startAge + 9}`,
-        index: idx,
-        hs_element: mappings?.heavenly_stems?.[pillarData.hs]?.english || 'Unknown',
-        eb_animal: mappings?.earthly_branches?.[pillarData.eb]?.animal || 'Unknown',
-        ten_god_hs: mappings?.ten_gods?.[dayMaster]?.[pillarData.hs] 
-          ? getTenGodAbbreviation(mappings.ten_gods[dayMaster][pillarData.hs])
-          : 'Unknown',
-        ten_god_hidden: tenGodsHidden
-      }
-    })
   }
 
   // Function to fetch 10-year luck pillar data

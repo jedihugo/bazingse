@@ -1,15 +1,34 @@
 import type { ElementType } from '~/types/bazi'
 
-// Yang stems (darker colors)
+// Yang stems (used for polarity detection)
 const yangStems = ['Jia', 'Bing', 'Wu', 'Geng', 'Ren']
 
-// Yang branches (darker colors)
+// Yang branches (used for polarity detection)
 const yangBranches = ['Zi', 'Yin', 'Chen', 'Wu', 'Shen', 'Xu']
 
-// Element color mapping - now with Yang (darker) and Yin (lighter) variations
+// NOTE: Element colors should come from API mappings.elements
+// These are kept for legacy compatibility but should be phased out.
+// Use API: mappings.elements[element].hex_color instead
+
+// Helper to get element hex color from API mappings
+export function getElementHexColorFromMappings(element: ElementType, mappings: any, polarity?: 'Yang' | 'Yin'): string {
+  const elementData = mappings?.elements?.[element]
+  if (!elementData) return '#6b7280' // gray fallback
+
+  if (polarity === 'Yang' && elementData.hex_color_yang) {
+    return elementData.hex_color_yang
+  }
+  if (polarity === 'Yin' && elementData.hex_color_yin) {
+    return elementData.hex_color_yin
+  }
+  return elementData.hex_color || '#6b7280'
+}
+
+// Legacy Tailwind class mappings - DEPRECATED, use API hex colors instead
+// Kept for backward compatibility during migration
 export const elementColorsYang: Record<ElementType, string> = {
   Fire: 'text-red-600',
-  Earth: 'text-yellow-700', 
+  Earth: 'text-yellow-700',
   Metal: 'text-gray-600',
   Water: 'text-blue-700',
   Wood: 'text-green-700'
@@ -17,7 +36,7 @@ export const elementColorsYang: Record<ElementType, string> = {
 
 export const elementColorsYin: Record<ElementType, string> = {
   Fire: 'text-red-400',
-  Earth: 'text-yellow-600', 
+  Earth: 'text-yellow-600',
   Metal: 'text-gray-400',
   Water: 'text-blue-500',
   Wood: 'text-green-500'
@@ -78,24 +97,36 @@ export function parsePillar(pillarString: string): { stem: string, branch: strin
   }
 }
 
-// Get element color class based on stem (Yang/Yin)
+// Get element hex color by stem - uses API mappings
+export function getElementHexByStem(stemEnglish: string, mappings: any): string {
+  const stemData = mappings?.heavenly_stems?.[stemEnglish]
+  return stemData?.hex_color || '#6b7280'
+}
+
+// Get element hex color by branch - uses API mappings
+export function getElementHexByBranch(branchEnglish: string, mappings: any): string {
+  const branchData = mappings?.earthly_branches?.[branchEnglish]
+  return branchData?.hex_color || '#6b7280'
+}
+
+// Get element color class based on stem (Yang/Yin) - DEPRECATED, use getElementHexByStem
 export function getElementColorByStem(element: ElementType, stemEnglish: string): string {
   const isYang = yangStems.includes(stemEnglish)
   const colors = isYang ? elementColorsYang : elementColorsYin
   return colors[element] || 'text-gray-600'
 }
 
-// Get element color class based on branch (Yang/Yin)
+// Get element color class based on branch (Yang/Yin) - DEPRECATED, use getElementHexByBranch
 export function getElementColorByBranch(branchEnglish: string): string {
   const element = branchElements[branchEnglish]
   if (!element) return 'text-gray-600'
-  
+
   const isYang = yangBranches.includes(branchEnglish)
   const colors = isYang ? elementColorsYang : elementColorsYin
   return colors[element] || 'text-gray-600'
 }
 
-// Legacy function for backward compatibility
+// Legacy function for backward compatibility - DEPRECATED, use API mappings
 export function getElementColor(element: ElementType): string {
   return elementColors[element] || 'text-gray-600'
 }

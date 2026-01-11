@@ -311,12 +311,12 @@ def calculate_element_scores_with_interactions(bazi_chart: Dict, month_branch: s
         states = ELEMENT_SEASONAL_STATES.get(element, {})
         if month_branch in states.get("Prosperous", []):
             return 1.5  # 50% boost when prosperous
-        elif month_branch in states.get("Growing", []):
-            return 1.2  # 20% boost when growing
+        elif month_branch in states.get("Strengthening", []):
+            return 1.2  # 20% boost when strengthening
         elif month_branch in states.get("Resting", []):
             return 1.0  # Normal strength
-        elif month_branch in states.get("Imprisoned", []):
-            return 0.8  # 20% reduction when imprisoned
+        elif month_branch in states.get("Trapped", []):
+            return 0.8  # 20% reduction when trapped
         elif month_branch in states.get("Dead", []):
             return 0.5  # 50% reduction when dead
         return 1.0
@@ -1434,12 +1434,12 @@ def calculate_element_scores_with_interactions_v2(bazi_chart: Dict, month_branch
         states = ELEMENT_SEASONAL_STATES.get(element, {})
         if month_branch in states.get("Prosperous", []):
             return 1.5  # 50% boost when prosperous
-        elif month_branch in states.get("Growing", []):
-            return 1.2  # 20% boost when growing
+        elif month_branch in states.get("Strengthening", []):
+            return 1.2  # 20% boost when strengthening
         elif month_branch in states.get("Resting", []):
             return 1.0  # Normal strength
-        elif month_branch in states.get("Imprisoned", []):
-            return 0.8  # 20% reduction when imprisoned
+        elif month_branch in states.get("Trapped", []):
+            return 0.8  # 20% reduction when trapped
         elif month_branch in states.get("Dead", []):
             return 0.5  # 50% reduction when dead
         return 1.0

@@ -1,74 +1,247 @@
 # AGENTS.md
 
-This file provides guidance to AI coding agents when working with the BaZingSe codebase.
+Guidance for AI agents working on **BaZingSe** - a full-stack Chinese BaZi (Four Pillars/八字) astrology application.
+
+**Status**: Production-ready API with 8-26 node extensible architecture, Vue 3 + Vite frontend, comprehensive test suite.
+
+---
 
 ## Project Overview
-
-**BaZingSe** is a full-stack Chinese BaZi (Four Pillars/八字) astrology application analyzing birth charts and destiny interactions through time.
 
 - **Frontend**: Vue 3 + Vite (Pure SPA) with Custom CSS
 - **Backend**: Python FastAPI + sxtwl calendar library
 - **Architecture**: Backend-driven calculation engine with frontend display layer
 
-## Development Commands
+---
 
-### Frontend (Vue 3 SPA - Port 3000)
-```bash
-cd /Users/macbookair/GitHub/bazingse-app
-npm install
-npm run dev     # Development server: http://localhost:3000
-npm run build   # Production build → dist/
-npm run preview # Preview production build
+## CRITICAL: Pattern-Based Thinking (READ THIS FIRST!)
+
+**When given an example, NEVER hardcode for just that one case. Always identify the pattern and apply it universally.**
+
+### WRONG Approach:
+```
+User: "Add distance field to SIX_HARMONIES interactions"
+Agent: *Only adds distance to SIX_HARMONIES*
+Result: 23 other interaction types still missing distance field!
 ```
 
-### Backend (FastAPI - Port 8008)
-```bash
-cd /Users/macbookair/GitHub/bazingse-app/api
-# Create/activate venv if needed
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-# Run server
-python run_bazingse.py  # http://localhost:8008
+### CORRECT Approach:
+```
+User: "Add distance field to SIX_HARMONIES interactions"
+Agent:
+  1. Understands: User wants distance for scoring transparency
+  2. Searches: How many interaction types exist? (grep for interaction_log.append)
+  3. Discovers: 14 interaction types, 24 locations total
+  4. Applies: Adds distance to ALL interaction types
+  5. Verifies: Checks that ALL interactions now have distance field
+Result: Complete fix, no follow-up needed!
 ```
 
-## Core Architecture Principles
+### Key Questions to Ask:
+1. **"Is this a single instance or a pattern?"** (Usually a pattern!)
+2. **"Where else does this pattern occur?"** (Search with grep/Glob)
+3. **"What's the root cause?"** (Fix the source, not symptoms)
+4. **"Are there similar cases?"** (Apply fix universally)
 
-### ⚠️ CRITICAL: Backend-Driven Design
+---
 
-**ALL BaZi calculations, logic, and astrology knowledge MUST live in the Python backend.**
+## CRITICAL: API is the Single Source of Truth
+
+**ALL data, logic, calculations, and display metadata MUST live in the Python API backend.**
+
+This includes:
+- BaZi calculations and astrology knowledge
+- **Colors (hex values)** for elements, stems, branches
+- **Styling metadata** for Ten Gods, event types, badges
+- **Icons and labels** for all UI elements
+- Hidden stem percentages, qi values, transformations
+- All mappings and reference data
 
 **Frontend responsibilities (ONLY):**
-- Collect user inputs
+- Collect user inputs (forms, date pickers)
 - Call backend APIs
-- Display returned data
-- Handle UI interactions (hover, click, toggle)
+- Display returned data using API-provided styling
+- Handle UI interactions (hover, click, toggle, animations)
+- Layout and responsive design
 
 **Frontend must NEVER:**
 - Calculate elements, stems, branches, or Ten Gods
 - Implement BaZi rules or interaction logic
 - Hardcode Chinese astrology knowledge
+- **Hardcode hex colors** - use `mappings.elements[element].hex_color`
+- **Hardcode styling** - use `mappings.ten_gods_styling[id].hex_color`
+- **Create mock/fallback data** - if API doesn't provide it, request API enhancement
 
-**Why?**
-- Single source of truth for BaZi knowledge
-- Uses battle-tested `sxtwl` library
-- One place to fix/update calculations
-- Consistent across all clients
+---
+
+## Critical BaZi Principles
+
+### 1. Earthly Branch Polarity Rules (MOST IMPORTANT)
+
+**CRITICAL: Different rules for transformations vs. energy flow!**
+
+#### A. EB Transformations (Combinations)
+**When Earthly Branches transform through combinations, use BRANCH polarity for the badge.**
+
+Applies to: THREE_MEETINGS, THREE_COMBINATIONS, SIX_HARMONIES, HALF_COMBINATIONS, ARCHED_COMBINATIONS
+
+**Examples:**
+- Si 巳 (Yin branch) → Fire transformation uses **Ding** 丁 (Yin Fire badge)
+- Wu 午 (Yang branch) → Fire transformation uses **Bing** 丙 (Yang Fire badge)
+
+**Implementation:** In `transform_to_element()`, use `EARTHLY_BRANCHES[branch_id]["polarity"]`
+
+#### B. Energy Flow (Natural Production)
+**When Earthly Branches generate elements through WuXing cycle, use PRIMARY QI polarity.**
+
+Applies to: Natural element generation, receiver nodes in energy flow
+
+**Examples:**
+- Si 巳 (Yin branch) has Bing 丙 (Yang) primary → Produces **Geng** 庚 (Yang Metal)
+- Wu 午 (Yang branch) has Ding 丁 (Yin) primary → Produces **Xin** 辛 (Yin Metal)
+
+**Implementation:** Use `get_primary_qi_polarity(branch_id)` helper in `add_element()` calls
+
+| Context | Use | Example |
+|---------|-----|---------|
+| EB Transformation Badge | Branch Polarity | Si (Yin) → Fire = Ding badge |
+| Energy Generation/Flow | Primary Qi Polarity | Si (Bing Yang primary) → Metal = Geng |
+
+### 2. BaZi Is Deterministic
+**Use constants, never dynamic functions.** All mappings are fixed forever.
+
+```python
+# CORRECT: Deterministic constants
+ELEMENT_CHARACTERS = {"Wood": "木", "Fire": "火", ...}
+ELEMENT_POLARITY_TO_STEM = {"Yang Wood": "Jia", "Yin Wood": "Yi", ...}
+
+# WRONG: Dynamic lookup functions
+def get_element_character(name): ...  # Don't do this!
+```
+
+### 3. Interaction Logic Flow
+All interactions follow this sequence:
+
+1. **DETECTION**: Required stems/branches present?
+2. **DISTANCE**: Adjacent (0), nearby (1), or far (2+)?
+3. **TRANSFORMATION**: Transforming element exists?
+   - HS combinations: Check if target element exists in **ANY EB** (including luck pillars!)
+   - EB combinations: Check if target element exists in **ANY HS**
+
+### 4. Hidden Qi Interaction Depth (藏干相剋)
+
+**Classical BaZi principle: Primary, Secondary, AND Tertiary Qi can interact.**
+
+| Qi Pairing | Strength Multiplier | Notes |
+|------------|---------------------|-------|
+| Primary-Primary | 1.0 | Full interaction |
+| Primary-Secondary | 0.5 | Half strength |
+| Secondary-Secondary | 0.25 | Quarter strength |
+| Primary-Tertiary | 0.30 | Tertiary engagement |
+| Secondary-Tertiary | 0.15 | Cross-level |
+| Tertiary-Tertiary | 0.10 | Rare, both have tertiary |
+
+### 5. Stem-Branch Unity (干支一體)
+
+**Classical BaZi principle: HS and EB within the same pillar form a unified energy.**
+
+Calculated FIRST before other interactions (innate pillar nature):
+
+| Relationship | Effect | Example |
+|--------------|--------|---------|
+| HS produces EB | +10% boost to EB | Wood stem + Fire branch |
+| HS controls EB | -8% penalty to EB | Fire stem + Metal branch |
+| Same element | +5% boost to both | Fire stem + Fire branch |
+
+### 6. Punishment Hierarchy (刑法輕重)
+
+| Category | Chinese | Severity | Multiplier | Pattern |
+|----------|---------|----------|------------|---------|
+| 勢刑 (Shi Xing) | Power/Bullying | Severe | 1.0 | Yin-Si-Shen |
+| 無禮刑 (Wu Li Xing) | Rudeness | Moderate | 0.85 | Chou-Wei-Xu |
+| 恩刑 (En Xing) | Ungrateful | Light | 0.70 | Zi-Mao |
+| 自刑 (Zi Xing) | Self-punishment | Self | 0.60 | Chen-Chen, etc. |
+
+### 7. Rooting and Support (通根/透出)
+
+**Same element relationships indicate strength without qi exchange.**
+
+#### Primary Qi (本氣) vs Hidden Stems (藏干)
+
+| Index | Term | Chinese | Description | Hidden? |
+|-------|------|---------|-------------|---------|
+| 0 | **Primary Qi** | 本氣 | Main/dominant energy of the branch | NO - visible |
+| 1+ | **Hidden Stems** | 藏干 | Secondary/tertiary energies | YES - actually hidden |
+
+**Example - Yin Tiger (寅)**:
+- Index 0: Jia (甲 Wood, 60) = **Primary Qi (本氣)** - NOT hidden
+- Index 1: Bing (丙 Fire, 30) = **Hidden Stem (藏干)** - secondary, hidden
+- Index 2: Wu (戊 Earth, 10) = **Hidden Stem (藏干)** - tertiary, hidden
+
+---
+
+## Architecture
+
+### File Structure
+```
+bazingse/
+├── api/                             # Backend - Python FastAPI
+│   ├── bazingse.py (~4,000 lines)   # Core interaction engine (8-26 nodes)
+│   ├── chart_constructor.py         # Pillar generation (uses sxtwl)
+│   ├── routes.py                    # FastAPI endpoint /analyze_bazi
+│   ├── run_bazingse.py              # Entry point (uvicorn on port 8008)
+│   ├── library/                     # Modular BaZi constants & utilities
+│   │   ├── __init__.py              # Package exports
+│   │   ├── core.py                  # STEMS & BRANCHES - single source of truth
+│   │   ├── derived.py               # Computed data from core
+│   │   ├── seasonal.py              # Seasonal strength multipliers (旺相休囚死)
+│   │   ├── combinations.py          # Positive interactions (三會/三合/六合)
+│   │   ├── conflicts.py             # Negative interactions (沖/害/刑/破)
+│   │   ├── scoring.py               # Distance multipliers & base scores
+│   │   ├── distance.py              # Node coordinate calculations
+│   │   ├── unity.py                 # Wu Xing Combat Engine (控/生)
+│   │   ├── unit_tracker.py          # Qi Story Timeline tracker
+│   │   ├── dong_gong.py             # Dong Gong date selection
+│   │   └── wealth_storage.py        # 财库 (wealth storage) detection
+│   └── test_analyze_bazi.py         # Python test suite
+│
+├── app/                             # Frontend - Vue 3 + Vite
+│   ├── index.html                   # Entry HTML
+│   ├── vite.config.js               # Vite configuration (port 3000)
+│   ├── package.json                 # npm dependencies
+│   ├── public/                      # Static assets
+│   │   ├── bazingse-logo.png        # App logo
+│   │   └── favicon.ico              # Favicon
+│   └── src/
+│       ├── main.js                  # Vue app entry point
+│       ├── App.vue (~5,500 lines)   # Main Vue component
+│       ├── styles.css               # Global styles
+│       ├── types/
+│       │   └── bazi.ts              # TypeScript interfaces
+│       └── utils/
+│           └── baziHelpers.ts       # BaZi utility functions
+│
+├── composables/                     # Vue composables
+│   └── useBaziData.ts               # BaZi data composable
+│
+└── AGENTS.md                        # AI coding guidelines (this file)
+```
+
+### Node System (8-26 nodes)
+**Natal (8)**: `hs_y`, `hs_m`, `hs_d`, `hs_h`, `eb_y`, `eb_m`, `eb_d`, `eb_h`
+**10-Year Luck (2)**: `hs_10yl`, `eb_10yl` (when `analysis_year` provided)
+**Annual (2)**: `hs_yl`, `eb_yl`
+**Monthly (2)**: `hs_ml`, `eb_ml` (when `analysis_month` provided)
+**Daily (2)**: `hs_dl`, `eb_dl` (when `analysis_day` provided)
+**Hourly (2)**: `hs_hl`, `eb_hl` (when `analysis_time` provided)
+**Talisman (0-8)**: `hs_ty`, `eb_ty`, `hs_tm`, `eb_tm`, `hs_td`, `eb_td`, `hs_th`, `eb_th` (optional)
+
+**CRITICAL**: Talismans can be **partial** - HS and EB are independent:
+- HS-only: `talisman_year_hs=Jia` (creates only `hs_ty`)
+- EB-only: `talisman_year_eb=Zi` (creates only `eb_ty`)
+- Both: Provide both parameters (creates both nodes)
 
 ### 18-Node System Architecture
-
-The system can calculate up to **9 pillars × 2 nodes each = 18 nodes:**
-
-**Natal Chart (8 nodes - always present):**
-- 4 Heavenly Stems: `hs_y`, `hs_m`, `hs_d`, `hs_h`
-- 4 Earthly Branches: `eb_y`, `eb_m`, `eb_d`, `eb_h`
-
-**Temporal Luck Pillars (up to 10 additional nodes):**
-- **10-Year Luck** (大运): `hs_10yl`, `eb_10yl` - Position 4
-- **Annual Luck** (年運): `hs_yl`, `eb_yl` - Position 5
-- **Monthly Luck** (月運): `hs_ml`, `eb_ml` - Position 6
-- **Daily Luck** (日運): `hs_dl`, `eb_dl` - Position 7
-- **Hourly Luck** (時運): `hs_hl`, `eb_hl` - Position 8
 
 **Position System:**
 ```
@@ -78,8 +251,6 @@ Hour | Day | Month | Year || 10Y Luck || Annual | Monthly | Daily | Hourly
 
 Backend Position Codes:
 0=Hour | 1=Day | 2=Month | 3=Year || 4=10YL | 5=Annual | 6=Monthly | 7=Daily | 8=Hourly
-                                      ↑                                                 ↑
-                              natal (spatial)                               temporal (overlays)
 ```
 
 ### Temporal Overlay Metaphysics
@@ -88,362 +259,36 @@ Backend Position Codes:
 Luck pillars (10Y, Annual, Monthly, Daily, Hourly) are NOT spatial positions—they are **temporal overlays** affecting the ENTIRE natal chart equally.
 
 **Backend Implementation:**
-- `calculate_interaction_distance()` in `api/bazingse.py` treats luck positions (4-8) as **distance=0** to ALL natal positions (0-3)
+- `calculate_interaction_distance()` treats luck positions (4-8) as **distance=0** to ALL natal positions (0-3)
 - All luck-natal interactions receive full adjacency strength
-- Luck-luck interactions use normal distance
-- This ensures luck pillars interact equally with Year, Month, Day, and Hour (no spatial bias)
 
-## Backend Structure
+---
 
-**Location:** `/Users/macbookair/GitHub/bazingse-app/api/`
+## Development Commands
 
-**Key Modules:**
-- `routes.py` - FastAPI endpoint definitions (main: `/analyze_bazi`)
-- `bazingse.py` - Core 18-node interaction engine with `analyze_8_node_interactions()`
-- `library.py` - BaZi constants (stems, branches, Ten Gods, interactions)
-- `chart_constructor.py` - Chart generation, luck pillar timing calculations
-- `interaction.py` - Pattern analysis helpers (combinations, clashes, harmonies)
-
-**Main API Endpoint:**
-```
-GET /analyze_bazi
-Parameters:
-  - birth_date: YYYY-MM-DD (required)
-  - birth_time: HH:MM (optional, "unknown" for missing hour)
-  - gender: "male" | "female" (required)
-  - analysis_year: int (optional, triggers 10-year + annual luck)
-  - include_annual_luck: bool (default: true)
-  - analysis_month: int 1-12 (optional, adds monthly luck)
-  - analysis_day: int 1-31 (optional, adds daily luck)
-  - analysis_time: HH:MM (optional, adds hourly luck)
-
-Returns:
-  - birth_info: Birth details
-  - analysis_info: Time period flags (has_luck_pillar, has_annual, has_monthly, etc.)
-  - All nodes: hs_y, hs_m, hs_d, hs_h, hs_10yl, hs_yl, hs_ml, hs_dl, hs_hl (present nodes only)
-                eb_y, eb_m, eb_d, eb_h, eb_10yl, eb_yl, eb_ml, eb_dl, eb_hl
-  - base_element_score: Pre-interaction element scores (flat dict: stem_id → score)
-  - post_element_score: Post-interaction element scores
-  - interactions: Complete interaction dictionary (key: "TYPE~Pattern~nodes")
-  - daymaster_analysis: Day master strength analysis
-  - mappings: Reference tables (heavenly_stems, earthly_branches, ten_gods)
+### Frontend (Vue 3 SPA - Port 3000)
+```bash
+cd /Users/macbookair/GitHub/bazingse/app
+npm install
+npm run dev     # Development server: http://localhost:3000
+npm run build   # Production build → dist/
+npm run preview # Preview production build
 ```
 
-**Interaction Types Calculated:**
-- Six Harmonies (六合), Clashes (相冲), Harms (相害), Punishments (相刑)
-- Three Meetings (三會), Three Combinations (三合), Half Combinations (半合)
-- Stem Combinations (天干合), Stem Conflicts (天干沖)
-- Destructions (相破), Seasonal adjustments
-
-## Frontend Structure
-
-**Location:** `/Users/macbookair/GitHub/bazingse-app/`
-
-### Main Files
-
-**Entry Point:**
-- `index.html` - HTML entry point with Vue app mount target
-- `src/main.js` - Vue app initialization, imports App.vue and styles.css
-- `vite.config.js` - Vite configuration with API proxy to backend
-
-**Primary Interface:**
-- `src/App.vue` (~4981 lines)
-  - All-in-one Single File Component (SFC)
-  - Complete BaZi interface: inputs, chart display, interactions, analysis
-  - Explicit Vue 3 imports (ref, computed, watch, onMounted, etc.)
-  - Quick Test Presets: 9 pre-configured birth data buttons
-  - View mode toggle: Base (pre-interaction) vs Post (post-interaction with transformations)
-  - WuXing flow indicators between pillars
-  - Five element graphs with before/after comparison
-  - Talisman system: Manual pillar override with Jia-Zi pair validation
-  - Location feature: Overseas/birthplace toggle
-  - Smooth CSS transitions (no stuttering)
-
-**Styling:**
-- `src/styles.css` (~600 lines) - All application styles
-  - Custom CSS (converted from Tailwind)
-  - Preserves all Tailwind utility class names
-  - CSS custom properties for colors and transitions
-  - Responsive design (mobile-first)
-  - No preprocessor needed
-
-**Type Definitions:**
-- `src/types/bazi.ts` (~194 lines) - TypeScript interfaces
-  - Node structures (BaziNode, NodeState, QiValue)
-  - API response types (NatalChartResponse, LuckPillarResponse)
-  - Element type definitions
-
-**Utilities:**
-- `src/utils/baziHelpers.ts` (~151 lines) - Helper functions
-  - Element color mappings (Yang/Yin variations)
-  - Ten Gods abbreviation mappings
-  - Stem/branch Chinese character mappings
-  - Element extraction from Chinese characters
-  - Color functions with brightness adjustment
-
-### API Proxy Layer
-
-**Vite Proxy Configuration:**
-- All `/api/*` requests → `http://localhost:8008/*`
-- Configured in `vite.config.js`
-- Automatic path rewriting (removes `/api` prefix)
-- CORS handling built-in
-
-**Backend Endpoints Used:**
-- `/api/analyze_bazi` - Main 18-node analysis endpoint
-- `/api/generate_natal_chart` - Natal chart only
-- `/api/parse-input` - Natural language parsing (experimental)
-
-### Key State Management (in App.vue)
-
-**Chart Data:**
-- `chartData` - Complete backend response (18-node system data)
-- `currentLuckPillar` - Current 10-year luck timing info
-- `annualLuckPillar` - Current annual luck pillar
-
-**Input State:**
-- `birthDate`, `birthTime`, `gender` - Birth information
-- `yearInput`, `monthInput`, `dayInput` - Separated date inputs for UI
-- `unknownHour` - Toggle for missing hour pillar
-
-**Time Travel State:**
-- `showAnalysisPeriod` - "Time Travel" mode toggle
-- `analysisYear`, `analysisMonth`, `analysisDay`, `analysisTime` - Analysis period parameters
-- `includeAnnualLuck`, `includeMonthlyLuck`, `includeDailyLuck`, `includeHourlyLuck` - Progressive pillar toggles
-
-**View State:**
-- `viewMode` - Toggle between 'base' (pre-interaction) and 'post' (post-interaction with transformations)
-- `showInteractionLog` - Toggle for interaction log panel visibility (default: true)
-- `hoveredNode`, `hoveredInteraction`, `highlightedNodes` - Hover state for interactive highlighting
-- `highlightContext` - Stores interaction context for element-based coloring
-- `hoveredTransformationId` - Track which transformation is being hovered
-- `activeConnections` - Array of active connection lines between nodes
-- `showConnections` - Toggle for displaying connection lines between interacting nodes
-- `tooltipContent`, `tooltipPosition` - Dynamic tooltip state
-
-**Talisman State:**
-- `showTalismans` - Toggle for talisman pillar display
-- `talismanYearHS`, `talismanYearEB` - Year talisman stem/branch overrides
-- `talismanMonthHS`, `talismanMonthEB` - Month talisman stem/branch overrides
-- `talismanDayHS`, `talismanDayEB` - Day talisman stem/branch overrides
-- `talismanHourHS`, `talismanHourEB` - Hour talisman stem/branch overrides
-
-### Data Flow
-
-1. User fills birth inputs + toggles "Time Travel" mode (🔮)
-2. Frontend calls `/api/analyze_bazi?...` with progressive parameters
-3. Vite proxy forwards to backend `http://localhost:8008/analyze_bazi`
-4. Backend calculates nodes + interactions (up to 18 nodes)
-5. Frontend receives complete chart data
-6. UI renders with smooth transitions:
-   - 4-9 pillars (natal + active luck pillars)
-   - Base vs Post view toggle
-   - WuXing flow indicators
-   - Five element graphs (before/after)
-   - Interactive badges with tooltips
-   - Pillar enter/leave animations
-
-## UI/UX Design
-
-### Quick Test Presets
-
-**Pre-configured Test Data:**
-- Row of quick-access buttons with preset birth data for rapid testing
-- Each button shows: date, time, gender symbol (♀/♂)
-- Color-coded: Pink for female, Blue for male
-- Hover effect with scale animation
-- Automatically loads preset data on click
-- Located at top of interface for easy access
-
-**Current Presets:**
-9 pre-configured birth charts for rapid testing with various patterns and interactions
-
-### Time Travel Mode (🔮 Toggle)
-
-**Progressive Input Cascade:**
+### Backend (FastAPI - Port 8008)
+```bash
+cd /Users/macbookair/GitHub/bazingse/api
+# Create/activate venv if needed
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+# Run server
+python run_bazingse.py  # http://localhost:8008
 ```
-🔮 Time Travel OFF: Show only natal chart (4 pillars)
-
-🔮 Time Travel ON:
-  ↓ Shows 10-Year Luck + Annual inputs
-  ☑️ Annual (enabled) → Year input shown
-    ↓ Enter year → Monthly input appears
-    ☑️ Monthly (enabled) → Month input shown
-      ↓ Enter month → Daily input appears
-      ☑️ Daily (enabled) → Day input shown
-        ↓ Enter day → Hourly input appears
-        ☑️ Hourly (enabled) → Time input shown
-```
-
-**Toggle Checkbox Behavior:**
-- Checkboxes gate BOTH display AND calculations
-- Unchecking a level excludes that pillar from API call → no interactions calculated
-- Cascading reset: Unchecking Annual clears Monthly/Daily/Hourly; unchecking Monthly clears Daily/Hourly
-
-### Visual Design
-
-**Pillar Borders (6 distinct colors):**
-- **Blue** (`border-blue-500`) = Day pillar (Day Master/日主) - Always position 1
-- **Purple** (`border-purple-500`) = 10-Year Luck pillar (大运) - Position 4
-- **Orange** (`border-orange-500`) = Annual Luck pillar (年運) - Position 5
-- **Green** (`border-green-500`) = Monthly Luck pillar (月運) - Position 6
-- **Indigo** (`border-indigo-500`) = Daily Luck pillar (日運) - Position 7
-- **Pink** (`border-pink-500`) = Hourly Luck pillar (時運) - Position 8
-- No colored borders for: Year (pos 3), Month (pos 2), Hour (pos 0)
-
-**Gold Theme for Temporal Inputs (Annual/Monthly/Daily/Hourly):**
-- Background: `#F5F1E8` (cream gold)
-- Border: `#C9B037` (Robinhood gold)
-- Text: `#8B7355` (gold-brown)
-- Badge: `#FEF3C7` background, `#92400E` text, `#D97706` border
-- Checkbox accent: `#C9B037`
-- When disabled: Grey with 60% opacity + grayscale
-
-**Purple Gradient Dividers:**
-- Vertical purple gradients wrap ONLY the 10-year luck pillar
-- Visual separation: `Natal || 10Y Luck || Annual | Monthly | Daily | Hourly`
-- Reinforces 10-year luck's special temporal overlay status
-
-**Chart Layout (horizontal grid, 4-9 columns):**
-```
-Hour | Day | Month | Year || 10Y || Annual | Monthly | Daily | Hourly
-時   | 日  | 月    | 年   || 運  || 年運   | 月運    | 日運  | 時運
-(pos0) (pos1) (pos2) (pos3)  (pos4) (pos5)  (pos6)   (pos7) (pos8)
-
-Purple gradient dividers: ↑           ↑
-                    (wrap 10Y Luck only)
-```
-
-**View Mode Toggle:**
-- **Base View**: Shows pre-interaction state (naive element scores)
-- **Post View** (default): Shows post-interaction state with transformations
-  - WuXing flow indicators (→ symbols between pillars)
-  - Transformation badges on transformed nodes
-  - Element changes displayed in graphs
-
-**Interaction Badges:**
-- **Transformation** badges: Element-based colors with strength indicators (★★, ★, ●, ○)
-  - Ultra Strong: 32px, 2 stars
-  - Strong: 28px, 1 star
-  - Normal: 24px, filled dot
-  - Weak: 20px, hollow dot
-- **Combination** badges: Dashed borders with repeating diagonal pattern
-- **Negative** badges (clash/harm/punishment): Red background with solid borders
-- All badges are clickable/hoverable for interaction details and tooltips
-
-**Five Element Graphs:**
-- Horizontal bar charts showing element distribution
-- Grid lines dividing each 20% segment
-- Base view: Single bar per element
-- Post view: Dual bars with arrows showing change (naive → final)
-- Color-coded by element with relationship labels (support/drain/neutral)
-
-### Talisman System
-
-**Manual Pillar Override:**
-- Toggle-able talisman row (🧿 Talisman button)
-- Allows manual override of natal pillars with custom stems/branches
-- Four input pairs: Year, Month, Day, Hour
-- Each pair has dropdown selectors for Heavenly Stem and Earthly Branch
-- Real-time Jia-Zi pair validation (60 valid combinations)
-- Invalid pairs marked with ⚠️ warning and red border
-- Valid pairs show teal border and background
-- Talisman pillars render below natal chart with full interaction calculation
-- Useful for:
-  - Testing hypothetical charts
-  - Analyzing auspicious dates
-  - Feng Shui adjustments
-  - Name/logo selection timing
-
-**Validation:**
-- Uses `isValidJiaziPair(stem, branch)` function
-- Checks against 60-element Jia-Zi cycle
-- Visual feedback via `hasInvalidTalismanPairs` computed property
-- Prevents calculation with invalid combinations
-
-### Interaction Display
-
-**Pillar Column Interaction Cards:**
-- Each pillar shows its interactions below branch row
-- Green background = positive (harmonies, combinations)
-- Red background = negative (clashes, harms, punishments)
-- Subtitle shows "with [Other Pillar]"
-- Hover highlights ALL involved nodes with blue rings
-
-**Interaction Log (expandable sidebar panel):**
-- Right-side panel showing detailed list of ALL interactions
-- Expandable/collapsible with toggle button
-- Shows for each interaction:
-  - Interaction type and pattern name
-  - Node names involved (with Chinese characters)
-  - Effect description
-  - Stage indicator (pre/post)
-- Hover sync: Hovering interaction in log highlights nodes in chart
-- Click to focus: Clicking interaction scrolls and highlights it
-- Filter toggle to hide natural energy flow interactions
-
-## Key Implementation Patterns
-
-### Backend Development
-
-**Adding New Calculations:**
-1. Update `api/library.py` if new constants needed
-2. Add logic to `api/bazingse.py` or `api/interaction.py`
-3. Expose via new parameter in `api/routes.py` or modify existing endpoint
-4. Return all calculated data in response (frontend should not re-calculate)
-
-**Position System Rules:**
-- Positions 0-3: Natal chart (spatial, normal distance calculation)
-- Positions 4-8: Luck pillars (temporal overlay, distance=0 to natal)
-- Use `position_to_index` dict to map position codes to indices
-- Always update `position_codes` list when adding new luck pillars
-
-### Frontend Development
-
-**NO BaZi Logic in Frontend:**
-```javascript
-// ❌ WRONG - Frontend calculating Ten God
-function getTenGod(dayMaster, stem) {
-  if (dayMaster === 'Jia' && stem === 'Yi') return 'R' // NO!
-}
-
-// ✅ CORRECT - Backend lookup only
-const tenGod = chartData.mappings.ten_gods[dayMasterStem][stem].abbreviation
-```
-
-**Adding New Temporal Pillar Display:**
-1. Add toggle ref with explicit import: `import { ref } from 'vue'` then `const includeXLuck = ref(true)`
-2. Add to localStorage save/load in `saveToStorage()` and `loadFromStorage()`
-3. Add checkbox in input header section with gold theme styling
-4. Add conditional in API URL builder in `generateChart()`: `if (valueX && includeXLuck.value) apiUrl += '&param_x=...'`
-5. Update `luckPillarsOrdered` computed to extract new pillar from `chartData`
-6. Add node mapping in `formatNodeName()` for display
-7. Add border color class in pillar rendering template
-8. Add to analysis info display panel badge section
-9. Update `totalPillarCount` computed to include new pillar
-
-**State Management:**
-- Explicit Vue 3 imports: `import { ref, computed, watch, onMounted } from 'vue'`
-- All refs created with `ref()` or `shallowRef()` for performance
-- localStorage for persistence using `STORAGE_KEY` constant
-- Computed properties for derived data (use `computed()`)
-- Watchers for cascading resets (use `watch()`)
-- No Pinia/Vuex - pure Vue 3 Composition API
-- All state is reactive and triggers smooth UI updates with CSS transitions
-
-**Working with Node Data:**
-- Always check `viewMode.value` to determine whether to use `base` or `post` node state
-- Access node data via `chartData.value.hs_X` or `chartData.value.eb_X` where X is position code
-- Use `node.base.qi` for pre-interaction qi scores
-- Use `node.post_interaction_qi` for post-interaction qi scores
-- Check `node.transformed`, `node.alive`, `node.interacted` flags for visual indicators
-- Access badges via `node.badges` array (contains transformation, combination, negative badges)
-
-## Common Tasks
 
 ### Restart Backend with Changes
 ```bash
-cd /Users/macbookair/GitHub/bazingse-app/api
+cd /Users/macbookair/GitHub/bazingse/api
 pkill -f "python.*run_bazingse"
 source .venv/bin/activate && nohup python run_bazingse.py > /tmp/bazingse.log 2>&1 &
 ```
@@ -453,81 +298,256 @@ source .venv/bin/activate && nohup python run_bazingse.py > /tmp/bazingse.log 2>
 curl "http://localhost:8008/analyze_bazi?birth_date=1986-11-29&birth_time=01:30&gender=male&analysis_year=2025&include_annual_luck=true&analysis_month=10" | python3 -m json.tool
 ```
 
-### Check Interactions
-```bash
-# Count interactions by type
-curl "..." 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print(f'Total: {len(d.get(\"interactions\",{}))}'); [print(k.split('~')[0]) for k in d.get('interactions',{}).keys()]" | sort | uniq -c
+---
+
+## API Endpoint
+
+**GET** `/analyze_bazi`
+
+**Required Parameters**:
+- `birth_date` (YYYY-MM-DD) - Birth date
+- `gender` (male/female) - Gender for luck pillar calculation
+
+**Optional Time Period Parameters**:
+- `birth_time` (HH:MM) - Birth time for hour pillar
+- `analysis_year` (int) - Triggers 10-year luck pillar calculation
+- `include_annual_luck` (bool, default: true) - Include annual luck when analysis_year provided
+- `analysis_month` (1-12) - Month luck pillar (requires analysis_year)
+- `analysis_day` (1-31) - Day luck pillar (requires analysis_month)
+- `analysis_time` (HH:MM) - Hour luck pillar (requires analysis_day)
+
+**Optional Talisman Parameters**:
+- `talisman_year_hs`, `talisman_year_eb` - Talisman slot 1 (any of 60 pillars)
+- `talisman_month_hs`, `talisman_month_eb` - Talisman slot 2
+- `talisman_day_hs`, `talisman_day_eb` - Talisman slot 3
+- `talisman_hour_hs`, `talisman_hour_eb` - Talisman slot 4
+
+**Optional Location Parameter**:
+- `location` (overseas/birthplace) - Non-interactive element boost based on residence location
+
+**Returns**: Flat JSON structure with:
+- All node data (base_qi, post_interaction_qi, badges, interactions)
+- Interaction log (all 14 interaction types)
+- Base/post element scores
+- Daymaster analysis
+- Chinese character mappings
+- Unit tracker (Qi Story Timeline)
+
+---
+
+## Interaction Types
+
+The system detects and processes **14 interaction types**:
+
+**Positive (Earthly Branch Combinations):**
+1. THREE_MEETINGS (三會) - Directional combinations
+2. THREE_COMBINATIONS (三合) - Triangular combinations
+3. HALF_MEETINGS (半會) - Partial directional combinations
+4. SIX_HARMONIES (六合) - Pair harmonies
+5. HALF_COMBINATIONS (半合) - Partial triangular combinations
+6. ARCHED_COMBINATIONS (拱合) - Arched combinations
+
+**Positive (Heavenly Stem Combinations):**
+7. STEM_COMBINATIONS (天干合) - 5 stem pairs that combine
+
+**Negative (Conflicts):**
+8. STEM_CONFLICTS (天干沖) - Heavenly stem clashes (same polarity only)
+9. CLASHES (地支沖) - Earthly branch oppositions
+10. PUNISHMENTS (刑) - Ungrateful/power/rudeness punishments
+11. HARMS (害) - Mutual harm relationships
+12. DESTRUCTION (破) - Destructive relationships
+
+**Special:**
+13. SEASONAL_ADJUSTMENT - Month-based element adjustments
+14. ENERGY_FLOW - Natural WuXing production cycles
+
+---
+
+## Node Badge System
+
+### Badge Types (7 total)
+
+**Positive (Additive):**
+- `transformation`: Successful EB/HS combination with element support
+  - Badge: Stem character of NEW element (e.g., "Ren" for Water)
+  - Size: Based on interaction strength (xl/lg/md/sm/xs)
+
+- `combination`: Partial EB combination without full element support
+  - Badge: Stem character of partial element
+
+**Negative (Reductive):**
+- `punishment`: "XING" (刑)
+- `harm`: "HAI" (害)
+- `clash`: "CHONG" (沖)
+- `destruction`: "PO" (破)
+- `stem_conflict`: "KE" (剋)
+
+**Key Principles**:
+- **Positive badges**: Display stem character → elemental visualization
+- **Negative badges**: Display icon identifier → neutral visualization
+- **Badge distribution**: Both controller AND victim receive badges
+
+---
+
+## Unit Tracker (Qi Story Timeline)
+
+The Unit Tracker provides a **video game-style narrative** of how qi flows through the chart.
+
+### Timeline Phases (Processing Order)
+
+```
+ 1. naive_assignment        → Register all qi units with initial values
+ 2. pillar_unity_d         → Day HS ↔ Day EB qi
+ 3. pillar_unity_y         → Year HS ↔ Year EB qi
+ 4. pillar_unity_m         → Month HS ↔ Month EB qi
+ 5. pillar_unity_h         → Hour HS ↔ Hour EB qi
+ 6. seasonal               → Apply 旺相休囚死 Fibonacci multipliers
+ 7. three_meetings         → 三會 detection and tracking
+ 8. three_combinations     → 三合 detection and tracking
+ 9. half_meetings          → 半會 detection and tracking
+10. six_harmonies          → 六合 detection and tracking
+11. conflicts              → 沖害刑 detection and tracking
+12. half_combinations      → 半合 detection and tracking
+13. arched_combinations    → 拱合 detection and tracking
+14. cross_pillar           → Cross-pillar HS ↔ EB qi interactions
 ```
 
-## Important Files
+### Seasonal Adjustments (旺相休囚死)
 
-**Backend:**
-- `/Users/macbookair/GitHub/bazingse-app/api/routes.py` - API endpoints
-- `/Users/macbookair/GitHub/bazingse-app/api/bazingse.py` - Interaction engine (~2900 lines)
-- `/Users/macbookair/GitHub/bazingse-app/api/library.py` - BaZi constants
-- `/Users/macbookair/GitHub/bazingse-app/api/chart_constructor.py` - Chart generation and luck pillar calculations
-- `/Users/macbookair/GitHub/bazingse-app/api/interaction.py` - Pattern analysis helpers
+| State | Chinese | Multiplier | Fibonacci Basis |
+|-------|---------|------------|-----------------|
+| Prosperous | 旺 Wang | 1.382 | Fibonacci advancement (strongest) |
+| Strengthening | 相 Xiang | 1.236 | Fibonacci level |
+| Resting | 休 Xiu | 1.000 | Baseline (no change) |
+| Trapped | 囚 Qiu | 0.786 | Fibonacci retracement |
+| Dead | 死 Si | 0.618 | Golden ratio retracement (weakest) |
 
-**Frontend:**
-- `/Users/macbookair/GitHub/bazingse-app/index.html` - HTML entry point
-- `/Users/macbookair/GitHub/bazingse-app/src/main.js` - Vue app initialization
-- `/Users/macbookair/GitHub/bazingse-app/src/App.vue` - Main component (~4981 lines)
-- `/Users/macbookair/GitHub/bazingse-app/src/styles.css` - All application styles (~600 lines)
-- `/Users/macbookair/GitHub/bazingse-app/src/types/bazi.ts` - TypeScript interfaces (~194 lines)
-- `/Users/macbookair/GitHub/bazingse-app/src/utils/baziHelpers.ts` - Helper utilities (~151 lines)
-- `/Users/macbookair/GitHub/bazingse-app/vite.config.js` - Vite config + API proxy
+---
 
-**Documentation:**
-- `/Users/macbookair/GitHub/bazingse-app/AGENTS.md` - This file (complete agent guidance)
-- `/Users/macbookair/GitHub/bazingse-app/README.md` - Project overview and quick start
-- `/Users/macbookair/GitHub/bazingse-app/QUICK_START.md` - Development guide
+## Frontend Structure
 
-**Dependencies:**
-- Backend: `fastapi`, `uvicorn`, `sxtwl`, `python-dotenv`
-- Frontend: 
-  - Core: `vue@^3.5.22`
-  - Build: `vite@^5.1.4`, `@vitejs/plugin-vue@^5.0.4`
-  - Total: 30 packages (~40MB node_modules)
+### Main Files
 
-## Configuration
+**Entry Point:**
+- `app/index.html` - HTML entry point with Vue app mount target
+- `app/src/main.js` - Vue app initialization
+- `app/vite.config.js` - Vite configuration with API proxy to backend
 
-**Vite Config** (`vite.config.js`):
-- Vue 3 plugin configuration
-- API proxy: `/api/*` → `http://localhost:8008/*`
-- Dev server on port 3000
-- Path alias: `@` → `./src`
-- Optimized production builds
+**Primary Interface:**
+- `app/src/App.vue` (~5,500 lines)
+  - All-in-one Single File Component (SFC)
+  - Complete BaZi interface: inputs, chart display, interactions, analysis
+  - Explicit Vue 3 imports (ref, computed, watch, onMounted, etc.)
 
-**HTML Entry** (`index.html`):
-- Vue app mount target: `#app`
-- Mobile-optimized meta tags
-- Viewport: no-zoom, no-scale for stability
-- Theme color: white
-- Favicon and touch icons
-- JetBrains Mono font via Google Fonts CDN
+**Styling:**
+- `app/src/styles.css` (~600 lines)
+  - Custom CSS (converted from Tailwind)
+  - **TUI-STYLE (Terminal UI)**: Content-first, minimal padding/margins
+  - **MOBILE-FIRST responsive design**
+  - **NO HORIZONTAL SCROLLING**
+
+### Key State Management (in App.vue)
+
+**Chart Data:**
+- `chartData` - Complete backend response (18-node system data)
+- `currentLuckPillar` - Current 10-year luck timing info
+
+**View State:**
+- `viewMode` - Toggle between 'base' (pre-interaction) and 'post' (post-interaction)
+- `showInteractionLog` - Toggle for interaction log panel visibility
+
+**Talisman State:**
+- `showTalismans` - Toggle for talisman pillar display
+- `talismanYearHS`, `talismanYearEB` - Year talisman stem/branch overrides
+
+### Data Flow
+
+1. User fills birth inputs + toggles "Time Travel" mode
+2. Frontend calls `/api/analyze_bazi?...` with progressive parameters
+3. Vite proxy forwards to backend `http://localhost:8008/analyze_bazi`
+4. Backend calculates nodes + interactions (up to 26 nodes)
+5. Frontend receives complete chart data
+6. UI renders with smooth transitions
+
+---
+
+## Key Implementation Patterns
+
+### Backend Development
+
+**Adding New Calculations:**
+1. Update `api/library/` if new constants needed
+2. Add logic to `api/bazingse.py` or create new module
+3. Expose via new parameter in `api/routes.py`
+4. Return all calculated data in response (frontend should not re-calculate)
+
+**Position System Rules:**
+- Positions 0-3: Natal chart (spatial, normal distance calculation)
+- Positions 4-8: Luck pillars (temporal overlay, distance=0 to natal)
+- Positions 9-12: Talisman (external harmony tools, distance=0 to natal)
+
+### Frontend Development
+
+**NO BaZi Logic in Frontend:**
+```javascript
+// WRONG - Frontend calculating Ten God
+function getTenGod(dayMaster, stem) {
+  if (dayMaster === 'Jia' && stem === 'Yi') return 'R' // NO!
+}
+
+// CORRECT - Backend lookup only
+const tenGod = chartData.mappings.ten_gods[dayMasterStem][stem].abbreviation
+```
+
+**State Management:**
+- Explicit Vue 3 imports: `import { ref, computed, watch, onMounted } from 'vue'`
+- All refs created with `ref()` or `shallowRef()` for performance
+- localStorage for persistence
+- No Pinia/Vuex - pure Vue 3 Composition API
+
+---
+
+## 2-Tier Element Scoring System
+
+Separate natal destiny vs. full chart element scores:
+
+```python
+1. base_element_score   # Natal chart ONLY (8 nodes), before interactions
+2. post_element_score   # ALL nodes (natal + luck + talisman + location), after interactions
+```
+
+**Base Score** (natal chart only, pure birth destiny):
+- Always 6 or 8 nodes (depends on birth_time provided)
+- NO luck pillars, NO talisman, NO location boost
+- NO interactions applied
+
+**Post Score** (full chart, current life situation):
+- Includes ALL nodes: Natal (8) + Luck (0-10) + Talisman (0-8)
+- Includes location boost (overseas or birthplace)
+- ALL interactions calculated and applied
+
+---
 
 ## Design Principles
 
 1. **Backend is Source of Truth** - Never calculate BaZi logic in frontend
-2. **KISS** - Keep solutions simple and understandable
+2. **KISS** - Keep solutions simple and understandable (middle-schooler friendly)
 3. **Flat Data Structures** - Avoid deep nesting (max 1 level)
 4. **Progressive Enhancement** - Features appear as user provides more input
 5. **Visual Clarity** - Colors and borders indicate pillar types and interactions
 6. **Temporal Overlay Concept** - Luck pillars interact equally with all natal pillars
-7. **Responsive Design** - Mobile-first approach with touch-friendly controls
+7. **Mobile-First Responsive Design** - Base styles for mobile, enhanced for larger screens
+8. **NO HORIZONTAL SCROLLING** - Page must NEVER scroll left/right
+9. **TUI-STYLE (Terminal UI)** - Content-first design with minimal chrome
+
+---
 
 ## Troubleshooting
 
 **Interactions not showing for Monthly/Daily/Hourly:**
 - Check backend restarted after `bazingse.py` position code changes
-- Verify API params sent: `console.log('Calling API:', apiUrl)` in `generateChart()`
+- Verify API params sent: `console.log('Calling API:', apiUrl)`
 - Check response: `has_monthly`, `has_daily`, `has_hourly` flags
-- Verify `getPillarInteractionData()` includes positions 6, 7, 8
-
-**Pillar appears but greyed out:**
-- Check toggle checkbox state (must be enabled)
-- Verify API param sent when toggle is true
-- Check `includeXLuck` ref in API URL builder
 
 **Backend changes not reflecting:**
 - Restart backend server (Python doesn't hot-reload all changes)
@@ -535,74 +555,41 @@ curl "..." 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); pr
 - Test endpoint directly with `curl` to isolate issue
 
 **Vite/Vue Issues:**
-- Port conflict: `lsof -ti:3000 | xargs kill -9` or Vite will auto-select next port
+- Port conflict: `lsof -ti:3000 | xargs kill -9`
 - HMR not working: Check browser console, verify WS connection
-- CSS not loading: Check `src/styles.css` imported in `src/main.js`
-- State not persisting: Check localStorage in browser DevTools
 - Blank page: Check console for errors, verify backend is running
-
-## Recent Major Changes
-
-### November 2025 - Vue 3 SPA Migration
-
-**MAJOR ARCHITECTURE CHANGE:** Converted from Nuxt 4 to pure Vue 3 + Vite SPA
-
-**Why:**
-- KISS principle - simpler is better
-- 95% fewer packages (555 → 30)
-- 73% smaller footprint (150MB → 40MB)
-- 10x faster dev server startup (2s → 200ms)
-- 10x faster HMR (500ms → <50ms)
-- 12x faster builds (60s → 5s)
-- No framework magic - explicit imports
-- Pure Vue 3 standard patterns
-
-**What Changed:**
-- `pages/index.vue` → `src/App.vue` (~4981 lines)
-- Nuxt auto-imports → Explicit Vue 3 imports
-- `@nuxtjs/tailwindcss` → Custom CSS (~600 lines)
-- Nuxt server proxies → Vite proxy configuration
-- `nuxt.config.ts` → `vite.config.js`
-- Added `index.html` + `src/main.js` entry points
-
-**What Stayed:**
-- ✅ All features preserved (18-node system, time travel, talisman, location)
-- ✅ Same UI/UX with smooth CSS transitions
-- ✅ Backend-driven architecture (no calculation in frontend)
-- ✅ TypeScript types (`src/types/bazi.ts`)
-- ✅ Helper utilities (`src/utils/baziHelpers.ts`)
-- ✅ localStorage persistence
-
-### Current Features:
-1. **Quick Test Presets** - 9 pre-configured charts for rapid testing
-2. **Talisman System** - Manual pillar override with Jia-Zi validation
-3. **Location Feature** - Overseas/birthplace toggle
-4. **View Mode Toggle** - Base vs Post interaction visualization
-5. **WuXing Flow Indicators** - Visual arrows showing energy flow
-6. **Five Element Graphs** - Before/after comparison
-7. **Transformation Badges** - Strength-based visual indicators (★★, ★, ●, ○)
-8. **Progressive Pillar Display** - All 5 luck pillar types (10Y, Annual, Monthly, Daily, Hourly)
-9. **Smooth Transitions** - No stuttering, CSS-based animations
-10. **Mobile Optimization** - Touch-friendly, responsive design
-11. **TypeScript Support** - Complete type definitions
-
-### Architecture:
-1. **Pure Vue 3 SPA** - No SSR, no server components, explicit imports
-2. **Vite Build** - Lightning-fast HMR, optimized production builds
-3. **Custom CSS** - Tailwind utility classes as custom CSS
-4. **Backend-Driven** - All BaZi logic in Python, frontend only displays
-5. **18-Node System** - Up to 9 pillars × 2 nodes (stems + branches)
-6. **Temporal Overlay** - Luck pillars interact equally with all natal pillars
-
-### File Structure:
-- `src/App.vue` - Main component (~4981 lines)
-- `src/styles.css` - All styles (~600 lines)
-- `src/types/bazi.ts` - TypeScript interfaces (~194 lines)
-- `src/utils/baziHelpers.ts` - Helper functions (~151 lines)
-- `vite.config.js` - Build config + API proxy
-- `index.html` - Entry point
-- `src/main.js` - Vue app initialization
 
 ---
 
-**Last Updated:** 2025-11-09 (Vue 3 SPA migration complete)
+## Dependencies
+
+### Backend (api/)
+- **sxtwl**: Chinese calendar (accurate date conversions)
+- **FastAPI** + **Pydantic**: API framework + validation
+- **uvicorn**: ASGI server (auto-reload in dev)
+
+### Frontend (app/)
+- **Vue 3**: Reactive UI framework
+- **Vite**: Fast dev server and bundler
+- Total: ~30 packages (~40MB node_modules)
+
+---
+
+## TL;DR for AI Agents
+
+1. **EB transformations use BRANCH polarity**, **energy flow uses PRIMARY QI polarity** - Different rules!
+2. All constants are **deterministic** (no dynamic functions)
+3. HS combinations check **ALL EB nodes** including luck pillars AND talismans for transformation
+4. Use `get_primary_qi_polarity()` helper when adding elements to EB nodes in energy flow
+5. Scoring uses **nested dicts**, not tuples - Access with `.get("combined", {}).get("adjacent")`
+6. All interactions have `distance` field and `badges` list
+7. Up to 26 nodes supported: 8 natal + 10 luck + 8 talisman (all optional except natal)
+8. **Location boost**: Non-interactive element addition (overseas=Water, birthplace=Earth) - NOT a node!
+9. **2-tier scoring**: base=natal only (before interactions), post=everything (all nodes + location, after interactions)
+10. Keep code **KISS** - linear, flat, middle-schooler-friendly
+11. Test suite must pass before any commit
+12. **Pattern-based thinking**: When given an example, apply fix to ALL similar cases
+
+---
+
+**Last Updated:** 2026-01-11 (Merged root + api AGENTS.md)

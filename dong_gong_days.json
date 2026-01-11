@@ -1,0 +1,352 @@
+{
+  "system": "Dong Gong Date Selection (董公择日)",
+  "description": "Traditional Chinese date selection system based on 12 Day Officers and star formations",
+
+  "rating_scale": {
+    "excellent": { "symbol": "★", "value": 5, "chinese": "大吉" },
+    "auspicious": { "symbol": "✓", "value": 4, "chinese": "吉" },
+    "fair": { "symbol": "●", "value": 3, "chinese": "平" },
+    "inauspicious": { "symbol": "▲", "value": 2, "chinese": "凶" },
+    "dire": { "symbol": "✗", "value": 1, "chinese": "大凶" }
+  },
+
+  "twelve_day_officers": {
+    "jian": { "chinese": "建", "english": "Establish", "order": 0, "base_tendency": "bad", "notes": "Emptiness Day when day=month branch" },
+    "chu": { "chinese": "除", "english": "Remove", "order": 1, "base_tendency": "neutral" },
+    "man": { "chinese": "滿", "english": "Full", "order": 2, "base_tendency": "good_with_stars", "notes": "Good when Yellow Spiral stars present" },
+    "ping": { "chinese": "平", "english": "Balance", "order": 3, "base_tendency": "neutral" },
+    "ding": { "chinese": "定", "english": "Stable", "order": 4, "base_tendency": "excellent", "notes": "Best officer - Yellow Spiral stars" },
+    "zhi": { "chinese": "執", "english": "Initiate", "order": 5, "base_tendency": "good_with_virtue", "notes": "Good when Heavenly Virtue present" },
+    "po": { "chinese": "破", "english": "Destruction", "order": 6, "base_tendency": "bad" },
+    "wei": { "chinese": "危", "english": "Danger", "order": 7, "base_tendency": "bad" },
+    "cheng": { "chinese": "成", "english": "Success", "order": 8, "base_tendency": "excellent", "notes": "Very good - auspicious stars" },
+    "shou": { "chinese": "收", "english": "Receive", "order": 9, "base_tendency": "bad" },
+    "kai": { "chinese": "開", "english": "Open", "order": 10, "base_tendency": "mixed", "notes": "Some pillars good, some bad" },
+    "bi": { "chinese": "閉", "english": "Close", "order": 11, "base_tendency": "bad" }
+  },
+
+  "earthly_branches": [
+    { "pinyin": "yin", "chinese": "寅", "animal": "Tiger", "element": "Wood", "index": 0 },
+    { "pinyin": "mao", "chinese": "卯", "animal": "Rabbit", "element": "Wood", "index": 1 },
+    { "pinyin": "chen", "chinese": "辰", "animal": "Dragon", "element": "Earth", "index": 2, "is_storage": true },
+    { "pinyin": "si", "chinese": "巳", "animal": "Snake", "element": "Fire", "index": 3 },
+    { "pinyin": "wu", "chinese": "午", "animal": "Horse", "element": "Fire", "index": 4 },
+    { "pinyin": "wei", "chinese": "未", "animal": "Goat", "element": "Earth", "index": 5, "is_storage": true },
+    { "pinyin": "shen", "chinese": "申", "animal": "Monkey", "element": "Metal", "index": 6 },
+    { "pinyin": "you", "chinese": "酉", "animal": "Rooster", "element": "Metal", "index": 7 },
+    { "pinyin": "xu", "chinese": "戌", "animal": "Dog", "element": "Earth", "index": 8, "is_storage": true },
+    { "pinyin": "hai", "chinese": "亥", "animal": "Pig", "element": "Water", "index": 9 },
+    { "pinyin": "zi", "chinese": "子", "animal": "Rat", "element": "Water", "index": 10 },
+    { "pinyin": "chou", "chinese": "丑", "animal": "Ox", "element": "Earth", "index": 11, "is_storage": true }
+  ],
+
+  "heavenly_stems": [
+    { "pinyin": "jia", "chinese": "甲", "element": "Yang Wood", "index": 0 },
+    { "pinyin": "yi", "chinese": "乙", "element": "Yin Wood", "index": 1 },
+    { "pinyin": "bing", "chinese": "丙", "element": "Yang Fire", "index": 2 },
+    { "pinyin": "ding", "chinese": "丁", "element": "Yin Fire", "index": 3 },
+    { "pinyin": "wu", "chinese": "戊", "element": "Yang Earth", "index": 4 },
+    { "pinyin": "ji", "chinese": "己", "element": "Yin Earth", "index": 5 },
+    { "pinyin": "geng", "chinese": "庚", "element": "Yang Metal", "index": 6 },
+    { "pinyin": "xin", "chinese": "辛", "element": "Yin Metal", "index": 7 },
+    { "pinyin": "ren", "chinese": "壬", "element": "Yang Water", "index": 8 },
+    { "pinyin": "gui", "chinese": "癸", "element": "Yin Water", "index": 9 }
+  ],
+
+  "months": {
+    "1": {
+      "name": "First Month",
+      "chinese": "正月",
+      "branch": "yin",
+      "animal": "Tiger",
+      "season": "spring",
+      "heavenly_virtue_stem": "ding",
+      "days": {
+        "yin": {
+          "officer": "jian", "officer_chinese": "建",
+          "pillars": {
+            "jia_yin": "inauspicious", "bing_yin": "inauspicious", "wu_yin": "inauspicious",
+            "geng_yin": "inauspicious", "ren_yin": "inauspicious"
+          }
+        },
+        "mao": {
+          "officer": "chu", "officer_chinese": "除",
+          "pillars": {
+            "yi_mao": "inauspicious", "ding_mao": "inauspicious", "ji_mao": "inauspicious",
+            "xin_mao": "inauspicious", "gui_mao": "inauspicious"
+          }
+        },
+        "chen": {
+          "officer": "man", "officer_chinese": "滿",
+          "pillars": {
+            "jia_chen": "dire", "bing_chen": "inauspicious", "wu_chen": "dire",
+            "geng_chen": "inauspicious", "ren_chen": "inauspicious"
+          }
+        },
+        "si": {
+          "officer": "ping", "officer_chinese": "平",
+          "pillars": {
+            "yi_si": "inauspicious", "ding_si": "inauspicious", "ji_si": "fair",
+            "xin_si": "inauspicious", "gui_si": "inauspicious"
+          }
+        },
+        "wu": {
+          "officer": "ding", "officer_chinese": "定",
+          "pillars": {
+            "jia_wu": "excellent", "bing_wu": "excellent", "wu_wu": "auspicious",
+            "geng_wu": "auspicious", "ren_wu": "auspicious"
+          }
+        },
+        "wei": {
+          "officer": "zhi", "officer_chinese": "執",
+          "pillars": {
+            "yi_wei": "dire", "ding_wei": "inauspicious", "ji_wei": "inauspicious",
+            "xin_wei": "inauspicious", "gui_wei": "inauspicious"
+          }
+        },
+        "shen": {
+          "officer": "po", "officer_chinese": "破",
+          "pillars": {
+            "jia_shen": "inauspicious", "bing_shen": "inauspicious", "wu_shen": "inauspicious",
+            "geng_shen": "dire", "ren_shen": "dire"
+          }
+        },
+        "you": {
+          "officer": "wei", "officer_chinese": "危",
+          "pillars": {
+            "yi_you": "inauspicious", "ding_you": "auspicious", "ji_you": "inauspicious",
+            "xin_you": "dire", "gui_you": "inauspicious"
+          }
+        },
+        "xu": {
+          "officer": "cheng", "officer_chinese": "成",
+          "pillars": {
+            "jia_xu": "dire", "bing_xu": "inauspicious", "wu_xu": "dire",
+            "geng_xu": "inauspicious", "ren_xu": "dire"
+          }
+        },
+        "hai": {
+          "officer": "shou", "officer_chinese": "收",
+          "pillars": {
+            "yi_hai": "inauspicious", "ding_hai": "inauspicious", "ji_hai": "inauspicious",
+            "xin_hai": "inauspicious", "gui_hai": "inauspicious"
+          }
+        },
+        "zi": {
+          "officer": "kai", "officer_chinese": "開",
+          "pillars": {
+            "jia_zi": "inauspicious", "bing_zi": "auspicious", "wu_zi": "auspicious",
+            "geng_zi": "auspicious", "ren_zi": "inauspicious"
+          }
+        },
+        "chou": {
+          "officer": "bi", "officer_chinese": "閉",
+          "pillars": {
+            "yi_chou": "inauspicious", "ding_chou": "inauspicious", "ji_chou": "fair",
+            "xin_chou": "inauspicious", "gui_chou": "inauspicious"
+          }
+        }
+      }
+    },
+    "2": {
+      "name": "Second Month",
+      "chinese": "二月",
+      "branch": "mao",
+      "animal": "Rabbit",
+      "season": "spring",
+      "heavenly_virtue_branch": "shen",
+      "days": {
+        "mao": {
+          "officer": "jian", "officer_chinese": "建",
+          "pillars": {
+            "yi_mao": "inauspicious", "ding_mao": "inauspicious", "ji_mao": "inauspicious",
+            "xin_mao": "inauspicious", "gui_mao": "inauspicious"
+          }
+        },
+        "chen": {
+          "officer": "chu", "officer_chinese": "除",
+          "pillars": {
+            "jia_chen": "dire", "bing_chen": "inauspicious", "wu_chen": "dire",
+            "geng_chen": "inauspicious", "ren_chen": "dire"
+          }
+        },
+        "si": {
+          "officer": "man", "officer_chinese": "滿",
+          "pillars": {
+            "yi_si": "auspicious", "ding_si": "auspicious", "ji_si": "auspicious",
+            "xin_si": "auspicious", "gui_si": "auspicious"
+          }
+        },
+        "wu": {
+          "officer": "ping", "officer_chinese": "平",
+          "pillars": {
+            "jia_wu": "inauspicious", "bing_wu": "inauspicious", "wu_wu": "inauspicious",
+            "geng_wu": "inauspicious", "ren_wu": "inauspicious"
+          }
+        },
+        "wei": {
+          "officer": "ding", "officer_chinese": "定",
+          "pillars": {
+            "yi_wei": "dire", "ding_wei": "inauspicious", "ji_wei": "inauspicious",
+            "xin_wei": "inauspicious", "gui_wei": "auspicious"
+          }
+        },
+        "shen": {
+          "officer": "zhi", "officer_chinese": "執",
+          "pillars": {
+            "jia_shen": "auspicious", "bing_shen": "auspicious", "wu_shen": "auspicious",
+            "geng_shen": "fair", "ren_shen": "auspicious"
+          }
+        },
+        "you": {
+          "officer": "po", "officer_chinese": "破",
+          "pillars": {
+            "yi_you": "inauspicious", "ding_you": "inauspicious", "ji_you": "inauspicious",
+            "xin_you": "dire", "gui_you": "inauspicious"
+          }
+        },
+        "xu": {
+          "officer": "wei", "officer_chinese": "危",
+          "pillars": {
+            "jia_xu": "inauspicious", "bing_xu": "dire", "wu_xu": "dire",
+            "geng_xu": "inauspicious", "ren_xu": "dire"
+          }
+        },
+        "hai": {
+          "officer": "cheng", "officer_chinese": "成",
+          "pillars": {
+            "yi_hai": "auspicious", "ding_hai": "auspicious", "ji_hai": "auspicious",
+            "xin_hai": "excellent", "gui_hai": "excellent"
+          }
+        },
+        "zi": {
+          "officer": "shou", "officer_chinese": "收",
+          "pillars": {
+            "jia_zi": "inauspicious", "bing_zi": "inauspicious", "wu_zi": "inauspicious",
+            "geng_zi": "inauspicious", "ren_zi": "inauspicious"
+          }
+        },
+        "chou": {
+          "officer": "kai", "officer_chinese": "開",
+          "pillars": {
+            "yi_chou": "inauspicious", "ding_chou": "dire", "ji_chou": "inauspicious",
+            "xin_chou": "inauspicious", "gui_chou": "dire"
+          }
+        },
+        "yin": {
+          "officer": "bi", "officer_chinese": "閉",
+          "pillars": {
+            "jia_yin": "inauspicious", "bing_yin": "inauspicious", "wu_yin": "inauspicious",
+            "geng_yin": "inauspicious", "ren_yin": "inauspicious"
+          }
+        }
+      }
+    }
+  },
+
+  "patterns_discovered": {
+    "primary_pattern": {
+      "name": "Branch Type is the PRIMARY Factor",
+      "description": "The Day Branch type determines base tendency. Day Officer alone does NOT determine outcome.",
+      "branch_types": {
+        "fire_branches": {
+          "branches": ["si (巳/Snake)", "wu (午/Horse)"],
+          "tendency": "CAN be excellent with right officer + stars",
+          "notes": "Pure Fire energy, receptive to Yellow Spiral stars"
+        },
+        "water_branches": {
+          "branches": ["hai (亥/Pig)", "zi (子/Rat)"],
+          "tendency": "CAN be good with right officer + stars",
+          "notes": "Pure Water energy, receptive to auspicious stars"
+        },
+        "earth_storage_branches": {
+          "chinese": "四库",
+          "branches": ["chen (辰/Dragon)", "wei (未/Goat)", "xu (戌/Dog)", "chou (丑/Ox)"],
+          "tendency": "ALMOST ALWAYS BAD regardless of officer",
+          "notes": "Storage/Tomb branches trap energy, inherently problematic"
+        },
+        "wood_branches": {
+          "branches": ["yin (寅/Tiger)", "mao (卯/Rabbit)"],
+          "tendency": "Bad especially when same as month branch (建 Establish)",
+          "notes": "Emptiness Day when branch = month"
+        },
+        "metal_branches": {
+          "branches": ["shen (申/Monkey)", "you (酉/Rooster)"],
+          "tendency": "Depends on season and Four Abandonment rule",
+          "notes": "Metal pillars dire in Spring (四廢)"
+        }
+      }
+    },
+
+    "critical_evidence": {
+      "same_officer_different_results": {
+        "stable_officer": {
+          "month_1_horse": { "branch_type": "Fire", "result": "ALL EXCELLENT/AUSPICIOUS" },
+          "month_2_goat": { "branch_type": "Earth Storage", "result": "MOSTLY BAD (only Gui Wei auspicious)" }
+        },
+        "success_officer": {
+          "month_1_dog": { "branch_type": "Earth Storage", "result": "ALL BAD" },
+          "month_2_pig": { "branch_type": "Water", "result": "ALL EXCELLENT/AUSPICIOUS" }
+        },
+        "full_officer": {
+          "month_1_dragon": { "branch_type": "Earth Storage", "result": "ALL BAD" },
+          "month_2_snake": { "branch_type": "Fire", "result": "ALL AUSPICIOUS" }
+        }
+      },
+      "conclusion": "Day Officer is NECESSARY but NOT SUFFICIENT. Branch Type determines if the officer can express positively."
+    },
+
+    "secondary_patterns": {
+      "four_abandonment": {
+        "chinese": "四廢",
+        "description": "Pure Metal pillars (庚申, 辛酉) are dire/bad in Spring because Metal is 'dead' in Wood season",
+        "spring_affected": ["geng_shen", "xin_you"],
+        "hypothesis_summer": ["ren_zi", "gui_hai"],
+        "hypothesis_autumn": ["jia_yin", "yi_mao"],
+        "hypothesis_winter": ["bing_wu", "ding_si"]
+      },
+
+      "sha_qi_central_palace": {
+        "description": "Certain pillars on Earth Storage branches (辰未戌丑) become Dire",
+        "consistently_dire": ["jia_chen", "wu_chen", "yi_wei", "wu_xu", "ren_xu"],
+        "varies_by_month": ["ren_chen", "bing_xu", "ding_chou", "gui_chou"],
+        "notes": "Pattern unclear - may involve Flying Star calculation"
+      },
+
+      "heavenly_virtue": {
+        "chinese": "天德",
+        "description": "Heavenly Virtue star location varies by month, can elevate a pillar's rating",
+        "month_1_tiger": { "location": "ding stem", "effect": "ding_you becomes auspicious despite Danger officer" },
+        "month_2_rabbit": { "location": "shen branch", "effect": "monkey days become auspicious despite normally bad" }
+      },
+
+      "yellow_spiral_stars": {
+        "chinese": "黃羅",
+        "description": "Yellow Spiral and related wealth stars appear on Stable (定) and Full (滿) officer days",
+        "associated_stars": ["Purple Sandalwood (紫檀)", "Heavenly Emperor (天皇)", "Earthly Emperor (地皇)", "Golden Wealth Storage (金銀庫樓)"]
+      }
+    }
+  },
+
+  "calculation_rules": {
+    "day_officer": {
+      "formula": "officer_index = (day_branch_index - month_branch_index + 12) % 12",
+      "officers_in_order": ["jian", "chu", "man", "ping", "ding", "zhi", "po", "wei", "cheng", "shou", "kai", "bi"],
+      "example_month_1": "Tiger month: Tiger=建, Rabbit=除, Dragon=滿, Snake=平, Horse=定, Goat=執, Monkey=破, Rooster=危, Dog=成, Pig=收, Rat=開, Ox=閉",
+      "example_month_2": "Rabbit month: Rabbit=建, Dragon=除, Snake=滿, Horse=平, Goat=定, Monkey=執, Rooster=破, Dog=危, Pig=成, Rat=收, Ox=開, Tiger=閉"
+    },
+
+    "stem_branch_pairing": {
+      "yang_stems": ["jia", "bing", "wu", "geng", "ren"],
+      "yin_stems": ["yi", "ding", "ji", "xin", "gui"],
+      "yang_branches": ["yin", "chen", "wu", "shen", "xu", "zi"],
+      "yin_branches": ["mao", "si", "wei", "you", "hai", "chou"]
+    },
+
+    "best_days_per_month": {
+      "description": "Look for 定 (Stable) and 成 (Success) officer days",
+      "month_1_tiger": { "stable": "wu (Horse)", "success": "xu (Dog) - but has Sha Qi issues" },
+      "month_2_rabbit": { "stable": "wei (Goat) - but Yi Wei is dire", "success": "hai (Pig)" }
+    }
+  }
+}

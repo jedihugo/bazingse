@@ -12,7 +12,15 @@ from library import (
     Gan,
     Zhi,
     GAN_MAP,
-    ZHI_MAP
+    ZHI_MAP,
+    # Dong Gong Date Selection
+    DONG_GONG_RATINGS,
+    DONG_GONG_DAY_OFFICERS,
+    DONG_GONG_MONTHS,
+    DONG_GONG_BRANCH_TO_MONTH,
+    get_dong_gong_officer,
+    get_dong_gong_rating,
+    get_dong_gong_day_info
 )
 
 # Import from chart_constructor
@@ -97,8 +105,9 @@ async def analyze_bazi(
         - birth_info: Birth details (natal foundation)
         - analysis_info: Time period being analyzed
         - nodes: All HS and EB nodes with their qi states
-        - base_element_score: Elements before interactions
-        - post_element_score: Elements after all interactions
+        - base_element_score: Natal chart before interactions (raw qi)
+        - natal_element_score: Natal chart after interactions (internal dynamics)
+        - post_element_score: All nodes after interactions (full situation)
         - interactions: Complete interaction log
         - daymaster_analysis: Day master strength analysis
         - mappings: Reference data (stems, branches, ten gods)
@@ -265,8 +274,8 @@ async def analyze_bazi(
             "badges": [],
             "disabled": True  # Mark as disabled for frontend
         }
-        # Get qi scores from EARTHLY_BRANCHES
-        eb_qi = {qi_item["stem"]: float(qi_item["score"]) for qi_item in EARTHLY_BRANCHES[annual_eb]["qi"]}
+        # Get qi scores from EARTHLY_BRANCHES (qi is list of (stem, score) tuples)
+        eb_qi = {qi_tuple[0]: float(qi_tuple[1]) for qi_tuple in EARTHLY_BRANCHES[annual_eb]["qi"]}
         
         response["eb_yl"] = {
             "base": {"id": annual_eb, "qi": eb_qi},
@@ -281,35 +290,135 @@ async def analyze_bazi(
         response["hs_10yl"]["misc"] = luck_10y_info
         response["eb_10yl"]["misc"] = luck_10y_info
     
-    # Add scores and interactions (2-tier: base=natal only, post=everything)
+    # Add scores and interactions (3-tier: base → natal → post)
     response["base_element_score"] = interaction_results.get("base_element_score", {})
+    response["natal_element_score"] = interaction_results.get("natal_element_score", {})
     response["post_element_score"] = interaction_results.get("post_element_score", {})
     response["interactions"] = interaction_results.get("interactions", {})
     response["daymaster_analysis"] = interaction_results["daymaster_analysis"]
-    
-    # Add mappings
+    response["wealth_storage_analysis"] = interaction_results.get("wealth_storage_analysis", {})
+    response["unit_tracker"] = interaction_results.get("unit_tracker")  # Unit Story tracking
+
+    # Add Dong Gong Date Selection info when daily luck is present
+    if analysis_year and analysis_month and analysis_day and "daily_luck" in chart_dict and "monthly_luck" in chart_dict:
+        daily_pillar = chart_dict["daily_luck"]  # e.g., "Geng Shen"
+        daily_stem, daily_branch = daily_pillar.split(" ")
+
+        # Extract the ACTUAL Chinese month branch from the monthly luck pillar
+        monthly_pillar = chart_dict["monthly_luck"]  # e.g., "Geng Yin" for Yin month
+        monthly_stem, monthly_branch = monthly_pillar.split(" ")
+
+        # Get the Chinese month number from the branch (Yin=1, Mao=2, etc.)
+        chinese_month = DONG_GONG_BRANCH_TO_MONTH.get(monthly_branch)
+
+        if chinese_month and monthly_branch:
+            # Calculate day officer using actual Chinese month branch
+            day_officer = get_dong_gong_officer(monthly_branch, daily_branch)
+            officer_info = DONG_GONG_DAY_OFFICERS.get(day_officer, {})
+
+            # Get rating for this specific pillar using Chinese month number
+            rating = get_dong_gong_rating(chinese_month, daily_branch, daily_stem)
+            rating_info = DONG_GONG_RATINGS.get(rating, {}) if rating else {}
+
+            # Get full day info (good_for, bad_for, descriptions)
+            day_info = get_dong_gong_day_info(chinese_month, daily_branch)
+
+            response["dong_gong"] = {
+                "month": chinese_month,
+                "month_branch": monthly_branch,
+                "month_chinese": DONG_GONG_MONTHS.get(chinese_month, {}).get("chinese", ""),
+                "day_stem": daily_stem,
+                "day_branch": daily_branch,
+                "pillar": daily_pillar,
+                "officer": {
+                    "id": day_officer,
+                    "chinese": officer_info.get("chinese", ""),
+                    "english": officer_info.get("english", ""),
+                },
+                "rating": {
+                    "id": rating,
+                    "value": rating_info.get("value", 0),
+                    "symbol": rating_info.get("symbol", ""),
+                    "chinese": rating_info.get("chinese", ""),
+                } if rating else None,
+                "good_for": day_info.get("good_for", []) if day_info else [],
+                "bad_for": day_info.get("bad_for", []) if day_info else [],
+                "description_chinese": day_info.get("description_chinese", "") if day_info else "",
+                "description_english": day_info.get("description_english", "") if day_info else "",
+            }
+
+    # Add mappings (using new structure where key is the id)
     response["mappings"] = {
         "heavenly_stems": {
             stem_id: {
-                "id": stem_data["id"],
-                "pinyin": stem_data["pinyin"],
+                "id": stem_id,
+                "pinyin": stem_id,  # pinyin is the key
                 "chinese": stem_data["chinese"],
-                "english": stem_data["english"],
-                "hex_color": stem_data["hex_color"]
+                "english": stem_id,  # use pinyin as english equivalent
+                "hex_color": stem_data["color"]
             }
             for stem_id, stem_data in HEAVENLY_STEMS.items()
         },
         "earthly_branches": {
             branch_id: {
-                "id": branch_data["id"],
+                "id": branch_id,
                 "chinese": branch_data["chinese"],
                 "animal": branch_data["animal"],
-                "hex_color": branch_data["hex_color"]
+                "hex_color": branch_data["color"],
+                "qi": [
+                    {
+                        "stem": qi_tuple[0],
+                        "score": qi_tuple[1],
+                        "stem_chinese": HEAVENLY_STEMS.get(qi_tuple[0], {}).get("chinese", "?"),
+                        "element": HEAVENLY_STEMS.get(qi_tuple[0], {}).get("element", "?"),
+                        "polarity": HEAVENLY_STEMS.get(qi_tuple[0], {}).get("polarity", "?"),
+                        "hex_color": HEAVENLY_STEMS.get(qi_tuple[0], {}).get("color", "#ccc")
+                    }
+                    for qi_tuple in branch_data.get("qi", [])
+                ]
             }
             for branch_id, branch_data in EARTHLY_BRANCHES.items()
         },
-        "ten_gods": TEN_GODS
+        "ten_gods": TEN_GODS,
+        # Event type styling for frontend rendering
+        "event_types": {
+            "registration": {"hex_color": "#60a5fa", "icon": "📝", "label": "Registration"},
+            "seasonal": {"hex_color": "#fbbf24", "icon": "🍂", "label": "Seasonal"},
+            "controlling": {"hex_color": "#f87171", "icon": "⚔️", "label": "Controlling"},
+            "controlled": {"hex_color": "#f87171", "icon": "⚔️", "label": "Controlled"},
+            "control": {"hex_color": "#f87171", "icon": "⚔️", "label": "Control"},
+            "producing": {"hex_color": "#4ade80", "icon": "🌱", "label": "Producing"},
+            "produced": {"hex_color": "#4ade80", "icon": "🌱", "label": "Produced"},
+            "generation": {"hex_color": "#4ade80", "icon": "🌱", "label": "Generation"},
+            "combination": {"hex_color": "#c084fc", "icon": "🤝", "label": "Combination"},
+            "conflict": {"hex_color": "#fb923c", "icon": "💥", "label": "Conflict"},
+            "conflict_aggressor": {"hex_color": "#fb923c", "icon": "💥", "label": "Conflict"},
+            "conflict_victim": {"hex_color": "#fb923c", "icon": "💥", "label": "Conflict"},
+            "same_element": {"hex_color": "#2dd4bf", "icon": "🔗", "label": "Same Element"},
+        },
+        # Ten gods styling for frontend rendering
+        "ten_gods_styling": {
+            "DM": {"hex_color": "#9333ea", "bg_hex": "#f3e8ff", "label": "Day Master"},
+            "F": {"hex_color": "#2563eb", "bg_hex": "#dbeafe", "label": "Friend"},
+            "RW": {"hex_color": "#3b82f6", "bg_hex": "#eff6ff", "label": "Rob Wealth"},
+            "EG": {"hex_color": "#16a34a", "bg_hex": "#dcfce7", "label": "Eating God"},
+            "HO": {"hex_color": "#22c55e", "bg_hex": "#f0fdf4", "label": "Hurting Officer"},
+            "IW": {"hex_color": "#ca8a04", "bg_hex": "#fef9c3", "label": "Indirect Wealth"},
+            "DW": {"hex_color": "#eab308", "bg_hex": "#fefce8", "label": "Direct Wealth"},
+            "7K": {"hex_color": "#dc2626", "bg_hex": "#fee2e2", "label": "Seven Killings"},
+            "DO": {"hex_color": "#ef4444", "bg_hex": "#fef2f2", "label": "Direct Officer"},
+            "IR": {"hex_color": "#4b5563", "bg_hex": "#f3f4f6", "label": "Indirect Resource"},
+            "DR": {"hex_color": "#6b7280", "bg_hex": "#f9fafb", "label": "Direct Resource"},
+        },
+        # Element colors for frontend rendering
+        "elements": {
+            "Wood": {"hex_color": "#22c55e", "hex_color_yang": "#16a34a", "hex_color_yin": "#4ade80"},
+            "Fire": {"hex_color": "#ef4444", "hex_color_yang": "#dc2626", "hex_color_yin": "#f87171"},
+            "Earth": {"hex_color": "#ca8a04", "hex_color_yang": "#a16207", "hex_color_yin": "#eab308"},
+            "Metal": {"hex_color": "#6b7280", "hex_color_yang": "#4b5563", "hex_color_yin": "#9ca3af"},
+            "Water": {"hex_color": "#3b82f6", "hex_color_yang": "#2563eb", "hex_color_yin": "#60a5fa"},
+        }
     }
-    
+
     return response
 
