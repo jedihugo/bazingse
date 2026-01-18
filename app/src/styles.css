@@ -607,6 +607,210 @@ button:active, .clickable:active {
   padding-right: var(--container-px);
 }
 
+/* ===== MOBILE DENSE MODE ===== */
+/* Clean, pristine 5-column grid for mobile */
+@media (max-width: 639px) {
+  /* === PILLAR WIDTH: exactly 20vw === */
+  .w-28, .pillar-width {
+    width: 20vw !important;
+    min-width: 20vw !important;
+    max-width: 20vw !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* === ALL FLEX ROWS: no gaps === */
+  .flex.gap-1,
+  .flex.gap-2,
+  .flex.gap-3 {
+    gap: 0 !important;
+  }
+
+  /* === CHART ROWS: no wrap, edge-to-edge === */
+  .relative.w-full > .flex {
+    flex-wrap: nowrap !important;
+  }
+
+  /* === ZERO MARGIN BETWEEN HS AND EB === */
+  /* Hide vertical flow row on mobile */
+  .h-5.w-28,
+  .flex.items-center > .h-5 {
+    height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  /* Kill all vertical margins between chart rows */
+  .-mt-1\.5, .-mb-1\.5, .mt-1, .mb-1, .mb-2 {
+    margin: 0 !important;
+  }
+
+  /* === HIDE DIVIDERS === */
+  .luck-divider,
+  .mx-3,
+  .mx-3.self-stretch,
+  .mx-3.flex-shrink-0,
+  div.flex-shrink-0.flex.flex-col.justify-end.mx-3 {
+    display: none !important;
+  }
+
+  /* === CONTAINER: zero padding === */
+  .main-content {
+    padding: 0 !important;
+    padding-bottom: 4rem !important;
+  }
+
+  div[style*="max-width: 800px"] {
+    max-width: 100vw !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* === NODE STYLING === */
+  .aspect-square,
+  .p-3 {
+    padding: 2px !important;
+  }
+
+  .px-3 {
+    padding-left: 2px !important;
+    padding-right: 2px !important;
+  }
+
+  .pt-2, .pb-0 {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  /* === BORDERS: clean grid lines === */
+  .border-gray-300,
+  .border {
+    border-width: 1px !important;
+    border-style: solid !important;
+  }
+
+  /* Day Master: blue left accent */
+  .border-2.border-blue-500 {
+    border: 1px solid #d1d5db !important;
+    border-left: 3px solid #3b82f6 !important;
+  }
+
+  /* No border radius - clean grid */
+  .rounded, .rounded-md, .rounded-lg {
+    border-radius: 0 !important;
+  }
+  .rounded-full {
+    border-radius: 9999px !important;
+  }
+
+  /* === TYPOGRAPHY === */
+  .text-2xl {
+    font-size: 1.1rem !important;
+    line-height: 1 !important;
+  }
+
+  .text-xs {
+    font-size: 8px !important;
+    line-height: 1 !important;
+  }
+
+  .text-\[10px\], .text-\[9px\], .text-\[8px\], .text-\[7px\] {
+    font-size: 7px !important;
+  }
+
+  /* === BADGES: tight positioning === */
+  .absolute.top-1 { top: 0 !important; }
+  .absolute.left-1 { left: 0 !important; }
+  .absolute.right-1 { right: 0 !important; }
+  .absolute.bottom-1 { bottom: 0 !important; }
+  .gap-0\.5 { gap: 0 !important; }
+
+  /* === HEADER: compact === */
+  header {
+    padding: 2px 4px !important;
+  }
+  header .w-12 {
+    width: 1.5rem !important;
+    height: 1.5rem !important;
+  }
+  header .text-xl {
+    font-size: 0.875rem !important;
+  }
+
+  /* === INPUT ROW: 4 columns only, hide location divider === */
+  .flex.gap-1.mb-2.flex-wrap.items-center {
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+  }
+
+  /* Location toggle: make it 20vw width */
+  .flex-shrink-0.flex.flex-col.justify-end:last-child {
+    width: 20vw !important;
+    min-width: 20vw !important;
+  }
+
+  /* Location inner box */
+  div[style*="min-width: 110px"] {
+    min-width: unset !important;
+    width: 100% !important;
+    padding: 2px !important;
+    font-size: 7px !important;
+  }
+
+  /* === QUICK TEST: keep readable === */
+  .bg-gradient-to-r.from-blue-50 {
+    padding: 4px !important;
+    margin: 2px !important;
+  }
+
+  /* === GENDER ROW === */
+  .flex.justify-center.gap-3 {
+    gap: 8px !important;
+  }
+
+  /* === HIDDEN STEMS: fixed widths 50%/30%/20% === */
+  /* Container for hidden stems */
+  .absolute.bottom-0.left-0.right-0.flex.overflow-hidden.h-10 {
+    height: 24px !important;
+  }
+
+  /* Primary Qi = 50% */
+  .absolute.bottom-0.left-0.right-0.flex.overflow-hidden > div:first-child {
+    width: 50% !important;
+    min-width: 50% !important;
+    max-width: 50% !important;
+    padding: 1px !important;
+  }
+
+  /* Second hidden stem = 30% */
+  .absolute.bottom-0.left-0.right-0.flex.overflow-hidden > div:nth-child(2) {
+    width: 30% !important;
+    min-width: 30% !important;
+    max-width: 30% !important;
+    padding: 1px !important;
+  }
+
+  /* Third hidden stem = 20% */
+  .absolute.bottom-0.left-0.right-0.flex.overflow-hidden > div:nth-child(3) {
+    width: 20% !important;
+    min-width: 20% !important;
+    max-width: 20% !important;
+    padding: 1px !important;
+  }
+
+  /* Hidden stem characters only - larger */
+  .absolute.bottom-0.left-0.right-0.flex.overflow-hidden .text-\[11px\],
+  .absolute.bottom-0.left-0.right-0.flex.overflow-hidden .text-\[9px\] {
+    font-size: 10px !important;
+    font-weight: bold !important;
+  }
+
+  /* Hide padding in hidden stem cells */
+  .absolute.bottom-0.left-0.right-0.flex.overflow-hidden > div {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    justify-content: center !important;
+  }
+}
+
 /* Hidden on mobile, shown on larger screens */
 .hidden-mobile {
   display: none !important;

@@ -92,7 +92,7 @@ from .scoring import (
 )
 
 # Ten Gods (computed from STEMS in derived.py)
-from .derived import TEN_GODS
+from .derived import TEN_GODS, TEN_GOD_NOTES
 
 # Seasonal configurations
 from .seasonal import (
@@ -257,6 +257,7 @@ __all__ = [
     "generate_asymmetric_scoring",
     # Ten Gods
     "TEN_GODS",
+    "TEN_GOD_NOTES",
     "get_ten_god",
     # Day Officers
     "get_day_officer",

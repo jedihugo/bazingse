@@ -16,13 +16,13 @@ for branch_id, branch in BRANCHES.items():
         SEASONAL_STRENGTH[element][state].append(branch_id)
 
 SEASONAL_ADJUSTMENT = {
-    # Fibonacci-based multipliers for seasonal effects (旺相休囚死)
-    # Uses moderate Fibonacci levels for balanced impact
-    "prosperous": 1.382,     # 旺 Wang - Fibonacci advancement (strongest)
-    "strengthening": 1.236,  # 相 Xiang - Fibonacci level (was "growing")
+    # Balanced multipliers for seasonal effects (旺相休囚死)
+    # Reduced impact for more subtle seasonal influence
+    "prosperous": 1.236,     # 旺 Wang - Peak/thriving (strongest)
+    "strengthening": 1.146,  # 相 Xiang - Growing phase
     "resting": 1.0,          # 休 Xiu - Baseline (no change)
-    "trapped": 0.786,        # 囚 Qiu - Fibonacci retracement (was "imprisoned")
-    "dead": 0.618            # 死 Si - Golden ratio retracement (weakest)
+    "trapped": 0.886,        # 囚 Qiu - Trapped/declining
+    "dead": 0.786            # 死 Si - Dead/weakest
 }
 
 # Alias for backward compatibility

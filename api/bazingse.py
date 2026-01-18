@@ -1603,121 +1603,145 @@ def analyze_8_node_interactions(
         required_branches = info["branches"]
         element = info["element"]
         missing = info["missing"]
-        
+
         # Check if nodes have THREE_MEETINGS interaction (blocks HALF_MEETINGS)
-        matching = [(pos, nid, node) for pos, nid, node in branch_data 
-                   if node.value in required_branches 
+        matching = [(pos, nid, node) for pos, nid, node in branch_data
+                   if node.value in required_branches
                    and not any("THREE_MEETING" in badge.get("interaction_id", "") for badge in node.badges)]
-        
+
         if len(matching) >= 2:
-            found_branches = [node.value for _, _, node in matching[:2]]
-            if set(found_branches) == set(required_branches):
-                positions = [pos for pos, _, _ in matching[:2]]
-                nodes_affected = [node for _, _, node in matching[:2]]
-                ids_affected = [nid for _, nid, _ in matching[:2]]
+            # Find ALL possible pairs (every combination can happen!)
+            # Example: Year Hai + Month Hai + Day Chou → Two interactions:
+            #   1. Year Hai + Day Chou
+            #   2. Month Hai + Day Chou
 
-                # Calculate distance key and multiplier
-                from library import get_distance_key
-                distance_key = get_distance_key(ids_affected[0], ids_affected[1])
-                distance_mult = DISTANCE_MULTIPLIERS["two_branch"].get(distance_key, 1.0)
+            # Group nodes by their branch value
+            branches_map = {}
+            for pos, nid, node in matching:
+                if node.value not in branches_map:
+                    branches_map[node.value] = []
+                branches_map[node.value].append((pos, nid, node))
 
-                # Check if can transform (element exists in Heavenly Stems)
-                can_transform = element in heavenly_stems_elements
+            # Check if we have all required branches
+            if set(branches_map.keys()) >= set(required_branches):
+                # Get nodes for each required branch
+                branch1_nodes = branches_map.get(required_branches[0], [])
+                branch2_nodes = branches_map.get(required_branches[1], [])
 
-                # DYNAMIC SCORING: Calculate based on current qi of nodes
-                total_score, math_formula, qi_details, calculation_details = calculate_dynamic_combination_score(
-                    nodes=nodes_affected,
-                    combination_type="HALF_MEETINGS",
-                    is_transformed=can_transform,
-                    distance_multiplier=distance_mult
-                )
+                # Generate ALL possible pairs (Cartesian product)
+                for node1 in branch1_nodes:
+                    for node2 in branch2_nodes:
+                        selected = [node1, node2]
 
-                interaction_id = f"HALF_MEETING~{pattern_key}~{'-'.join(ids_affected)}"
+                        # Sort by position for consistent processing
+                        selected.sort(key=lambda x: x[0])
+                        positions = [pos for pos, _, _ in selected]
+                        nodes_affected = [node for _, _, node in selected]
+                        ids_affected = [nid for _, nid, _ in selected]
+                        found_branches = [node.value for node in nodes_affected]
 
-                if can_transform:
-                    for node in nodes_affected:
-                        node.transform_to_element(
-                            element=element,
-                            amount=total_score,
-                            is_transformed=True,
-                            transformation_type="HALF_MEETING",
-                            pattern=pattern_key,
-                            interaction_id=interaction_id
-                        )
-                        node.marked = True
-                        node.interactions.append(f"Half Meeting → {element}")
+                        # Calculate distance key and multiplier
+                        from library import get_distance_key
+                        distance_key = get_distance_key(ids_affected[0], ids_affected[1])
+                        distance_mult = DISTANCE_MULTIPLIERS["two_branch"].get(distance_key, 1.0)
 
-                    interaction_log.append({
-                        "type": "HALF_MEETING",
-                        "pattern": pattern_key,
-                        "nodes": ids_affected,
-                        "positions": positions,
-                        "branches": found_branches,
-                        "transformed": True,
-                        "element": element,
-                        "missing": missing,
-                        "boost": f"+{total_score:.1f} points",
-                        "math_formula": math_formula,
-                        "qi_details": [(s, q, n) for s, q, n in qi_details],
-                        "distance": distance_key,
-                        "distance_multiplier": distance_mult,
-                        "calculation_details": calculation_details
-                    })
+                        # Check if can transform (element exists in Heavenly Stems)
+                        can_transform = element in heavenly_stems_elements
 
-                    if unit_tracker:
-                        unit_tracker.record_combination(
-                            nodes=ids_affected,
-                            stems=[get_transformed_stem_for_node(node, element) for node in nodes_affected],
+                        # DYNAMIC SCORING: Calculate based on current qi of nodes
+                        total_score, math_formula, qi_details, calculation_details = calculate_dynamic_combination_score(
+                            nodes=nodes_affected,
                             combination_type="HALF_MEETINGS",
-                            pattern=pattern_key,
-                            element=element,
-                            boost_amount=total_score,
-                            is_transformed=True,
-                            math_formula=math_formula,
-                            calculation_details=calculation_details
+                            is_transformed=can_transform,
+                            distance_multiplier=distance_mult
                         )
-                else:
-                    for node in nodes_affected:
-                        node.transform_to_element(
-                            element=element,
-                            amount=total_score,
-                            is_transformed=False,
-                            transformation_type="HALF_MEETING",
-                            pattern=pattern_key,
-                            interaction_id=interaction_id
-                        )
-                        node.marked = True
-                        node.interactions.append(f"Half Meeting +{total_score:.1f}pts {element}")
 
-                    interaction_log.append({
-                        "type": "HALF_MEETING",
-                        "pattern": pattern_key,
-                        "nodes": ids_affected,
-                        "positions": positions,
-                        "branches": found_branches,
-                        "transformed": False,
-                        "element": element,
-                        "missing": missing,
-                        "boost": f"+{total_score:.1f} points",
-                        "math_formula": math_formula,
-                        "qi_details": [(s, q, n) for s, q, n in qi_details],
-                        "distance": distance_key,
-                        "distance_multiplier": distance_mult,
-                        "calculation_details": calculation_details
-                    })
+                        interaction_id = f"HALF_MEETING~{pattern_key}~{'-'.join(ids_affected)}"
 
-                    if unit_tracker:
-                        unit_tracker.record_combination(
-                            nodes=ids_affected,
-                            stems=[get_transformed_stem_for_node(node, element) for node in nodes_affected],
-                            combination_type="HALF_MEETINGS",
-                            pattern=pattern_key,
-                            element=element,
-                            boost_amount=total_score,
-                            is_transformed=False,
-                            calculation_details=calculation_details,
-                            math_formula=math_formula
-                        )
+                        if can_transform:
+                            for node in nodes_affected:
+                                node.transform_to_element(
+                                    element=element,
+                                    amount=total_score,
+                                    is_transformed=True,
+                                    transformation_type="HALF_MEETING",
+                                    pattern=pattern_key,
+                                    interaction_id=interaction_id
+                                )
+                                node.marked = True
+                                node.interactions.append(f"Half Meeting → {element}")
+
+                            interaction_log.append({
+                                "type": "HALF_MEETING",
+                                "pattern": pattern_key,
+                                "nodes": ids_affected,
+                                "positions": positions,
+                                "branches": found_branches,
+                                "transformed": True,
+                                "element": element,
+                                "missing": missing,
+                                "boost": f"+{total_score:.1f} points",
+                                "math_formula": math_formula,
+                                "qi_details": [(s, q, n) for s, q, n in qi_details],
+                                "distance": distance_key,
+                                "distance_multiplier": distance_mult,
+                                "calculation_details": calculation_details
+                            })
+
+                            if unit_tracker:
+                                unit_tracker.record_combination(
+                                    nodes=ids_affected,
+                                    stems=[get_transformed_stem_for_node(node, element) for node in nodes_affected],
+                                    combination_type="HALF_MEETINGS",
+                                    pattern=pattern_key,
+                                    element=element,
+                                    boost_amount=total_score,
+                                    is_transformed=True,
+                                    math_formula=math_formula,
+                                    calculation_details=calculation_details
+                                )
+                        else:
+                            for node in nodes_affected:
+                                node.transform_to_element(
+                                    element=element,
+                                    amount=total_score,
+                                    is_transformed=False,
+                                    transformation_type="HALF_MEETING",
+                                    pattern=pattern_key,
+                                    interaction_id=interaction_id
+                                )
+                                node.marked = True
+                                node.interactions.append(f"Half Meeting +{total_score:.1f}pts {element}")
+
+                            interaction_log.append({
+                                "type": "HALF_MEETING",
+                                "pattern": pattern_key,
+                                "nodes": ids_affected,
+                                "positions": positions,
+                                "branches": found_branches,
+                                "transformed": False,
+                                "element": element,
+                                "missing": missing,
+                                "boost": f"+{total_score:.1f} points",
+                                "math_formula": math_formula,
+                                "qi_details": [(s, q, n) for s, q, n in qi_details],
+                                "distance": distance_key,
+                                "distance_multiplier": distance_mult,
+                                "calculation_details": calculation_details
+                            })
+
+                            if unit_tracker:
+                                unit_tracker.record_combination(
+                                    nodes=ids_affected,
+                                    stems=[get_transformed_stem_for_node(node, element) for node in nodes_affected],
+                                    combination_type="HALF_MEETINGS",
+                                    pattern=pattern_key,
+                                    element=element,
+                                    boost_amount=total_score,
+                                    is_transformed=False,
+                                    calculation_details=calculation_details,
+                                    math_formula=math_formula
+                                )
 
     if unit_tracker:
         unit_tracker.end_phase()
@@ -4481,7 +4505,7 @@ def analyze_8_node_interactions(
                 else:
                     # Small storage: use the branch's natural clash partner as opener
                     eb_branch_data = EARTHLY_BRANCHES.get(pillar_info['eb'], {})
-                    opener_branch = eb_branch_data.get("clashes_with")
+                    opener_branch = eb_branch_data.get("clashes")
 
                 opener_positions = check_opener(opener_branch, pos) if opener_branch else []
                 is_opened = len(opener_positions) > 0

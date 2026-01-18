@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">BaZingSe</string>
+    <string name="title_activity_main">BaZingSe</string>
+    <string name="package_name">com.bazingse.app</string>
+    <string name="custom_url_scheme">com.bazingse.app</string>
+</resources>

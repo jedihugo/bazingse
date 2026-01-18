@@ -57,6 +57,7 @@ LARGE_WEALTH_STORAGE = {
 
 # Small Wealth Storage Pillars (小财库)
 # HS sits on regular branch (NOT 库) containing its wealth element
+# Opener is the branch's clash partner (冲)
 SMALL_WEALTH_STORAGE = {
     # Fire DM wealth (Metal) in non-storage branches
     "Bing-Shen": {
@@ -66,6 +67,7 @@ SMALL_WEALTH_STORAGE = {
         "hs_element": "Fire",
         "wealth_element": "Metal",
         "wealth_stem": "Geng",
+        "opener": "Yin",  # Shen-Yin clash
         "description": "Fire Monkey - Metal wealth for Fire DM"
     },
     "Ding-You": {
@@ -75,6 +77,7 @@ SMALL_WEALTH_STORAGE = {
         "hs_element": "Fire",
         "wealth_element": "Metal",
         "wealth_stem": "Xin",
+        "opener": "Mao",  # You-Mao clash
         "description": "Fire Rooster - Metal wealth for Fire DM"
     },
     # Earth DM wealth (Water) in non-storage branches
@@ -85,6 +88,7 @@ SMALL_WEALTH_STORAGE = {
         "hs_element": "Earth",
         "wealth_element": "Water",
         "wealth_stem": "Gui",
+        "opener": "Wu",  # Zi-Wu clash
         "description": "Earth Rat - Water wealth for Earth DM"
     },
     "Ji-Hai": {
@@ -94,6 +98,7 @@ SMALL_WEALTH_STORAGE = {
         "hs_element": "Earth",
         "wealth_element": "Water",
         "wealth_stem": "Ren",
+        "opener": "Si",  # Hai-Si clash
         "description": "Earth Pig - Water wealth for Earth DM"
     },
     # Metal DM wealth (Wood) in non-storage branches
@@ -104,6 +109,7 @@ SMALL_WEALTH_STORAGE = {
         "hs_element": "Metal",
         "wealth_element": "Wood",
         "wealth_stem": "Jia",
+        "opener": "Shen",  # Yin-Shen clash
         "description": "Metal Tiger - Wood wealth for Metal DM"
     },
     "Xin-Mao": {
@@ -113,6 +119,7 @@ SMALL_WEALTH_STORAGE = {
         "hs_element": "Metal",
         "wealth_element": "Wood",
         "wealth_stem": "Yi",
+        "opener": "You",  # Mao-You clash
         "description": "Metal Rabbit - Wood wealth for Metal DM"
     },
     # Water DM wealth (Fire) in non-storage branches
@@ -123,6 +130,7 @@ SMALL_WEALTH_STORAGE = {
         "hs_element": "Water",
         "wealth_element": "Fire",
         "wealth_stem": "Bing",
+        "opener": "Zi",  # Wu-Zi clash
         "description": "Water Horse - Fire wealth for Water DM"
     },
     "Gui-Si": {
@@ -132,9 +140,10 @@ SMALL_WEALTH_STORAGE = {
         "hs_element": "Water",
         "wealth_element": "Fire",
         "wealth_stem": "Ding",
+        "opener": "Hai",  # Si-Hai clash
         "description": "Water Snake - Fire wealth for Water DM"
     },
-    # Wood DM wealth (Earth) in storage branches
+    # Wood DM wealth (Earth) in storage branches (these also have openers)
     "Jia-Chen": {
         "chinese": "甲辰",
         "hs": "Jia",
@@ -142,6 +151,7 @@ SMALL_WEALTH_STORAGE = {
         "hs_element": "Wood",
         "wealth_element": "Earth",
         "wealth_stem": "Wu",
+        "opener": "Xu",  # Chen-Xu clash
         "description": "Wood Dragon - Earth wealth for Wood DM"
     },
     "Jia-Xu": {
@@ -151,6 +161,7 @@ SMALL_WEALTH_STORAGE = {
         "hs_element": "Wood",
         "wealth_element": "Earth",
         "wealth_stem": "Wu",
+        "opener": "Chen",  # Xu-Chen clash
         "description": "Wood Dog - Earth wealth for Wood DM"
     }
 }

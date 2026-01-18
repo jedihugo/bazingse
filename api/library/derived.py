@@ -337,6 +337,24 @@ _TEN_GOD_PINYIN = {
     "IR": "piān yìn", "DR": "zhèng yìn"
 }
 
+# Ten God Notes - interpretive notes for each ten god
+TEN_GOD_NOTES = {
+    "F": {},   # Friend (比肩)
+    "RW": {},  # Rob Wealth (劫財)
+    "EG": {},  # Eating God (食神)
+    "HO": {},  # Hurting Officer (傷官)
+    "IW": {},  # Indirect Wealth (偏財)
+    "DW": {},  # Direct Wealth (正財)
+    "7K": {},  # Seven Killings (七殺)
+    "DO": {},  # Direct Officer (正官)
+    "IR": {    # Indirect Resource (偏印)
+        "unfavorable": "Can indicate susceptibility to santet/black magic"
+    },
+    "DR": {    # Direct Resource (正印)
+        "general": "Indicates physical health"
+    },
+}
+
 TEN_GODS = {
     dm_id: {
         target_id: {
