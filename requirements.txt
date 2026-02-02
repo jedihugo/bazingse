@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+sxtwl
+python-dotenv
+sqlalchemy
+sqlalchemy-libsql
+
