@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routes import router
 
 # Initialize FastAPI app for Vercel
 app = FastAPI(title="BaZingSe API")
@@ -14,5 +13,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include router with /api prefix
-app.include_router(router, prefix="/api")
+# Health check
+@app.get("/api/health")
+def health():
+    return {"status": "ok"}
+
+# Import router after app setup to catch import errors
+try:
+    from routes import router
+    app.include_router(router, prefix="/api")
+except Exception as e:
+    @app.get("/api/error")
+    def error():
+        return {"error": str(e)}
+
+    @app.get("/api/profiles")
+    def profiles_error():
+        return {"error": f"Import failed: {str(e)}"}
