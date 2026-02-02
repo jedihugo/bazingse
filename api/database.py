@@ -9,10 +9,8 @@ TURSO_URL = os.environ.get("TURSO_DATABASE_URL")
 TURSO_TOKEN = os.environ.get("TURSO_AUTH_TOKEN")
 
 if TURSO_URL and TURSO_TOKEN:
-    # Production: Use Turso
-    # Convert libsql:// to libsql+http:// for sqlalchemy-libsql
-    db_url = TURSO_URL.replace("libsql://", "libsql+https://")
-    SQLALCHEMY_DATABASE_URL = f"{db_url}?authToken={TURSO_TOKEN}"
+    # Production: Use Turso with libsql dialect
+    SQLALCHEMY_DATABASE_URL = f"{TURSO_URL}?authToken={TURSO_TOKEN}"
     engine = create_engine(SQLALCHEMY_DATABASE_URL)
 else:
     # Local development: Use SQLite file
