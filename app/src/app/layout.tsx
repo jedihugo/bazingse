@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
+import PasswordGate from '@/components/PasswordGate';
 
 export const metadata: Metadata = {
   title: 'BaZingSe - Chinese BaZi Astrology',
@@ -40,7 +41,9 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
       <body>
-        {children}
+        <PasswordGate>
+          {children}
+        </PasswordGate>
       </body>
     </html>
   );
