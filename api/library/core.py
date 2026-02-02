@@ -49,7 +49,7 @@ STEMS = {
     },
     "Bing": {
         "index": 2, "chinese": "丙", "element": "Fire", "polarity": "Yang",
-        "color": "#f3adae",
+        "color": "#fca5a5",
         "combines_with": "Xin", "combination_element": "Water",
         "controls": "Geng", "controlled_by": "Ren",
         "ten_gods": {

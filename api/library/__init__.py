@@ -195,6 +195,54 @@ from .dynamic_scoring import (
     format_conflict_narrative,
 )
 
+# Life Aspects Analysis (Health, Wealth, Learning)
+from .life_aspects import (
+    # Base utilities
+    NODE_RELATIONSHIPS,
+    PILLAR_LIFE_PERIODS,
+    TEN_GOD_ASPECT_MAPPING,
+    ELEMENT_CONTROLS,
+    ELEMENT_GENERATES,
+    stems_to_element_totals,
+    get_node_relationship_context,
+    detect_control_imbalances,
+    calculate_aspect_severity,
+    # Health Analysis (TCM organ-element correlations)
+    ELEMENT_ORGANS,
+    CONFLICT_HEALTH_WEIGHTS,
+    SEASONAL_HEALTH_MODIFIER,
+    generate_health_analysis,
+    # Wealth Analysis
+    WEALTH_TEN_GODS,
+    WEALTH_INDICATORS,
+    generate_wealth_analysis,
+    # Learning Analysis
+    LEARNING_TEN_GODS,
+    LEARNING_INDICATORS,
+    generate_learning_analysis,
+    # Ten Gods Detail Analysis
+    TEN_GOD_PILLAR_MEANINGS,
+    get_ten_god_for_stem,
+    generate_ten_gods_detail,
+)
+
+# Narrative Interpretation System
+from .narrative import (
+    generate_narrative,
+    NARRATIVE_TEMPLATES,
+    calculate_priority_score,
+    prioritize_narratives,
+    apply_element_modifiers,
+    apply_shen_sha_modifiers,
+    get_element_balance_context,
+    generate_remedies,
+    REMEDY_TEMPLATES,
+    ELEMENT_REMEDIES,
+    build_narrative_text,
+    get_localized_template,
+    SUPPORTED_LOCALES,
+)
+
 # Export all symbols for "from library import *"
 __all__ = [
     # PRIMARY: Core data
@@ -335,4 +383,45 @@ __all__ = [
     "calculate_symmetric_conflict_score",
     "format_combination_narrative",
     "format_conflict_narrative",
+    # Life Aspects - Base
+    "NODE_RELATIONSHIPS",
+    "PILLAR_LIFE_PERIODS",
+    "TEN_GOD_ASPECT_MAPPING",
+    "ELEMENT_CONTROLS",
+    "ELEMENT_GENERATES",
+    "stems_to_element_totals",
+    "get_node_relationship_context",
+    "detect_control_imbalances",
+    "calculate_aspect_severity",
+    # Life Aspects - Health
+    "ELEMENT_ORGANS",
+    "CONFLICT_HEALTH_WEIGHTS",
+    "SEASONAL_HEALTH_MODIFIER",
+    "generate_health_analysis",
+    # Life Aspects - Wealth
+    "WEALTH_TEN_GODS",
+    "WEALTH_INDICATORS",
+    "generate_wealth_analysis",
+    # Life Aspects - Learning
+    "LEARNING_TEN_GODS",
+    "LEARNING_INDICATORS",
+    "generate_learning_analysis",
+    # Life Aspects - Ten Gods Detail
+    "TEN_GOD_PILLAR_MEANINGS",
+    "get_ten_god_for_stem",
+    "generate_ten_gods_detail",
+    # Narrative Interpretation System
+    "generate_narrative",
+    "NARRATIVE_TEMPLATES",
+    "calculate_priority_score",
+    "prioritize_narratives",
+    "apply_element_modifiers",
+    "apply_shen_sha_modifiers",
+    "get_element_balance_context",
+    "generate_remedies",
+    "REMEDY_TEMPLATES",
+    "ELEMENT_REMEDIES",
+    "build_narrative_text",
+    "get_localized_template",
+    "SUPPORTED_LOCALES",
 ]

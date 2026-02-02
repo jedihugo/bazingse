@@ -1,0 +1,85 @@
+{
+  "wuxing": {
+    "Wood": "Kayu",
+    "Fire": "Api",
+    "Earth": "Tanah",
+    "Metal": "Logam",
+    "Water": "Air"
+  },
+  "wuxing_chinese": {
+    "Wood": "木",
+    "Fire": "火",
+    "Earth": "土",
+    "Metal": "金",
+    "Water": "水"
+  },
+  "stems": {
+    "Jia": "Jia",
+    "Yi": "Yi",
+    "Bing": "Bing",
+    "Ding": "Ding",
+    "Wu": "Wu",
+    "Ji": "Ji",
+    "Geng": "Geng",
+    "Xin": "Xin",
+    "Ren": "Ren",
+    "Gui": "Gui"
+  },
+  "branches": {
+    "Zi": "Zi",
+    "Chou": "Chou",
+    "Yin": "Yin",
+    "Mao": "Mao",
+    "Chen": "Chen",
+    "Si": "Si",
+    "Wu": "Wu",
+    "Wei": "Wei",
+    "Shen": "Shen",
+    "You": "You",
+    "Xu": "Xu",
+    "Hai": "Hai"
+  },
+  "animals": {
+    "Rat": "Tikus",
+    "Ox": "Kerbau",
+    "Tiger": "Harimau",
+    "Rabbit": "Kelinci",
+    "Dragon": "Naga",
+    "Snake": "Ular",
+    "Horse": "Kuda",
+    "Goat": "Kambing",
+    "Monkey": "Monyet",
+    "Rooster": "Ayam",
+    "Dog": "Anjing",
+    "Pig": "Babi"
+  },
+  "polarity": {
+    "Yang": "Yang",
+    "Yin": "Yin"
+  },
+  "relationships": {
+    "self": "Diri",
+    "output": "Keluaran",
+    "wealth": "Kekayaan",
+    "officer": "Pejabat",
+    "resource": "Sumber Daya"
+  },
+  "analysis": {
+    "favorable": "Menguntungkan",
+    "unfavorable": "Tidak Menguntungkan",
+    "strong": "Kuat",
+    "weak": "Lemah",
+    "balanced": "Seimbang",
+    "very_strong": "Sangat Kuat",
+    "very_weak": "Sangat Lemah",
+    "natal": "Bawaan",
+    "post": "Saat Ini"
+  },
+  "daymaster": {
+    "title": "Analisis Tuan Hari",
+    "strength": "Kekuatan",
+    "favorable_elements": "Elemen Menguntungkan",
+    "unfavorable_elements": "Elemen Tidak Menguntungkan",
+    "support_percentage": "Dukungan"
+  }
+}

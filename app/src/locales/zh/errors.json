@@ -1,0 +1,30 @@
+{
+  "api": {
+    "connection_failed": "无法连接到服务器",
+    "invalid_response": "服务器响应无效",
+    "timeout": "请求超时"
+  },
+  "validation": {
+    "invalid_birth_date": "出生日期无效",
+    "invalid_birth_time": "出生时间格式无效",
+    "date_required": "请填写出生日期",
+    "gender_required": "请选择性别",
+    "year_out_of_range": "年份必须在1900到2100之间",
+    "month_out_of_range": "月份必须在1到12之间",
+    "day_out_of_range": "日期必须在1到31之间",
+    "invalid_jia_zi": "无效的甲子组合"
+  },
+  "profile": {
+    "not_found": "未找到档案",
+    "create_failed": "创建档案失败",
+    "update_failed": "更新档案失败",
+    "delete_failed": "删除档案失败"
+  },
+  "event": {
+    "not_found": "未找到人生事件",
+    "create_failed": "创建人生事件失败",
+    "update_failed": "更新人生事件失败",
+    "delete_failed": "删除人生事件失败"
+  },
+  "unknown": "发生未知错误"
+}

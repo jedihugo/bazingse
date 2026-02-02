@@ -1,0 +1,85 @@
+{
+  "wuxing": {
+    "Wood": "Wood",
+    "Fire": "Fire",
+    "Earth": "Earth",
+    "Metal": "Metal",
+    "Water": "Water"
+  },
+  "wuxing_chinese": {
+    "Wood": "木",
+    "Fire": "火",
+    "Earth": "土",
+    "Metal": "金",
+    "Water": "水"
+  },
+  "stems": {
+    "Jia": "Jia",
+    "Yi": "Yi",
+    "Bing": "Bing",
+    "Ding": "Ding",
+    "Wu": "Wu",
+    "Ji": "Ji",
+    "Geng": "Geng",
+    "Xin": "Xin",
+    "Ren": "Ren",
+    "Gui": "Gui"
+  },
+  "branches": {
+    "Zi": "Zi",
+    "Chou": "Chou",
+    "Yin": "Yin",
+    "Mao": "Mao",
+    "Chen": "Chen",
+    "Si": "Si",
+    "Wu": "Wu",
+    "Wei": "Wei",
+    "Shen": "Shen",
+    "You": "You",
+    "Xu": "Xu",
+    "Hai": "Hai"
+  },
+  "animals": {
+    "Rat": "Rat",
+    "Ox": "Ox",
+    "Tiger": "Tiger",
+    "Rabbit": "Rabbit",
+    "Dragon": "Dragon",
+    "Snake": "Snake",
+    "Horse": "Horse",
+    "Goat": "Goat",
+    "Monkey": "Monkey",
+    "Rooster": "Rooster",
+    "Dog": "Dog",
+    "Pig": "Pig"
+  },
+  "polarity": {
+    "Yang": "Yang",
+    "Yin": "Yin"
+  },
+  "relationships": {
+    "self": "Self",
+    "output": "Output",
+    "wealth": "Wealth",
+    "officer": "Officer",
+    "resource": "Resource"
+  },
+  "analysis": {
+    "favorable": "Favorable",
+    "unfavorable": "Unfavorable",
+    "strong": "Strong",
+    "weak": "Weak",
+    "balanced": "Balanced",
+    "very_strong": "Very Strong",
+    "very_weak": "Very Weak",
+    "natal": "Natal",
+    "post": "Post"
+  },
+  "daymaster": {
+    "title": "Day Master Analysis",
+    "strength": "Strength",
+    "favorable_elements": "Favorable Elements",
+    "unfavorable_elements": "Unfavorable Elements",
+    "support_percentage": "Support"
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "types": {
+    "THREE_MEETINGS": "Tiga Pertemuan",
+    "THREE_COMBINATIONS": "Tiga Kombinasi",
+    "HALF_MEETINGS": "Setengah Pertemuan",
+    "SIX_HARMONIES": "Enam Harmoni",
+    "HALF_COMBINATIONS": "Setengah Kombinasi",
+    "ARCHED_COMBINATIONS": "Kombinasi Lengkung",
+    "STEM_COMBINATIONS": "Kombinasi Batang",
+    "STEM_CONFLICTS": "Konflik Batang",
+    "CLASHES": "Benturan",
+    "PUNISHMENTS": "Hukuman",
+    "HARMS": "Bahaya",
+    "DESTRUCTION": "Kehancuran",
+    "SEASONAL_ADJUSTMENT": "Musiman",
+    "ENERGY_FLOW": "Aliran Energi"
+  },
+  "types_chinese": {
+    "THREE_MEETINGS": "三會",
+    "THREE_COMBINATIONS": "三合",
+    "HALF_MEETINGS": "半會",
+    "SIX_HARMONIES": "六合",
+    "HALF_COMBINATIONS": "半合",
+    "ARCHED_COMBINATIONS": "拱合",
+    "STEM_COMBINATIONS": "天干合",
+    "STEM_CONFLICTS": "天干沖",
+    "CLASHES": "地支沖",
+    "PUNISHMENTS": "刑",
+    "HARMS": "害",
+    "DESTRUCTION": "破"
+  },
+  "badges": {
+    "transformation": "Transformasi",
+    "combination": "Kombinasi",
+    "clash": "Benturan",
+    "punishment": "Hukuman",
+    "harm": "Bahaya",
+    "destruction": "Kehancuran",
+    "stem_conflict": "Konflik Batang"
+  },
+  "descriptions": {
+    "positive": "Interaksi positif",
+    "negative": "Interaksi negatif",
+    "neutral": "Interaksi netral"
+  }
+}

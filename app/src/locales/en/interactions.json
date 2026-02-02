@@ -1,0 +1,46 @@
+{
+  "types": {
+    "THREE_MEETINGS": "Three Meetings",
+    "THREE_COMBINATIONS": "Three Combinations",
+    "HALF_MEETINGS": "Half Meetings",
+    "SIX_HARMONIES": "Six Harmonies",
+    "HALF_COMBINATIONS": "Half Combinations",
+    "ARCHED_COMBINATIONS": "Arched Combinations",
+    "STEM_COMBINATIONS": "Stem Combinations",
+    "STEM_CONFLICTS": "Stem Conflicts",
+    "CLASHES": "Clash",
+    "PUNISHMENTS": "Punishment",
+    "HARMS": "Harm",
+    "DESTRUCTION": "Destruction",
+    "SEASONAL_ADJUSTMENT": "Seasonal",
+    "ENERGY_FLOW": "Energy Flow"
+  },
+  "types_chinese": {
+    "THREE_MEETINGS": "三會",
+    "THREE_COMBINATIONS": "三合",
+    "HALF_MEETINGS": "半會",
+    "SIX_HARMONIES": "六合",
+    "HALF_COMBINATIONS": "半合",
+    "ARCHED_COMBINATIONS": "拱合",
+    "STEM_COMBINATIONS": "天干合",
+    "STEM_CONFLICTS": "天干沖",
+    "CLASHES": "地支沖",
+    "PUNISHMENTS": "刑",
+    "HARMS": "害",
+    "DESTRUCTION": "破"
+  },
+  "badges": {
+    "transformation": "Transformation",
+    "combination": "Combination",
+    "clash": "Clash",
+    "punishment": "Punishment",
+    "harm": "Harm",
+    "destruction": "Destruction",
+    "stem_conflict": "Stem Conflict"
+  },
+  "descriptions": {
+    "positive": "Positive interaction",
+    "negative": "Negative interaction",
+    "neutral": "Neutral interaction"
+  }
+}

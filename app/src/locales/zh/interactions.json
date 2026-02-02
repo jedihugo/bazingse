@@ -1,0 +1,46 @@
+{
+  "types": {
+    "THREE_MEETINGS": "三會",
+    "THREE_COMBINATIONS": "三合",
+    "HALF_MEETINGS": "半會",
+    "SIX_HARMONIES": "六合",
+    "HALF_COMBINATIONS": "半合",
+    "ARCHED_COMBINATIONS": "拱合",
+    "STEM_COMBINATIONS": "天干合",
+    "STEM_CONFLICTS": "天干沖",
+    "CLASHES": "地支沖",
+    "PUNISHMENTS": "刑",
+    "HARMS": "害",
+    "DESTRUCTION": "破",
+    "SEASONAL_ADJUSTMENT": "旺衰",
+    "ENERGY_FLOW": "能量流"
+  },
+  "types_chinese": {
+    "THREE_MEETINGS": "三會",
+    "THREE_COMBINATIONS": "三合",
+    "HALF_MEETINGS": "半會",
+    "SIX_HARMONIES": "六合",
+    "HALF_COMBINATIONS": "半合",
+    "ARCHED_COMBINATIONS": "拱合",
+    "STEM_COMBINATIONS": "天干合",
+    "STEM_CONFLICTS": "天干沖",
+    "CLASHES": "地支沖",
+    "PUNISHMENTS": "刑",
+    "HARMS": "害",
+    "DESTRUCTION": "破"
+  },
+  "badges": {
+    "transformation": "化",
+    "combination": "合",
+    "clash": "沖",
+    "punishment": "刑",
+    "harm": "害",
+    "destruction": "破",
+    "stem_conflict": "剋"
+  },
+  "descriptions": {
+    "positive": "正面作用",
+    "negative": "负面作用",
+    "neutral": "中性作用"
+  }
+}

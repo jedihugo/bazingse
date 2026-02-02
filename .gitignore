@@ -27,4 +27,17 @@ logs
 *.pyc
 __pycache__
 venv
-.venv.playwright-mcp/
+.venv
+
+# Playwright
+.playwright-mcp/
+.playwright/
+test-results/
+playwright-report/
+
+# Next.js
+.next/
+*.tsbuildinfo
+
+# Database
+*.db

@@ -1,0 +1,27 @@
+{
+  "app": {
+    "title": "BaZingSe",
+    "subtitle": "Chinese BaZi Calculator"
+  },
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "loading": "Loading...",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "status": {
+    "loading_chart": "Loading chart...",
+    "no_data": "No data",
+    "error": "Error"
+  },
+  "navigation": {
+    "home": "Home",
+    "profiles": "Profiles",
+    "debug": "Debug"
+  }
+}

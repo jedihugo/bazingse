@@ -4354,8 +4354,10 @@ def analyze_8_node_interactions(
             "explanation": explanation
         }
     
-    # Perform Daymaster analysis (use post for full chart strength)
-    daymaster_analysis = analyze_daymaster_strength(bazi_chart, post_five_elements)
+    # Perform Daymaster analysis (use NATAL for inherent chart strength)
+    # CRITICAL: Use natal_five_elements (natal only, after interactions)
+    # NOT post_five_elements (which includes luck pillars and inflates strength)
+    daymaster_analysis = analyze_daymaster_strength(bazi_chart, natal_five_elements)
     
     # ============= WEALTH/INFLUENCE STORAGE DETECTION (财库/官库分析) =============
     #

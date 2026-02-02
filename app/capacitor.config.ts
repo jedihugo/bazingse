@@ -1,15 +1,19 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
+// Set to true for development (live reload from dev server)
+// Set to false for production build (uses bundled files)
+const USE_DEV_SERVER = true;
+
 const config: CapacitorConfig = {
   appId: 'com.bazingse.app',
   appName: 'BaZingSe',
-  webDir: 'dist',
-  server: {
-    // For development, you can enable this to load from dev server
-    // url: 'http://localhost:3000',
-    // cleartext: true,
-
-    // For production, the app loads from the bundled dist folder
+  webDir: 'out',
+  server: USE_DEV_SERVER ? {
+    // Development: Load from Next.js dev server for live reload
+    url: 'http://localhost:4321',
+    cleartext: true,
+  } : {
+    // Production: Load from bundled files
     androidScheme: 'https'
   },
   plugins: {

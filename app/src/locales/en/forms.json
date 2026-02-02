@@ -1,0 +1,90 @@
+{
+  "natal": {
+    "title": "Birth Information",
+    "pillars": {
+      "hour": "Hour",
+      "day": "Day",
+      "month": "Month",
+      "year": "Year"
+    },
+    "pillar_labels": {
+      "hour": "時 Hour",
+      "day": "日 Day",
+      "month": "月 Month",
+      "year": "年 Year"
+    },
+    "birth_date": "Birth Date",
+    "birth_time": "Birth Time",
+    "unknown_hour": "Unknown Hour",
+    "gender": {
+      "label": "Gender",
+      "male": "Male",
+      "female": "Female"
+    }
+  },
+  "comparison": {
+    "title": "Time Travel",
+    "enable": "Enable Time Travel",
+    "pillars": {
+      "ten_year": "10Y Luck",
+      "annual": "Annual",
+      "monthly": "Monthly",
+      "daily": "Daily",
+      "hourly": "Hourly"
+    },
+    "pillar_labels": {
+      "ten_year": "運 10Y",
+      "annual": "年運 Annual",
+      "monthly": "月運 Monthly",
+      "daily": "日運 Daily",
+      "hourly": "時運 Hourly"
+    },
+    "include_annual": "Include Annual Luck"
+  },
+  "talisman": {
+    "title": "Talisman",
+    "enable": "Enable Talisman",
+    "slots": {
+      "year": "Year Slot",
+      "month": "Month Slot",
+      "day": "Day Slot",
+      "hour": "Hour Slot"
+    },
+    "pillar_labels": {
+      "year": "符年 T-Year",
+      "month": "符月 T-Month",
+      "day": "符日 T-Day",
+      "hour": "符時 T-Hour"
+    },
+    "invalid_pair": "Invalid Jia-Zi pair"
+  },
+  "location": {
+    "title": "Location",
+    "label": "地 Location",
+    "enable": "Enable Location",
+    "options": {
+      "overseas": "Overseas",
+      "birthplace": "Birthplace"
+    },
+    "pillar_labels": {
+      "overseas_1": "海1 Overseas 1",
+      "overseas_2": "海2 Overseas 2",
+      "birthplace_1": "鄉1 Birthplace 1",
+      "birthplace_2": "鄉2 Birthplace 2",
+      "birthplace_3": "鄉3 Birthplace 3",
+      "birthplace_4": "鄉4 Birthplace 4"
+    }
+  },
+  "quick_test": {
+    "label": "Quick Test",
+    "select_preset": "Select a preset..."
+  },
+  "placeholders": {
+    "select_stem": "Stem",
+    "select_branch": "Branch",
+    "enter_year": "YYYY",
+    "enter_month": "MM",
+    "enter_day": "DD",
+    "enter_time": "HH:MM"
+  }
+}

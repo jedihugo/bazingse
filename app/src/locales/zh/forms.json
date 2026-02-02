@@ -1,0 +1,90 @@
+{
+  "natal": {
+    "title": "出生信息",
+    "pillars": {
+      "hour": "时",
+      "day": "日",
+      "month": "月",
+      "year": "年"
+    },
+    "pillar_labels": {
+      "hour": "时柱",
+      "day": "日柱",
+      "month": "月柱",
+      "year": "年柱"
+    },
+    "birth_date": "出生日期",
+    "birth_time": "出生时间",
+    "unknown_hour": "时辰不详",
+    "gender": {
+      "label": "性别",
+      "male": "男",
+      "female": "女"
+    }
+  },
+  "comparison": {
+    "title": "时间推演",
+    "enable": "启用时间推演",
+    "pillars": {
+      "ten_year": "大运",
+      "annual": "流年",
+      "monthly": "流月",
+      "daily": "流日",
+      "hourly": "流时"
+    },
+    "pillar_labels": {
+      "ten_year": "大运",
+      "annual": "流年",
+      "monthly": "流月",
+      "daily": "流日",
+      "hourly": "流时"
+    },
+    "include_annual": "包含流年"
+  },
+  "talisman": {
+    "title": "符咒",
+    "enable": "启用符咒",
+    "slots": {
+      "year": "年位",
+      "month": "月位",
+      "day": "日位",
+      "hour": "时位"
+    },
+    "pillar_labels": {
+      "year": "符年",
+      "month": "符月",
+      "day": "符日",
+      "hour": "符时"
+    },
+    "invalid_pair": "无效的甲子组合"
+  },
+  "location": {
+    "title": "位置",
+    "label": "地 位置",
+    "enable": "启用位置",
+    "options": {
+      "overseas": "海外",
+      "birthplace": "故乡"
+    },
+    "pillar_labels": {
+      "overseas_1": "海外1",
+      "overseas_2": "海外2",
+      "birthplace_1": "故乡1",
+      "birthplace_2": "故乡2",
+      "birthplace_3": "故乡3",
+      "birthplace_4": "故乡4"
+    }
+  },
+  "quick_test": {
+    "label": "快速测试",
+    "select_preset": "选择预设..."
+  },
+  "placeholders": {
+    "select_stem": "天干",
+    "select_branch": "地支",
+    "enter_year": "年",
+    "enter_month": "月",
+    "enter_day": "日",
+    "enter_time": "时:分"
+  }
+}

@@ -15,6 +15,83 @@ def get_ten_god_value(ten_god_info):
         return ten_god_info.get("abbreviation", ten_god_info.get("id", ""))
     return ten_god_info
 
+def generate_xiao_yun_pillars(
+    hour_pillar: str,
+    year_pillar: str,
+    gender: Literal["male", "female"],
+    da_yun_start_age: int,
+) -> List[Dict]:
+    """
+    Generate Xiao Yun (小運) pillars for years before Da Yun begins.
+
+    Xiao Yun (小運), also called Xing Nian (行年 - "Traveling Year"), covers
+    the childhood years BEFORE the first 10-Year Luck Pillar (Da Yun) begins.
+
+    Key differences from Da Yun:
+    - Calculated from HOUR PILLAR (not Month Pillar)
+    - Each pillar covers 1 year (not 10 years)
+    - Uses Chinese age (虛歲): age 1 = birth year
+
+    Args:
+        hour_pillar: Hour pillar in format "HS EB" (e.g., "Jia Zi")
+        year_pillar: Year pillar in format "HS EB" (needed for direction)
+        gender: "male" or "female"
+        da_yun_start_age: Age when Da Yun begins (Xiao Yun covers ages before this)
+
+    Returns:
+        List of Xiao Yun pillars with Chinese ages (1 to da_yun_start_age - 1)
+    """
+    # Get the 60 pillars cycle (Jia Zi cycle)
+    heavenly_stems = ["Jia", "Yi", "Bing", "Ding", "Wu", "Ji", "Geng", "Xin", "Ren", "Gui"]
+    earthly_branches = ["Zi", "Chou", "Yin", "Mao", "Chen", "Si", "Wu", "Wei", "Shen", "You", "Xu", "Hai"]
+
+    sixty_pillars = []
+    for i in range(60):
+        hs_index = i % 10
+        eb_index = i % 12
+        sixty_pillars.append(f"{heavenly_stems[hs_index]} {earthly_branches[eb_index]}")
+
+    # Find the index of the HOUR pillar in the 60-pillar cycle
+    hour_index = sixty_pillars.index(hour_pillar)
+
+    # Determine if the year is Yang or Yin based on the Heavenly Stem
+    year_hs = year_pillar.split(" ")[0]
+    is_yang_year = year_hs in ["Jia", "Bing", "Wu", "Geng", "Ren"]
+
+    # Determine direction (forward or reverse) - SAME RULES as Da Yun
+    # Yang Male + Yin Female = Forward (順排)
+    # Yin Male + Yang Female = Backward (逆排)
+    forward = (gender == "male") == is_yang_year
+
+    # Generate Xiao Yun pillars for each year before Da Yun starts
+    # Chinese age (虛歲): age 1 = birth year, age 2 = 1 year old in Western age
+    # If Da Yun starts at Western age 3, we need Chinese ages 1, 2, 3 (Western ages 0, 1, 2)
+    result = []
+    for chinese_age in range(1, da_yun_start_age + 1):
+        # Calculate pillar index based on direction
+        # Age 1 starts from the NEXT pillar after hour pillar (forward) or PREVIOUS (backward)
+        if forward:
+            xiao_yun_index = (hour_index + chinese_age) % 60
+        else:
+            xiao_yun_index = (hour_index - chinese_age) % 60
+
+        xiao_yun_pillar = sixty_pillars[xiao_yun_index]
+
+        # Convert Chinese age to Western age for start/end
+        # Chinese age 1 = Western age 0, Chinese age 2 = Western age 1, etc.
+        western_age = chinese_age - 1
+
+        result.append({
+            "pillar": xiao_yun_pillar,
+            "chinese_age": chinese_age,  # 虛歲
+            "start_age": western_age,     # Western age start
+            "end_age": western_age,       # Western age end (same, since 1 year)
+            "is_xiao_yun": True,
+        })
+
+    return result
+
+
 def generate_luck_pillars(
     year_pillar: str,
     month_pillar: str,
