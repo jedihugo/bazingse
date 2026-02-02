@@ -4,6 +4,12 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 import os
 
+# Register libsql dialect for Turso
+try:
+    import sqlalchemy_libsql
+except ImportError:
+    pass  # Not available locally, that's fine
+
 # Check for Turso (production) or fall back to local SQLite
 TURSO_URL = os.environ.get("TURSO_DATABASE_URL")
 TURSO_TOKEN = os.environ.get("TURSO_AUTH_TOKEN")
