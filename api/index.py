@@ -25,6 +25,14 @@ def health():
 
 # Try to import router
 try:
+    # Use relative import for Vercel deployment
+    import os
+    import sys
+    # Add the api directory to Python path
+    api_dir = os.path.dirname(os.path.abspath(__file__))
+    if api_dir not in sys.path:
+        sys.path.insert(0, api_dir)
+
     from routes import router
     app.include_router(router, prefix="/api")
 except Exception as e:
