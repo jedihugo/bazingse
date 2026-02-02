@@ -60,9 +60,6 @@ export default function PasswordGate({ children }: PasswordGateProps) {
     <div className="min-h-screen tui-bg flex items-center justify-center p-4">
       <div
         className={`tui-frame p-6 w-full max-w-sm ${shake ? 'animate-shake' : ''}`}
-        style={{
-          animation: shake ? 'shake 0.5s ease-in-out' : undefined
-        }}
       >
         <div className="text-center mb-6">
           <h1 className="text-xl font-bold tui-text mb-2">BaZingSe</h1>
@@ -107,13 +104,6 @@ export default function PasswordGate({ children }: PasswordGateProps) {
         </div>
       </div>
 
-      <style jsx>{`
-        @keyframes shake {
-          0%, 100% { transform: translateX(0); }
-          10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
-          20%, 40%, 60%, 80% { transform: translateX(4px); }
-        }
-      `}</style>
     </div>
   );
 }
