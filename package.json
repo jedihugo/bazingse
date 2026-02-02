@@ -1,10 +1,36 @@
 {
-  "name": "bazingse",
-  "version": "1.0.0",
+  "name": "bazingse-app",
   "private": true,
+  "version": "1.0.0",
   "scripts": {
-    "build": "cd app && npm install && npm run build",
-    "dev": "cd app && npm run dev",
-    "start": "cd app && npm run start"
+    "dev": "next dev -p 4321",
+    "build": "next build",
+    "start": "next start -p 4321",
+    "lint": "next lint",
+    "api": "cd ../api && python3 run_bazingse.py",
+    "api:install": "cd ../api && pip3 install -r requirements.txt",
+    "cap:sync": "npm run build && npx cap sync",
+    "cap:ios": "npm run build && npx cap sync ios && npx cap open ios",
+    "cap:android": "npm run build && npx cap sync android && npx cap open android",
+    "cap:run:ios": "npm run build && npx cap sync ios && npx cap run ios",
+    "cap:run:android": "npm run build && npx cap sync android && npx cap run android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.0.1",
+    "@capacitor/cli": "^8.0.1",
+    "@capacitor/core": "^8.0.1",
+    "@capacitor/ios": "^8.0.1",
+    "next": "^14.2.0",
+    "next-intl": "^4.8.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.57.0",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "playwright": "^1.57.0",
+    "typescript": "^5.9.3"
   }
 }
