@@ -1,18 +1,27 @@
-"""SQLite database connection and session management."""
+"""Database connection - Turso (libsql) for production, SQLite for local."""
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 import os
 
-# Database file path - stored in the api directory
-DATABASE_PATH = os.path.join(os.path.dirname(__file__), "bazingse.db")
-SQLALCHEMY_DATABASE_URL = f"sqlite:///{DATABASE_PATH}"
+# Check for Turso (production) or fall back to local SQLite
+TURSO_URL = os.environ.get("TURSO_DATABASE_URL")
+TURSO_TOKEN = os.environ.get("TURSO_AUTH_TOKEN")
 
-# Create engine with check_same_thread=False for SQLite
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False}
-)
+if TURSO_URL and TURSO_TOKEN:
+    # Production: Use Turso
+    # Convert libsql:// to libsql+http:// for sqlalchemy-libsql
+    db_url = TURSO_URL.replace("libsql://", "libsql+https://")
+    SQLALCHEMY_DATABASE_URL = f"{db_url}?authToken={TURSO_TOKEN}"
+    engine = create_engine(SQLALCHEMY_DATABASE_URL)
+else:
+    # Local development: Use SQLite file
+    DATABASE_PATH = os.path.join(os.path.dirname(__file__), "bazingse.db")
+    SQLALCHEMY_DATABASE_URL = f"sqlite:///{DATABASE_PATH}"
+    engine = create_engine(
+        SQLALCHEMY_DATABASE_URL,
+        connect_args={"check_same_thread": False}
+    )
 
 # Session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
