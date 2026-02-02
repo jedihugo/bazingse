@@ -1,7 +1,7 @@
-fastapi
+fastapi==0.115.0
 uvicorn
-sxtwl
+sxtwl==2.0.7
 python-dotenv
-sqlalchemy
-libsql-experimental
-sqlalchemy-libsql
+sqlalchemy==2.0.36
+libsql-experimental==0.0.55
+sqlalchemy-libsql==0.2.0
