@@ -1,32 +1,18 @@
-'use client';
+import ProfilePageClient from './ProfilePageClient';
+import { locales } from '@/i18n/config';
 
-import { useParams } from 'next/navigation';
-import Header from '@/components/Header';
-import ProfilePage from '@/components/ProfilePage';
+// For static export - generate placeholder, actual data loaded client-side
+export function generateStaticParams() {
+  // Generate a placeholder for each locale
+  return locales.map((locale) => ({
+    locale,
+    id: '_', // Placeholder - real IDs handled client-side
+  }));
+}
+
+// Allow any dynamic ID (client-side routing)
+export const dynamicParams = true;
 
 export default function ProfileRoute() {
-  const params = useParams();
-  const profileId = params?.id as string;
-
-  if (!profileId) {
-    return (
-      <div className="min-h-screen tui-bg">
-        <Header />
-        <main className="mx-auto main-content p-4">
-          <p className="text-center tui-text-muted">Loading...</p>
-        </main>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen tui-bg">
-      <Header />
-      <main className="mx-auto main-content">
-        <div className="mx-auto" style={{ maxWidth: '900px' }}>
-          <ProfilePage profileId={profileId} />
-        </div>
-      </main>
-    </div>
-  );
+  return <ProfilePageClient />;
 }
