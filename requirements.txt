@@ -3,5 +3,5 @@ uvicorn
 sxtwl
 python-dotenv
 sqlalchemy
+libsql-experimental
 sqlalchemy-libsql
-
