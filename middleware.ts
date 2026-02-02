@@ -1,9 +1,12 @@
 import createMiddleware from 'next-intl/middleware';
-import { routing } from './src/i18n/routing';
 
-export default createMiddleware(routing);
+// Minimal config for Edge runtime - no external imports
+export default createMiddleware({
+  locales: ['en', 'id', 'zh'],
+  defaultLocale: 'id',
+  localePrefix: 'always'
+});
 
 export const config = {
-  // Match all pathnames except for API, static files, and Vercel internals
   matcher: '/((?!api|_next|_vercel|.*\\..*).*)'
 };
