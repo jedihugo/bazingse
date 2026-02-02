@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import PasswordGate from '@/components/PasswordGate';
+import LocaleProvider from '@/components/LocaleProvider';
 
 export const metadata: Metadata = {
   title: 'BaZingSe - Chinese BaZi Astrology',
@@ -17,7 +18,6 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: 'cover',
-  // Theme color adapts to system preference via media query in head
 };
 
 export default function RootLayout({
@@ -42,7 +42,9 @@ export default function RootLayout({
       </head>
       <body>
         <PasswordGate>
-          {children}
+          <LocaleProvider>
+            {children}
+          </LocaleProvider>
         </PasswordGate>
       </body>
     </html>

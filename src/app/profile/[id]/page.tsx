@@ -4,11 +4,11 @@ import { useParams } from 'next/navigation';
 import Header from '@/components/Header';
 import ProfilePage from '@/components/ProfilePage';
 
-export default function ProfilePageClient() {
+export default function ProfileRoute() {
   const params = useParams();
   const profileId = params?.id as string;
 
-  if (!profileId || profileId === '_') {
+  if (!profileId) {
     return (
       <div className="min-h-screen tui-bg">
         <Header />
