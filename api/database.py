@@ -4,10 +4,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 import os
 
-# Database file path - use Railway volume, /tmp, or local
+# Database file path - use Railway volume /data, or local
 if os.environ.get("RAILWAY_ENVIRONMENT"):
-    # Railway: use /tmp for now (add volume for persistence later)
-    DATABASE_PATH = "/tmp/bazingse.db"
+    # Railway: use persistent volume
+    DATABASE_PATH = "/data/bazingse.db"
 else:
     DATABASE_PATH = os.path.join(os.path.dirname(__file__), "bazingse.db")
 
