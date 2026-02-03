@@ -3,7 +3,7 @@
 // Detect if running inside Capacitor native app
 const isCapacitor = typeof window !== 'undefined' &&
   // @ts-expect-error - Capacitor is injected at runtime
-  (window.Capacitor?.isNativePlatform?.() || window.Capacitor?.platform !== 'web');
+  (window.Capacitor?.isNativePlatform?.() === true);
 
 // API URL: Railway for production, localhost for development
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ||
