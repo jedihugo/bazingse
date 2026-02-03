@@ -6,15 +6,11 @@ from fastapi.middleware.cors import CORSMiddleware
 # Initialize FastAPI app
 app = FastAPI(title="BaZingSe API")
 
-# Add CORS middleware
+# Add CORS middleware - allow all for cross-origin requests
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://bazingse.vercel.app",
-        "http://localhost:4321",
-        "http://localhost:3000",
-    ],
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
