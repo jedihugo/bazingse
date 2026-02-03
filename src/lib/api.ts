@@ -5,13 +5,11 @@ const isCapacitor = typeof window !== 'undefined' &&
   // @ts-expect-error - Capacitor is injected at runtime
   (window.Capacitor?.isNativePlatform?.() || window.Capacitor?.platform !== 'web');
 
-// In development, use the backend directly. In production (static export),
-// the backend should be configured via NEXT_PUBLIC_API_URL or accessed directly.
-// For Capacitor (mobile), localhost:8008 works in iOS Simulator (shares Mac's network)
+// API URL: Railway for production, localhost for development
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ||
   (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || isCapacitor)
     ? 'http://localhost:8008'
-    : '');
+    : 'https://bazingse-production.up.railway.app');
 
 // Life Event types
 export interface LifeEvent {
