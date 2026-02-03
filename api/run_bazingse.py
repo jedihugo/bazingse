@@ -19,9 +19,10 @@ app.add_middleware(
 app.include_router(router, prefix="/api")
 
 if __name__ == "__main__":
+    import os
+    port = int(os.environ.get("PORT", 8008))
     uvicorn.run(
         "run_bazingse:app",
         host="0.0.0.0",
-        port=8008,
-        reload=True,
+        port=port,
     )
