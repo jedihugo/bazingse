@@ -1,10 +1,17 @@
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routes import router
 
 # Initialize FastAPI app
 app = FastAPI(title="BaZingSe API")
+
+# Simple health check - no database
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+# Import router after app is created
+from routes import router
 
 # Add CORS middleware for Capacitor native apps
 app.add_middleware(
