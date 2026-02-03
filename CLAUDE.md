@@ -160,6 +160,39 @@ The app is protected by a simple password gate.
 
 ---
 
+## Production Infrastructure
+
+### Frontend: Vercel
+- **URL**: https://bazingse.vercel.app
+- Auto-deploys from `main` branch
+- No `vercel.json` needed - Next.js at repo root is auto-detected
+
+### Backend: Railway
+- **URL**: https://bazingse-production.up.railway.app
+- Python FastAPI with sxtwl calendar library
+- Auto-deploys from `main` branch (watches `api/` directory)
+
+### Database: Railway SQLite (SOURCE OF TRUTH)
+- **Location**: `/data/bazingse.db` on Railway persistent volume
+- **23 profiles** seeded (including test data + Ika Yayasan)
+- **NO local database** - Railway is the single source of truth
+- Seed endpoint: `POST /api/seed` (only works if DB is empty)
+
+### API Endpoints (Railway)
+```
+GET  /health                    # Health check
+GET  /api/profiles              # List all profiles
+POST /api/profiles              # Create profile
+GET  /api/profiles/{id}         # Get profile
+PUT  /api/profiles/{id}         # Update profile
+DELETE /api/profiles/{id}       # Delete profile
+POST /api/profiles/{id}/life_events  # Add life event
+GET  /api/analyze_bazi?...      # BaZi chart analysis
+POST /api/seed                  # Seed database (if empty)
+```
+
+---
+
 ## Vercel Deployment
 
 ### Configuration
@@ -338,10 +371,11 @@ The user is **non-technical**. This means:
 4. **Anti-WIMP** - No modals, inline forms, keyboard-first
 5. **i18n locales**: `en`, `id` (default), `zh`
 6. **Port 4321** for frontend, **Port 8008** for backend
-7. **Vercel auto-deploys** - No config needed if Next.js at root
-8. **Backend is Source of Truth** - No BaZi logic in frontend
-9. **Pattern-based thinking** - Apply fixes universally, not just to examples
-10. **Non-technical user** - Explain in plain language, no jargon
+7. **Vercel** for frontend, **Railway** for backend + database
+8. **Railway SQLite is SOURCE OF TRUTH** - No local database, always refer to Railway
+9. **Backend is Source of Truth** - No BaZi logic in frontend
+10. **Pattern-based thinking** - Apply fixes universally, not just to examples
+11. **Non-technical user** - Explain in plain language, no jargon
 
 ---
 
