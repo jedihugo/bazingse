@@ -4,9 +4,15 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 import os
 
-# Database file path - stored in the api directory
-DATABASE_PATH = os.path.join(os.path.dirname(__file__), "bazingse.db")
+# Database file path - use Railway volume, /tmp, or local
+if os.environ.get("RAILWAY_ENVIRONMENT"):
+    # Railway: use /tmp for now (add volume for persistence later)
+    DATABASE_PATH = "/tmp/bazingse.db"
+else:
+    DATABASE_PATH = os.path.join(os.path.dirname(__file__), "bazingse.db")
+
 SQLALCHEMY_DATABASE_URL = f"sqlite:///{DATABASE_PATH}"
+print(f"Using database: {DATABASE_PATH}")
 
 # Create engine with check_same_thread=False for SQLite
 engine = create_engine(
