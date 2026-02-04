@@ -727,7 +727,7 @@ async def seed_database(db: Session = Depends(get_db)):
 @router.get("/profiles", response_model=List[ProfileResponse])
 async def list_profiles(
     skip: int = Query(0, ge=0),
-    limit: int = Query(100, ge=1, le=5000),
+    limit: int = Query(100, ge=1, le=10000),
     db: Session = Depends(get_db)
 ):
     """List all profiles."""
