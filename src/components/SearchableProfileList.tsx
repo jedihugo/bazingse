@@ -24,6 +24,7 @@ export default function SearchableProfileList({
   const listRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
   // Filter profiles based on search query
   const filteredProfiles = useMemo(() => {
@@ -57,16 +58,29 @@ export default function SearchableProfileList({
     }
   }, [selectedIndex]);
 
-  // Handle infinite scroll
-  const handleScroll = useCallback(() => {
-    if (!listRef.current) return;
-
-    const { scrollTop, scrollHeight, clientHeight } = listRef.current;
-    const nearBottom = scrollTop + clientHeight >= scrollHeight - 200;
-
-    if (nearBottom && visibleCount < filteredProfiles.length) {
+  // Load more profiles
+  const loadMore = useCallback(() => {
+    if (visibleCount < filteredProfiles.length) {
       setVisibleCount(prev => Math.min(prev + ITEMS_PER_PAGE, filteredProfiles.length));
     }
+  }, [visibleCount, filteredProfiles.length]);
+
+  // IntersectionObserver for infinite scroll (more reliable than scroll events)
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && visibleCount < filteredProfiles.length) {
+          setVisibleCount(prev => Math.min(prev + ITEMS_PER_PAGE, filteredProfiles.length));
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
+
+    return () => observer.disconnect();
   }, [visibleCount, filteredProfiles.length]);
 
   // Keyboard navigation
@@ -153,7 +167,6 @@ export default function SearchableProfileList({
       {/* Profile List */}
       <div
         ref={listRef}
-        onScroll={handleScroll}
         className="flex-1 overflow-y-auto"
         style={{ scrollbarWidth: 'thin' }}
       >
@@ -226,11 +239,15 @@ export default function SearchableProfileList({
               </div>
             ))}
 
-            {/* Load more indicator */}
+            {/* Load more indicator - clickable button + IntersectionObserver target */}
             {visibleCount < filteredProfiles.length && (
-              <div className="text-center py-4 tui-text-muted text-sm">
+              <div
+                ref={loadMoreRef}
+                onClick={loadMore}
+                className="text-center py-4 tui-text-muted text-sm cursor-pointer hover:tui-text transition-colors"
+              >
                 Showing {visibleCount.toLocaleString()} of {filteredProfiles.length.toLocaleString()}
-                <span className="ml-2">(scroll for more)</span>
+                <span className="ml-2 underline">[Load More]</span>
               </div>
             )}
           </div>
