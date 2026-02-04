@@ -4,12 +4,13 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import InlineProfileForm from '@/components/InlineProfileForm';
+import SearchableProfileList from '@/components/SearchableProfileList';
 import { getProfiles, deleteProfile, type Profile } from '@/lib/api';
 
 // Detect if running inside Capacitor native app (hide debug link on mobile)
 const isCapacitor = typeof window !== 'undefined' &&
   // @ts-expect-error - Capacitor is injected at runtime
-  (window.Capacitor?.isNativePlatform?.() || window.Capacitor?.platform !== 'web');
+  (window.Capacitor?.isNativePlatform?.() === true);
 
 export default function Home() {
   const router = useRouter();
@@ -61,9 +62,9 @@ export default function Home() {
   return (
     <div className="min-h-screen tui-bg">
       <Header />
-      <main className="mx-auto main-content px-4 py-6">
+      <main className="mx-auto main-content px-4 py-4">
         <div className="mx-auto" style={{ maxWidth: '800px' }}>
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex justify-between items-center mb-4">
             <h1 className="text-2xl font-bold tui-text">Profiles</h1>
             {!showCreateForm && (
               <button
@@ -83,7 +84,7 @@ export default function Home() {
 
           {/* Inline Create Form */}
           {showCreateForm && (
-            <div className="mb-6">
+            <div className="mb-4">
               <InlineProfileForm
                 onSuccess={handleProfileCreated}
                 onCancel={() => setShowCreateForm(false)}
@@ -91,62 +92,18 @@ export default function Home() {
             </div>
           )}
 
-          {isLoading ? (
-            <div className="text-center py-12 tui-text-muted">Loading profiles...</div>
-          ) : profiles.length === 0 && !showCreateForm ? (
-            <div className="text-center py-12">
-              <p className="tui-text-muted mb-4">No profiles yet</p>
-              <button
-                onClick={() => setShowCreateForm(true)}
-                className="tui-btn"
-              >
-                Create your first profile
-              </button>
-            </div>
-          ) : (
-            <div className="grid gap-4">
-              {profiles.map(profile => (
-                <div
-                  key={profile.id}
-                  onClick={() => router.push(`/profile/${profile.id}`)}
-                  className="tui-frame p-4 cursor-pointer"
-                  style={{ transition: 'border-color 0.15s' }}
-                  onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--tui-water)'}
-                  onMouseLeave={(e) => e.currentTarget.style.borderColor = ''}
-                >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-semibold text-lg tui-text">{profile.name}</h3>
-                      <p className="text-sm tui-text-dim">
-                        {profile.birth_date}
-                        {profile.birth_time && ` ${profile.birth_time}`}
-                        {' - '}
-                        <span style={{ color: profile.gender === 'female' ? 'var(--tui-accent-pink)' : 'var(--tui-water)' }}>
-                          {profile.gender === 'female' ? '\u2640' : '\u2642'}
-                        </span>
-                      </p>
-                    </div>
-                    <button
-                      onClick={(e) => handleDeleteProfile(profile.id, e)}
-                      className="tui-text-muted p-1"
-                      style={{ transition: 'color 0.15s' }}
-                      onMouseEnter={(e) => e.currentTarget.style.color = 'var(--tui-fire)'}
-                      onMouseLeave={(e) => e.currentTarget.style.color = ''}
-                      title="Delete profile"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+          {/* Searchable Profile List */}
+          {!showCreateForm && (
+            <SearchableProfileList
+              profiles={profiles}
+              onDeleteProfile={handleDeleteProfile}
+              isLoading={isLoading}
+            />
           )}
 
           {/* Quick link to debug page - hidden on mobile app */}
           {showDebugLink && (
-            <div className="mt-8 pt-4 border-t tui-border-color">
+            <div className="mt-4 pt-4 border-t tui-border-color">
               <a
                 href="/debug"
                 className="text-sm tui-text-muted"
