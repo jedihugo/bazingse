@@ -7,23 +7,12 @@ import InlineProfileForm from '@/components/InlineProfileForm';
 import SearchableProfileList from '@/components/SearchableProfileList';
 import { getProfiles, deleteProfile, type Profile } from '@/lib/api';
 
-// Detect if running inside Capacitor native app (hide debug link on mobile)
-const isCapacitor = typeof window !== 'undefined' &&
-  // @ts-expect-error - Capacitor is injected at runtime
-  (window.Capacitor?.isNativePlatform?.() === true);
-
 export default function Home() {
   const router = useRouter();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [showDebugLink, setShowDebugLink] = useState(false);
-
-  // Only show debug link on web (not in native mobile app)
-  useEffect(() => {
-    setShowDebugLink(!isCapacitor);
-  }, []);
 
   const loadProfiles = useCallback(async () => {
     try {
@@ -99,18 +88,6 @@ export default function Home() {
               onDeleteProfile={handleDeleteProfile}
               isLoading={isLoading}
             />
-          )}
-
-          {/* Quick link to debug page - hidden on mobile app */}
-          {showDebugLink && (
-            <div className="mt-4 pt-4 border-t tui-border-color">
-              <a
-                href="/debug"
-                className="text-sm tui-text-muted"
-              >
-                Debug Mode
-              </a>
-            </div>
           )}
         </div>
       </main>
