@@ -69,8 +69,8 @@ export interface ProfileUpdate {
 }
 
 // Profile CRUD functions
-export async function getProfiles(): Promise<Profile[]> {
-  const response = await fetch(`${API_BASE_URL}/api/profiles`);
+export async function getProfiles(limit: number = 10000): Promise<Profile[]> {
+  const response = await fetch(`${API_BASE_URL}/api/profiles?limit=${limit}`);
   if (!response.ok) {
     throw new Error('Failed to fetch profiles');
   }
