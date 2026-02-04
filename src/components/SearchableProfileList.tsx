@@ -24,7 +24,6 @@ export default function SearchableProfileList({
   const listRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const loadMoreRef = useRef<HTMLDivElement>(null);
 
   // Filter profiles based on search query
   const filteredProfiles = useMemo(() => {
@@ -60,28 +59,30 @@ export default function SearchableProfileList({
 
   // Load more profiles
   const loadMore = useCallback(() => {
-    if (visibleCount < filteredProfiles.length) {
-      setVisibleCount(prev => Math.min(prev + ITEMS_PER_PAGE, filteredProfiles.length));
-    }
-  }, [visibleCount, filteredProfiles.length]);
+    setVisibleCount(prev => Math.min(prev + ITEMS_PER_PAGE, filteredProfiles.length));
+  }, [filteredProfiles.length]);
 
-  // IntersectionObserver for infinite scroll (more reliable than scroll events)
+  // Scroll event handler for infinite scroll
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && visibleCount < filteredProfiles.length) {
-          setVisibleCount(prev => Math.min(prev + ITEMS_PER_PAGE, filteredProfiles.length));
-        }
-      },
-      { threshold: 0.1 }
-    );
+    const listElement = listRef.current;
+    if (!listElement) return;
 
-    if (loadMoreRef.current) {
-      observer.observe(loadMoreRef.current);
-    }
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = listElement;
+      // Load more when within 100px of bottom
+      if (scrollHeight - scrollTop - clientHeight < 100) {
+        setVisibleCount(prev => {
+          if (prev < filteredProfiles.length) {
+            return Math.min(prev + ITEMS_PER_PAGE, filteredProfiles.length);
+          }
+          return prev;
+        });
+      }
+    };
 
-    return () => observer.disconnect();
-  }, [visibleCount, filteredProfiles.length]);
+    listElement.addEventListener('scroll', handleScroll);
+    return () => listElement.removeEventListener('scroll', handleScroll);
+  }, [filteredProfiles.length]);
 
   // Keyboard navigation
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
@@ -239,16 +240,16 @@ export default function SearchableProfileList({
               </div>
             ))}
 
-            {/* Load more indicator - clickable button + IntersectionObserver target */}
+            {/* Load more button */}
             {visibleCount < filteredProfiles.length && (
-              <div
-                ref={loadMoreRef}
+              <button
                 onClick={loadMore}
-                className="text-center py-4 tui-text-muted text-sm cursor-pointer hover:tui-text transition-colors"
+                className="w-full text-center py-4 tui-text-muted text-sm cursor-pointer hover:tui-text transition-colors tui-frame mt-2"
+                style={{ borderColor: 'var(--tui-border)' }}
               >
                 Showing {visibleCount.toLocaleString()} of {filteredProfiles.length.toLocaleString()}
-                <span className="ml-2 underline">[Load More]</span>
-              </div>
+                <span className="ml-2 font-bold">[Load More]</span>
+              </button>
             )}
           </div>
         )}
