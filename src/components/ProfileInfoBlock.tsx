@@ -160,6 +160,23 @@ export default function ProfileInfoBlock({
         )}
       </div>
 
+      {/* Phone/WhatsApp */}
+      {profile.phone && (
+        <div className="flex items-center text-sm mt-1">
+          <span className="tui-text-muted mr-2">Phone:</span>
+          <a
+            href={`https://wa.me/${profile.phone.replace(/\D/g, '')}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="tui-text-dim hover:underline"
+            style={{ color: 'var(--tui-earth)' }}
+            title="Open WhatsApp"
+          >
+            {profile.phone}
+          </a>
+        </div>
+      )}
+
       {/* Saving indicator */}
       {isSaving && (
         <div className="absolute top-2 right-2 text-xs tui-text-muted">
