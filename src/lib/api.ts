@@ -59,6 +59,7 @@ export interface ProfileCreate {
   birth_time?: string;
   gender: 'male' | 'female';
   place_of_birth?: string;
+  phone?: string;
 }
 
 export interface ProfileUpdate {

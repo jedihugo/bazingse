@@ -24,6 +24,7 @@ export default function InlineProfileForm({
   const [minute, setMinute] = useState('');
   const [unknownTime, setUnknownTime] = useState(false);
   const [gender, setGender] = useState<'male' | 'female'>('male');
+  const [phone, setPhone] = useState('');
 
   // UI state
   const [error, setError] = useState<string | null>(null);
@@ -90,6 +91,7 @@ export default function InlineProfileForm({
         birth_date: formatDate(),
         birth_time: formatTime(),
         gender,
+        phone: phone.trim() || undefined,
       };
 
       const profile = await createProfile(data);
@@ -227,6 +229,30 @@ export default function InlineProfileForm({
         </div>
         <div className="chat-field-hint">
           Press M or F to select
+        </div>
+      </div>
+
+      {/* WhatsApp Field */}
+      <div className="chat-field">
+        <div className="chat-field-label-row">
+          <span className="chat-field-label">
+            WhatsApp:
+            <span className="tui-text-muted" style={{ fontSize: '0.625rem', marginLeft: '0.25rem' }}>
+              (optional)
+            </span>
+          </span>
+          <span className="chat-field-cursor">{'>'}</span>
+        </div>
+        <div className="chat-field-input">
+          <input
+            type="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="e.g. 628123456789"
+            className="tui-input w-full"
+            disabled={isSubmitting}
+            autoComplete="tel"
+          />
         </div>
       </div>
     </ChatForm>
