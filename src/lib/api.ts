@@ -67,6 +67,7 @@ export interface ProfileUpdate {
   birth_time?: string;
   gender?: 'male' | 'female';
   place_of_birth?: string;
+  phone?: string;
 }
 
 // Profile CRUD functions

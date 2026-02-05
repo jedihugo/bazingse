@@ -46,6 +46,8 @@ export default function ProfileInfoBlock({
       updateData.name = trimmedValue;
     } else if (editingField === 'place_of_birth' && trimmedValue !== (profile.place_of_birth || '')) {
       updateData.place_of_birth = trimmedValue || undefined;
+    } else if (editingField === 'phone' && trimmedValue !== (profile.phone || '')) {
+      updateData.phone = trimmedValue || undefined;
     }
 
     // Only save if there are changes
@@ -160,22 +162,34 @@ export default function ProfileInfoBlock({
         )}
       </div>
 
-      {/* Phone/WhatsApp */}
-      {profile.phone && (
-        <div className="flex items-center text-sm mt-1">
-          <span className="tui-text-muted mr-2">Phone:</span>
-          <a
-            href={`https://wa.me/${profile.phone.replace(/\D/g, '')}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="tui-text-dim hover:underline"
-            style={{ color: 'var(--tui-earth)' }}
-            title="Open WhatsApp"
+      {/* Phone (editable) */}
+      <div className="flex items-center text-sm mt-1">
+        <span className="tui-text-muted mr-2">Phone:</span>
+        {editingField === 'phone' ? (
+          <input
+            ref={inputRef}
+            type="tel"
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            onBlur={handleSave}
+            onKeyDown={handleKeyDown}
+            placeholder="Enter phone number..."
+            className="tui-text-dim bg-transparent border-b outline-none flex-1"
+            style={{ borderColor: 'var(--tui-water)' }}
+            maxLength={20}
+          />
+        ) : (
+          <span
+            onClick={() => handleEdit('phone', profile.phone || '')}
+            className={`cursor-pointer px-1 -mx-1 ${
+              profile.phone ? 'tui-text-dim' : 'tui-text-muted italic'
+            }`}
+            title="Click to edit"
           >
-            {profile.phone}
-          </a>
-        </div>
-      )}
+            {profile.phone || 'Click to add...'}
+          </span>
+        )}
+      </div>
 
       {/* Saving indicator */}
       {isSaving && (
