@@ -44,6 +44,7 @@ class ProfileCreate(BaseModel):
     birth_time: Optional[str] = Field(None, pattern=r"^\d{2}:\d{2}$")  # HH:MM or None
     gender: Literal["male", "female"]
     place_of_birth: Optional[str] = Field(None, max_length=200)
+    phone: Optional[str] = Field(None, max_length=20)  # Mobile/WhatsApp number
     life_events: Optional[List[Any]] = Field(default=None)
 
 
@@ -54,6 +55,7 @@ class ProfileUpdate(BaseModel):
     birth_time: Optional[str] = Field(None, pattern=r"^\d{2}:\d{2}$")
     gender: Optional[Literal["male", "female"]] = None
     place_of_birth: Optional[str] = Field(None, max_length=200)
+    phone: Optional[str] = Field(None, max_length=20)
     life_events: Optional[List[Any]] = Field(default=None)
 
 
@@ -65,6 +67,7 @@ class ProfileResponse(BaseModel):
     birth_time: Optional[str]
     gender: str
     place_of_birth: Optional[str] = None
+    phone: Optional[str] = None
     life_events: Optional[List[LifeEvent]] = None
     created_at: Optional[datetime]
     updated_at: Optional[datetime]

@@ -61,6 +61,7 @@ class Profile(Base):
     birth_time = Column(String, nullable=True)   # HH:MM format or NULL for unknown
     gender = Column(String, nullable=False)      # "male" or "female"
     place_of_birth = Column(String, nullable=True)  # City/location string
+    phone = Column(String, nullable=True, unique=True)  # Mobile/WhatsApp number (unique identifier)
     life_events = Column(JSON, nullable=True, default=list)  # Legacy: Array of life event objects
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
@@ -77,6 +78,7 @@ class Profile(Base):
             "birth_time": self.birth_time,
             "gender": self.gender,
             "place_of_birth": self.place_of_birth,
+            "phone": self.phone,
             "life_events": self.life_events or [],
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,

@@ -47,6 +47,7 @@ export interface Profile {
   birth_time: string | null;
   gender: 'male' | 'female';
   place_of_birth: string | null;
+  phone: string | null;
   life_events: LifeEvent[] | null;
   created_at: string | null;
   updated_at: string | null;
