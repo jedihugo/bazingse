@@ -19,6 +19,7 @@ def create_profile(db: Session, profile_data: ProfileCreate) -> Profile:
         birth_time=profile_data.birth_time,
         gender=profile_data.gender,
         place_of_birth=profile_data.place_of_birth,
+        phone=profile_data.phone,
         life_events=[],
     )
     db.add(profile)
