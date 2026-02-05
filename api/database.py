@@ -37,6 +37,18 @@ def get_db():
 
 
 def init_db():
-    """Initialize database tables."""
+    """Initialize database tables and run migrations."""
     from models import Profile  # Import here to avoid circular imports
     Base.metadata.create_all(bind=engine)
+
+    # Migration: Add phone column if it doesn't exist
+    from sqlalchemy import text, inspect
+    inspector = inspect(engine)
+    columns = [c['name'] for c in inspector.get_columns('profiles')]
+
+    if 'phone' not in columns:
+        print("Migration: Adding phone column to profiles table...")
+        with engine.connect() as conn:
+            conn.execute(text("ALTER TABLE profiles ADD COLUMN phone VARCHAR"))
+            conn.commit()
+        print("Migration complete: phone column added")
