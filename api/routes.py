@@ -80,23 +80,25 @@ UNIVERSAL_CORRECTION = 0.105  # 6.3 minutes in hours (same as chart_constructor)
 
 
 def check_four_extinction_separation(
-    analysis_year: int, analysis_month: int, analysis_day: int,
-    analysis_hour: Optional[float] = None,
+    year: int, month: int, day: int,
+    hour: Optional[float] = None,
 ) -> Optional[dict]:
-    """Check if the analysis datetime falls within the 24 hours before a
-    Four Extinction (四絕) or Four Separation (四離) solar term.
+    """Check if this calendar day (or a specific hour on it) overlaps with the
+    24 hours before a Four Extinction (四絕) or Four Separation (四離) solar term.
 
-    Returns dict with type/name info if it's a forbidden day, else None.
-    The 24-hour window before the exact solar term time can span 2 calendar days,
-    so we check both the current day and next day for solar terms.
+    When ``hour`` is None (calendar view), returns the forbidden hour range for
+    the entire day so the UI can display both the original rating and the
+    forbidden overlay.  When ``hour`` is given (analyze_bazi), only returns a
+    result if that specific hour falls inside the forbidden window.
+
+    Returns dict with type/name info and forbidden_start_hour / forbidden_end_hour,
+    or None if the day/hour is unaffected.
     """
-    from datetime import datetime as dt
+    analysis_date = date(year, month, day)
 
-    analysis_date = date(analysis_year, analysis_month, analysis_day)
-    # Default to noon if no hour provided (conservative - catches most cases)
-    analysis_hour_val = analysis_hour if analysis_hour is not None else 12.0
-
-    # Check current day and next day for relevant solar terms
+    # Check the current day and the next day for relevant solar terms.
+    # A term on day+1 creates a forbidden tail on the current day, and
+    # a term on day+0 creates a forbidden head on the current day.
     for day_offset in range(2):
         check_date = analysis_date + timedelta(days=day_offset)
         lunar_day = sxtwl.fromSolar(check_date.year, check_date.month, check_date.day)
@@ -108,30 +110,40 @@ def check_four_extinction_separation(
         if jq_idx not in FOUR_EXTINCTION_INDICES and jq_idx not in FOUR_SEPARATION_INDICES:
             continue
 
-        # Get exact solar term time
+        # Get exact solar term time (hours from midnight of check_date)
         jq_jd = lunar_day.getJieQiJD()
         jd_fraction = jq_jd % 1
         apparent_solar_hour = (jd_fraction * 24 + 12) % 24
         transition_hour = (apparent_solar_hour - UNIVERSAL_CORRECTION) % 24
 
-        # Convert analysis datetime and solar term datetime to comparable values
-        # (hours since analysis_date midnight)
-        analysis_total_hours = analysis_hour_val
-        term_total_hours = (day_offset * 24) + transition_hour
+        # Express everything in hours from analysis_date midnight
+        term_total = day_offset * 24 + transition_hour
+        forbidden_start_total = term_total - 24
+        forbidden_end_total = term_total
 
-        # The forbidden window is the 24 hours BEFORE the solar term
-        hours_before_term = term_total_hours - analysis_total_hours
-        if 0 < hours_before_term <= 24:
-            jq_id, jq_chinese, jq_english = JIEQI_NAMES[jq_idx]
-            is_extinction = jq_idx in FOUR_EXTINCTION_INDICES
-            return {
-                "type": "four_extinction" if is_extinction else "four_separation",
-                "chinese": "四絕" if is_extinction else "四離",
-                "english": "Four Extinction" if is_extinction else "Four Separation",
-                "solar_term_id": jq_id,
-                "solar_term_chinese": jq_chinese,
-                "solar_term_english": jq_english,
-            }
+        # Clamp to this calendar day [0, 24)
+        overlap_start = max(forbidden_start_total, 0)
+        overlap_end = min(forbidden_end_total, 24)
+
+        if overlap_start >= overlap_end:
+            continue
+
+        # If a specific hour is given, only match if it falls inside
+        if hour is not None and not (overlap_start <= hour < overlap_end):
+            continue
+
+        jq_id, jq_chinese, jq_english = JIEQI_NAMES[jq_idx]
+        is_extinction = jq_idx in FOUR_EXTINCTION_INDICES
+        return {
+            "type": "four_extinction" if is_extinction else "four_separation",
+            "chinese": "四絕" if is_extinction else "四離",
+            "english": "Four Extinction" if is_extinction else "Four Separation",
+            "solar_term_id": jq_id,
+            "solar_term_chinese": jq_chinese,
+            "solar_term_english": jq_english,
+            "forbidden_start_hour": round(overlap_start, 2),
+            "forbidden_end_hour": round(overlap_end, 2),
+        }
 
     return None
 
@@ -674,7 +686,7 @@ async def analyze_bazi(
             }
 
             # Check Four Extinction (四絕) / Four Separation (四離)
-            # The 24 hours before key solar terms are strictly inauspicious
+            # analyze_bazi has a specific hour — check that exact moment
             analysis_hour_val = None
             if analysis_time:
                 ah, am = extract_hour_minute(analysis_time)
@@ -686,10 +698,9 @@ async def analyze_bazi(
             )
 
             if forbidden:
-                # Four Extinction / Four Separation: never promote, override rating
+                # Exact hour falls in forbidden window — override to dire
                 dong_gong_data["forbidden"] = forbidden
                 dong_gong_data["consult"] = None
-                # Force dire rating for forbidden days
                 dong_gong_data["rating"] = {
                     "id": "dire",
                     "value": 1,
@@ -882,19 +893,14 @@ async def dong_gong_calendar(
             day_obj["description_english"] = day_info.get("description_english", "") if day_info else ""
 
             # Check Four Extinction (四絕) / Four Separation (四離)
+            # No hour for calendar — returns the forbidden range for the whole day
             forbidden = check_four_extinction_separation(year, month, day)
+            day_obj["forbidden"] = forbidden  # None if unaffected
 
             if forbidden:
-                day_obj["forbidden"] = forbidden
+                # Forbidden days never get promoted to consult
                 day_obj["consult"] = None
-                day_obj["rating"] = {
-                    "id": "dire",
-                    "value": 1,
-                    "symbol": "✗",
-                    "chinese": forbidden["chinese"],
-                }
             else:
-                day_obj["forbidden"] = None
                 # Consult promotion: inauspicious days with BOTH good_for AND positive description
                 consult = check_consult_promotion(rating, day_info)
                 if consult:

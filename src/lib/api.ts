@@ -209,6 +209,8 @@ export interface DongGongForbidden {
   solar_term_id: string;
   solar_term_chinese: string;
   solar_term_english: string;
+  forbidden_start_hour: number;
+  forbidden_end_hour: number;
 }
 
 export interface DongGongDay {

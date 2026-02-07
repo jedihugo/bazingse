@@ -1,7 +1,19 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { getDongGongCalendar, type DongGongDay, type DongGongCalendarResponse } from '@/lib/api';
+import { getDongGongCalendar, type DongGongDay, type DongGongCalendarResponse, type DongGongForbidden } from '@/lib/api';
+
+/** Format a decimal hour (e.g. 14.5) as "14:30" */
+function formatHour(h: number): string {
+  const hrs = Math.floor(h);
+  const mins = Math.round((h - hrs) * 60);
+  return `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+}
+
+/** Human-readable forbidden range, e.g. "14:23 – 24:00" or "00:00 – 14:23" */
+function forbiddenRange(f: DongGongForbidden): string {
+  return `${formatHour(f.forbidden_start_hour)} – ${formatHour(f.forbidden_end_hour)}`;
+}
 
 const WEEKDAYS = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
 const MONTH_NAMES = [
@@ -233,13 +245,15 @@ export default function DongGongCalendar() {
                     {dayData.day}
                   </div>
 
-                  {/* Rating symbol */}
+                  {/* Rating symbol — show original/✗ when forbidden */}
                   {dayData.rating && (
-                    <div
-                      className="text-xs font-bold mt-0.5"
-                      style={{ color: ratingColor(dayData.rating.value) }}
-                    >
-                      {dayData.rating.symbol}
+                    <div className="text-xs font-bold mt-0.5">
+                      <span style={{ color: ratingColor(dayData.rating.value) }}>
+                        {dayData.rating.symbol}
+                      </span>
+                      {dayData.forbidden && (
+                        <span style={{ color: '#000000' }}>/✗</span>
+                      )}
                     </div>
                   )}
 
@@ -308,8 +322,16 @@ function DayDetail({ day, onClose }: { day: DongGongDay; onClose: () => void }) 
 
       {/* Forbidden day info (Four Extinction / Four Separation) */}
       {day.forbidden && (
-        <div className="mb-2 text-xs font-bold" style={{ color: '#000000' }}>
-          {day.forbidden.chinese} ({day.forbidden.english}) — {day.forbidden.solar_term_chinese} {day.forbidden.solar_term_english}
+        <div className="mb-2 text-xs" style={{ borderLeft: '3px solid #000000', paddingLeft: '0.5rem' }}>
+          <div className="font-bold" style={{ color: '#000000' }}>
+            ✗ {day.forbidden.chinese} ({day.forbidden.english})
+          </div>
+          <div className="tui-text-muted mt-0.5">
+            Before {day.forbidden.solar_term_chinese} {day.forbidden.solar_term_english}
+          </div>
+          <div className="tui-text-muted">
+            Forbidden hours: {forbiddenRange(day.forbidden)}
+          </div>
         </div>
       )}
 
