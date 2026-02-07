@@ -512,6 +512,34 @@ export default function BaZiChart({
           ))}
         </div>
 
+        {/* Dong Gong indicator row - between HS and EB on daily luck pillar */}
+        {chartData?.dong_gong?.rating && displayAlignedLuckPillars.length > 0 && (
+          <div className="flex gap-0 items-center">
+            {/* Empty spacers for natal pillars */}
+            {displayNatalPillars.map((_, index) => (
+              <div key={`dg-natal-${index}`} className="w-28 flex-shrink-0" />
+            ))}
+            {/* Luck pillar columns - only daily (index 1) shows badge */}
+            {displayAlignedLuckPillars.map((_, index) => (
+              <div key={`dg-luck-${index}`} className="w-28 flex-shrink-0 flex items-center justify-center">
+                {index === 1 && (
+                  <span
+                    className="text-xs font-medium px-1.5"
+                    style={{
+                      color: chartData.dong_gong.rating.value >= 4 ? 'var(--tui-wood)'
+                        : chartData.dong_gong.rating.value === 3 ? 'var(--tui-earth)'
+                        : 'var(--tui-fire)',
+                    }}
+                    title={`董公: ${chartData.dong_gong.officer?.chinese || ''} ${chartData.dong_gong.rating.chinese}`}
+                  >
+                    {chartData.dong_gong.rating.symbol} {chartData.dong_gong.rating.chinese}
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* Earthly Branches Row */}
         <div className="flex gap-0 overflow-visible items-stretch">
           {/* Natal Pillar Branches */}

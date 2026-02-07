@@ -48,22 +48,6 @@ export default function TimelineEntry({
               10Y Luck: {chartData.hs_10yl.misc.start_date?.split('-')[0]} - {chartData.hs_10yl.misc.end_date?.split('-')[0]}
             </span>
           )}
-          {chartData?.dong_gong?.rating && (
-            <span
-              className="text-xs px-1.5 py-0.5 font-medium"
-              style={{
-                background: chartData.dong_gong.rating.value >= 4 ? 'color-mix(in srgb, var(--tui-wood) 20%, var(--tui-bg))'
-                  : chartData.dong_gong.rating.value === 3 ? 'color-mix(in srgb, var(--tui-earth) 20%, var(--tui-bg))'
-                  : 'color-mix(in srgb, var(--tui-fire) 20%, var(--tui-bg))',
-                color: chartData.dong_gong.rating.value >= 4 ? 'var(--tui-wood)'
-                  : chartData.dong_gong.rating.value === 3 ? 'var(--tui-earth)'
-                  : 'var(--tui-fire)',
-              }}
-              title={`董公: ${chartData.dong_gong.officer?.chinese || ''} ${chartData.dong_gong.rating.chinese}`}
-            >
-              {chartData.dong_gong.rating.symbol} {chartData.dong_gong.rating.chinese}
-            </span>
-          )}
         </div>
         {!isNatal && onDelete && (
           <button

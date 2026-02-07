@@ -63,9 +63,12 @@ export default function LifeEventBlock({
   const tTenGods = useTranslations('lifeAspects.ten_gods');
   const locale = useLocale();
 
+  const tForms = useTranslations('forms');
+
   const [isEditingNotes, setIsEditingNotes] = useState(false);
   const [notes, setNotes] = useState(event.notes || '');
   const [isSaving, setIsSaving] = useState(false);
+  const [isTogglingAbroad, setIsTogglingAbroad] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -126,6 +129,22 @@ export default function LifeEventBlock({
     onDelete?.();
   };
 
+  const handleToggleAbroad = async () => {
+    if (isTogglingAbroad) return;
+    try {
+      setIsTogglingAbroad(true);
+      const newValue = !event.is_abroad;
+      const updated = await updateLifeEvent(profileId, event.id, {
+        is_abroad: newValue,
+      });
+      onEventUpdate?.(updated);
+    } catch (err) {
+      console.error('Failed to toggle abroad:', err);
+    } finally {
+      setIsTogglingAbroad(false);
+    }
+  };
+
   // Translate severity category
   const getSeverityLabel = (severity: string) => {
     const severityMap: Record<string, string> = {
@@ -174,22 +193,6 @@ export default function LifeEventBlock({
                 10Y: {chartData.hs_10yl.misc.start_date?.split('-')[0]} - {chartData.hs_10yl.misc.end_date?.split('-')[0]}
               </span>
             )}
-            {chartData?.dong_gong?.rating && (
-              <span
-                className="text-xs px-1.5 py-0.5 font-medium"
-                style={{
-                  background: chartData.dong_gong.rating.value >= 4 ? 'color-mix(in srgb, var(--tui-wood) 20%, var(--tui-bg))'
-                    : chartData.dong_gong.rating.value === 3 ? 'color-mix(in srgb, var(--tui-earth) 20%, var(--tui-bg))'
-                    : 'color-mix(in srgb, var(--tui-fire) 20%, var(--tui-bg))',
-                  color: chartData.dong_gong.rating.value >= 4 ? 'var(--tui-wood)'
-                    : chartData.dong_gong.rating.value === 3 ? 'var(--tui-earth)'
-                    : 'var(--tui-fire)',
-                }}
-                title={`董公: ${chartData.dong_gong.officer?.chinese || ''} ${chartData.dong_gong.rating.chinese}`}
-              >
-                {chartData.dong_gong.rating.symbol} {chartData.dong_gong.rating.chinese}
-              </span>
-            )}
           </div>
 
           {/* Delete button */}
@@ -226,10 +229,25 @@ export default function LifeEventBlock({
             </div>
           )}
         </div>
-        {/* Location line - shown prominently below date */}
+        {/* Location line with abroad toggle */}
         {!isNatal && event.location && (
-          <div className="text-xs tui-text-dim mt-1">
-            {event.location}
+          <div className="text-xs mt-1 flex items-center gap-2 flex-wrap">
+            <span className="tui-text-dim">{event.location}</span>
+            <button
+              onClick={handleToggleAbroad}
+              disabled={isTogglingAbroad}
+              className="inline-flex items-center gap-1 px-1.5 py-0.5 transition-colors"
+              style={{
+                color: event.is_abroad ? 'var(--tui-water)' : 'var(--tui-fg-muted)',
+                background: event.is_abroad ? 'color-mix(in srgb, var(--tui-water) 15%, var(--tui-bg))' : 'transparent',
+                border: `1px solid ${event.is_abroad ? 'var(--tui-water)' : 'var(--tui-border)'}`,
+                opacity: isTogglingAbroad ? 0.5 : 1,
+              }}
+              title={tForms('location.abroad_hint')}
+            >
+              <span style={{ fontFamily: 'monospace' }}>{event.is_abroad ? '[x]' : '[_]'}</span>
+              <span>{tForms('location.abroad')}</span>
+            </button>
           </div>
         )}
       </div>
