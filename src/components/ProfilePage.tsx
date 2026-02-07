@@ -56,6 +56,8 @@ export default function ProfilePage({ profileId }: ProfilePageProps) {
       includeMonthlyLuck: !!event.month,
       analysisDay: event.day || null,
       includeDailyLuck: !!event.day,
+      showLocation: !!event.is_abroad,
+      locationType: event.is_abroad ? 'overseas' : null,
     });
   }, []);
 
@@ -171,12 +173,16 @@ export default function ProfilePage({ profileId }: ProfilePageProps) {
     }
   }, [profile, fetchChartForEvent]);
 
-  // Handle event update (e.g., notes changed)
-  const handleEventUpdate = useCallback((updatedEvent: LifeEvent) => {
+  // Handle event update (e.g., notes changed, abroad toggled)
+  const handleEventUpdate = useCallback(async (updatedEvent: LifeEvent) => {
+    // Check if is_abroad changed — need to re-fetch chart
+    const previousEvent = lifeEvents.find(item => item.event.id === updatedEvent.id);
+    const abroadChanged = previousEvent && (!!previousEvent.event.is_abroad !== !!updatedEvent.is_abroad);
+
     setLifeEvents(prev =>
       prev.map(item =>
         item.event.id === updatedEvent.id
-          ? { ...item, event: updatedEvent }
+          ? { ...item, event: updatedEvent, ...(abroadChanged ? { isLoading: true, error: null } : {}) }
           : item
       )
     );
@@ -188,7 +194,29 @@ export default function ProfilePage({ profileId }: ProfilePageProps) {
         e.id === updatedEvent.id ? updatedEvent : e
       ),
     } : null);
-  }, []);
+
+    // Re-fetch chart if abroad flag changed
+    if (abroadChanged && profile) {
+      try {
+        const chartData = await fetchChartForEvent(profile, updatedEvent);
+        setLifeEvents(prev =>
+          prev.map(item =>
+            item.event.id === updatedEvent.id
+              ? { ...item, chartData, isLoading: false }
+              : item
+          )
+        );
+      } catch (err) {
+        setLifeEvents(prev =>
+          prev.map(item =>
+            item.event.id === updatedEvent.id
+              ? { ...item, isLoading: false, error: err instanceof Error ? err.message : 'Failed to load' }
+              : item
+          )
+        );
+      }
+    }
+  }, [lifeEvents, profile, fetchChartForEvent]);
 
   // Handle event deletion
   const handleDeleteEvent = useCallback(async (eventId: string) => {

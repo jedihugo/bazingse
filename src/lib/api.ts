@@ -19,6 +19,7 @@ export interface LifeEvent {
   day?: number | null;
   location?: string | null;
   notes?: string | null;
+  is_abroad?: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -29,6 +30,7 @@ export interface LifeEventCreate {
   day?: number | null;
   location?: string | null;
   notes?: string | null;
+  is_abroad?: boolean;
 }
 
 export interface LifeEventUpdate {
@@ -37,6 +39,7 @@ export interface LifeEventUpdate {
   day?: number | null;
   location?: string | null;
   notes?: string | null;
+  is_abroad?: boolean;
 }
 
 // Profile types
@@ -177,6 +180,55 @@ export async function deleteLifeEvent(profileId: string, eventId: string): Promi
     }
     throw new Error('Failed to delete life event');
   }
+}
+
+// Dong Gong Calendar types
+export interface DongGongOfficer {
+  id: string;
+  chinese: string;
+  english: string;
+}
+
+export interface DongGongRating {
+  id: string;
+  value: number;
+  symbol: string;
+  chinese: string;
+}
+
+export interface DongGongDay {
+  day: number;
+  weekday: number;
+  day_stem: string;
+  day_branch: string;
+  day_stem_chinese: string;
+  day_branch_chinese: string;
+  pillar: string;
+  chinese_month: number | null;
+  chinese_month_name: string;
+  officer: DongGongOfficer | null;
+  rating: DongGongRating | null;
+  good_for: string[];
+  bad_for: string[];
+  description_chinese: string;
+  description_english: string;
+}
+
+export interface DongGongCalendarResponse {
+  year: number;
+  month: number;
+  first_day_weekday: number;
+  days_in_month: number;
+  days: DongGongDay[];
+  chinese_months_spanned: { month: number; chinese: string; branch: string }[];
+}
+
+export async function getDongGongCalendar(year: number, month: number): Promise<DongGongCalendarResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/dong_gong_calendar?year=${year}&month=${month}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch Dong Gong calendar');
+  }
+  return response.json();
 }
 
 export interface AnalyzeBaziParams {

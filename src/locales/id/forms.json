@@ -62,6 +62,8 @@
     "title": "Lokasi",
     "label": "地 Lokasi",
     "enable": "Aktifkan Lokasi",
+    "abroad": "Luar Negeri",
+    "abroad_hint": "Lokasi luar negeri (menambah elemen Air)",
     "options": {
       "overseas": "Luar Negeri",
       "birthplace": "Tempat Lahir"

@@ -80,6 +80,7 @@ def add_life_event(db: Session, profile_id: str, event_data: LifeEventCreate) ->
         "day": event_data.day,
         "location": event_data.location,
         "notes": event_data.notes,
+        "is_abroad": event_data.is_abroad,
         "created_at": now,
         "updated_at": now,
     }

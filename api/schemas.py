@@ -13,6 +13,7 @@ class LifeEventCreate(BaseModel):
     day: Optional[int] = Field(None, ge=1, le=31)
     location: Optional[str] = Field(None, max_length=200)
     notes: Optional[str] = Field(None, max_length=10000)
+    is_abroad: Optional[bool] = False
 
 
 class LifeEventUpdate(BaseModel):
@@ -22,6 +23,7 @@ class LifeEventUpdate(BaseModel):
     day: Optional[int] = Field(None, ge=1, le=31)
     location: Optional[str] = Field(None, max_length=200)
     notes: Optional[str] = Field(None, max_length=10000)
+    is_abroad: Optional[bool] = None
 
 
 class LifeEvent(BaseModel):
@@ -32,6 +34,7 @@ class LifeEvent(BaseModel):
     day: Optional[int] = None
     location: Optional[str] = None
     notes: Optional[str] = None
+    is_abroad: Optional[bool] = False
     created_at: str
     updated_at: str
 

@@ -62,6 +62,8 @@
     "title": "Location",
     "label": "地 Location",
     "enable": "Enable Location",
+    "abroad": "Abroad",
+    "abroad_hint": "Overseas location (adds Water element)",
     "options": {
       "overseas": "Overseas",
       "birthplace": "Birthplace"

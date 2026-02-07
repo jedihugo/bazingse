@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { ChatForm, GuidedYearInput } from './chat-form';
 import { createLifeEvent, type LifeEventCreate, type LifeEvent } from '@/lib/api';
 
@@ -19,6 +20,7 @@ export default function InlineLifeEventForm({
   existingDates = [],
   className = '',
 }: InlineLifeEventFormProps) {
+  const tForms = useTranslations('forms');
   const currentYear = new Date().getFullYear();
 
   // Form state
@@ -26,6 +28,7 @@ export default function InlineLifeEventForm({
   const [month, setMonth] = useState<number | string>('');
   const [day, setDay] = useState<number | string>('');
   const [location, setLocation] = useState('');
+  const [isAbroad, setIsAbroad] = useState(false);
   const [notes, setNotes] = useState('');
 
   // UI state
@@ -86,6 +89,7 @@ export default function InlineLifeEventForm({
         day: dayNum,
         location: location.trim() || null,
         notes: notes.trim() || null,
+        is_abroad: location.trim() ? isAbroad : false,
       };
 
       const newEvent = await createLifeEvent(profileId, eventData);
@@ -258,6 +262,26 @@ export default function InlineLifeEventForm({
             autoComplete="off"
           />
         </div>
+        {/* Abroad toggle - only shown when location is filled */}
+        {location.trim() && (
+          <div className="mt-1">
+            <button
+              type="button"
+              onClick={() => setIsAbroad(!isAbroad)}
+              disabled={isSubmitting}
+              className="inline-flex items-center gap-1 px-1.5 py-0.5 text-xs transition-colors"
+              style={{
+                color: isAbroad ? 'var(--tui-water)' : 'var(--tui-fg-muted)',
+                background: isAbroad ? 'color-mix(in srgb, var(--tui-water) 15%, var(--tui-bg))' : 'transparent',
+                border: `1px solid ${isAbroad ? 'var(--tui-water)' : 'var(--tui-border)'}`,
+              }}
+              title={tForms('location.abroad_hint')}
+            >
+              <span style={{ fontFamily: 'monospace' }}>{isAbroad ? '[x]' : '[_]'}</span>
+              <span>{tForms('location.abroad')}</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Notes Field */}

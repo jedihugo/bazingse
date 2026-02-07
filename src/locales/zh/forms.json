@@ -62,6 +62,8 @@
     "title": "位置",
     "label": "地 位置",
     "enable": "启用位置",
+    "abroad": "海外",
+    "abroad_hint": "海外位置（增加水元素）",
     "options": {
       "overseas": "海外",
       "birthplace": "故乡"
