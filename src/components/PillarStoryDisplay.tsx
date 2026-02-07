@@ -6,13 +6,13 @@ interface PillarStoryDisplayProps {
   chartData: any;
 }
 
-// Element colors
+// Element colors - theme-aware via CSS variables
 const ELEMENT_COLORS: Record<string, string> = {
-  Wood: '#22c55e',
-  Fire: '#ef4444',
-  Earth: '#eab308',
-  Metal: '#94a3b8',
-  Water: '#3b82f6',
+  Wood: 'var(--tui-wood)',
+  Fire: 'var(--tui-fire)',
+  Earth: 'var(--tui-earth)',
+  Metal: 'var(--tui-metal)',
+  Water: 'var(--tui-water)',
 };
 
 // Ten God abbreviations
@@ -62,12 +62,12 @@ export default function PillarStoryDisplay({ chartData }: PillarStoryDisplayProp
               <div
                 className={`minimap-cell ${activeNodeId === pillar.hs.node_id ? 'ring-2' : ''}`}
                 style={{
-                  backgroundColor: ELEMENT_COLORS[pillar.hs.element] || '#e5e7eb',
+                  backgroundColor: ELEMENT_COLORS[pillar.hs.element] || 'var(--tui-bg-alt)',
                   '--tw-ring-color': 'var(--tui-accent-purple)',
                 } as React.CSSProperties}
                 title={`${pillar.hs.value} (${pillar.hs.element})`}
               >
-                <span className="text-[8px] font-bold text-white drop-shadow">
+                <span className="text-[8px] font-bold drop-shadow" style={{ color: 'var(--tui-bg)' }}>
                   {pillar.hs.value?.slice(0, 2)}
                 </span>
               </div>
@@ -76,12 +76,12 @@ export default function PillarStoryDisplay({ chartData }: PillarStoryDisplayProp
               <div
                 className={`minimap-cell mt-0.5 ${activeNodeId === pillar.eb.node_id ? 'ring-2' : ''}`}
                 style={{
-                  backgroundColor: ELEMENT_COLORS[pillar.eb.element] || '#e5e7eb',
+                  backgroundColor: ELEMENT_COLORS[pillar.eb.element] || 'var(--tui-bg-alt)',
                   '--tw-ring-color': 'var(--tui-accent-purple)',
                 } as React.CSSProperties}
                 title={`${pillar.eb.value} (${pillar.eb.element})`}
               >
-                <span className="text-[8px] font-bold text-white drop-shadow">
+                <span className="text-[8px] font-bold drop-shadow" style={{ color: 'var(--tui-bg)' }}>
                   {pillar.eb.value?.slice(0, 2)}
                 </span>
               </div>
@@ -95,7 +95,7 @@ export default function PillarStoryDisplay({ chartData }: PillarStoryDisplayProp
         {stories?.map((story: any) => {
           const isActive = activeNodeId === story.node_id;
           const isExpanded = expandedStory === story.node_id;
-          const elementColor = ELEMENT_COLORS[story.element] || '#9ca3af';
+          const elementColor = ELEMENT_COLORS[story.element] || 'var(--tui-fg-muted)';
 
           return (
             <div
@@ -113,7 +113,7 @@ export default function PillarStoryDisplay({ chartData }: PillarStoryDisplayProp
                   className="w-8 h-8 rounded flex items-center justify-center shrink-0"
                   style={{ backgroundColor: elementColor }}
                 >
-                  <span className="text-[10px] font-bold text-white">
+                  <span className="text-[10px] font-bold" style={{ color: 'var(--tui-bg)' }}>
                     {story.is_daymaster ? 'DM' : TEN_GOD_ABBREV[story.ten_god_role] || '?'}
                   </span>
                 </div>
@@ -127,7 +127,7 @@ export default function PillarStoryDisplay({ chartData }: PillarStoryDisplayProp
                     <span
                       className="text-[9px] px-1 py-0.5 rounded"
                       style={{
-                        backgroundColor: elementColor + '30',
+                        backgroundColor: `color-mix(in srgb, ${elementColor} 20%, var(--tui-bg))`,
                         color: elementColor,
                       }}
                     >

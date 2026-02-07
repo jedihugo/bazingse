@@ -9,15 +9,15 @@ interface NarrativeDisplayProps {
   chartData: any;
 }
 
-// Category display order and colors
+// Category display order and colors - theme-aware via CSS variables
 const CATEGORY_CONFIG: Record<string, { label: string; labelZh: string; color: string; bgColor: string }> = {
-  combination: { label: 'Combinations', labelZh: '组合', color: '#8b5cf6', bgColor: '#f3e8ff' },
-  conflict: { label: 'Conflicts', labelZh: '冲突', color: '#ef4444', bgColor: '#fee2e2' },
-  balance: { label: 'Element Balance', labelZh: '五行平衡', color: '#f59e0b', bgColor: '#fef3c7' },
-  daymaster: { label: 'Daymaster', labelZh: '日主', color: '#3b82f6', bgColor: '#dbeafe' },
-  wealth: { label: 'Wealth', labelZh: '财运', color: '#10b981', bgColor: '#d1fae5' },
-  seasonal: { label: 'Seasonal', labelZh: '季节', color: '#6366f1', bgColor: '#e0e7ff' },
-  energy: { label: 'Energy Flow', labelZh: '能量', color: '#06b6d4', bgColor: '#cffafe' },
+  combination: { label: 'Combinations', labelZh: '组合', color: 'var(--tui-accent-purple)', bgColor: 'color-mix(in srgb, var(--tui-accent-purple) 15%, var(--tui-bg))' },
+  conflict: { label: 'Conflicts', labelZh: '冲突', color: 'var(--tui-error)', bgColor: 'color-mix(in srgb, var(--tui-error) 15%, var(--tui-bg))' },
+  balance: { label: 'Element Balance', labelZh: '五行平衡', color: 'var(--tui-earth)', bgColor: 'color-mix(in srgb, var(--tui-earth) 15%, var(--tui-bg))' },
+  daymaster: { label: 'Daymaster', labelZh: '日主', color: 'var(--tui-water)', bgColor: 'color-mix(in srgb, var(--tui-water) 15%, var(--tui-bg))' },
+  wealth: { label: 'Wealth', labelZh: '财运', color: 'var(--tui-success)', bgColor: 'color-mix(in srgb, var(--tui-success) 15%, var(--tui-bg))' },
+  seasonal: { label: 'Seasonal', labelZh: '季节', color: 'var(--tui-accent-teal)', bgColor: 'color-mix(in srgb, var(--tui-accent-teal) 15%, var(--tui-bg))' },
+  energy: { label: 'Energy Flow', labelZh: '能量', color: 'var(--tui-info)', bgColor: 'color-mix(in srgb, var(--tui-info) 15%, var(--tui-bg))' },
 };
 
 // Category display order
@@ -110,7 +110,7 @@ export default function NarrativeDisplay({ chartData }: NarrativeDisplayProps) {
                 {/* Category Header */}
                 <div
                   className="flex items-center gap-2 mb-1.5 pb-1 border-b"
-                  style={{ borderColor: config.color + '40' }}
+                  style={{ borderColor: `color-mix(in srgb, ${config.color} 25%, var(--tui-bg))` }}
                 >
                   <span
                     className="px-1.5 py-0.5 text-[10px] font-semibold rounded"

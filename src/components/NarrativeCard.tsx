@@ -44,10 +44,17 @@ const ICON_MAP: Record<string, string> = {
   flow: 'FL',
 };
 
-// Polarity to color mapping
+// Theme-aware color helper: derives bg/border from a CSS variable using color-mix
+const themeColor = (cssVar: string) => ({
+  text: cssVar,
+  bg: `color-mix(in srgb, ${cssVar} 15%, var(--tui-bg))`,
+  border: `color-mix(in srgb, ${cssVar} 40%, var(--tui-bg))`,
+});
+
+// Polarity to color mapping - theme-aware
 const POLARITY_COLORS: Record<string, { bg: string; border: string; text: string }> = {
-  positive: { bg: '#dcfce7', border: '#22c55e', text: '#166534' },
-  negative: { bg: '#fee2e2', border: '#ef4444', text: '#991b1b' },
+  positive: themeColor('var(--tui-success)'),
+  negative: themeColor('var(--tui-error)'),
   neutral: { bg: 'var(--tui-bg-alt)', border: 'var(--tui-border)', text: 'var(--tui-fg)' },
 };
 
@@ -81,7 +88,7 @@ export default function NarrativeCard({ narrative, isExpanded, onToggle, mapping
           className="shrink-0 w-7 h-7 flex items-center justify-center rounded text-[10px] font-bold"
           style={{
             backgroundColor: elementColor || colors.border,
-            color: '#fff',
+            color: 'var(--tui-bg)',
           }}
         >
           {icon}
@@ -99,8 +106,8 @@ export default function NarrativeCard({ narrative, isExpanded, onToggle, mapping
               <span
                 className="px-1 py-0.5 text-[9px] rounded"
                 style={{
-                  backgroundColor: elementColor ? elementColor + '30' : '#e5e7eb',
-                  color: elementColor || '#374151',
+                  backgroundColor: elementColor ? `color-mix(in srgb, ${elementColor} 20%, var(--tui-bg))` : 'var(--tui-bg-alt)',
+                  color: elementColor || 'var(--tui-fg-dim)',
                 }}
               >
                 {narrative.element}
