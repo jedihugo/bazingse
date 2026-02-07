@@ -529,10 +529,13 @@ export default function BaZiChart({
                       color: chartData.dong_gong.rating.value >= 4 ? 'var(--tui-wood)'
                         : chartData.dong_gong.rating.value === 3 ? 'var(--tui-earth)'
                         : chartData.dong_gong.rating.value === 2.5 ? 'var(--tui-water)'
+                        : chartData.dong_gong.rating.value <= 1 ? '#000000'
                         : 'var(--tui-fire)',
                     }}
                     title={
-                      chartData.dong_gong.consult?.promoted
+                      chartData.dong_gong.forbidden
+                        ? `董公: ${chartData.dong_gong.forbidden.chinese} (${chartData.dong_gong.forbidden.solar_term_chinese}) — ${chartData.dong_gong.forbidden.english}`
+                        : chartData.dong_gong.consult?.promoted
                         ? `董公: ${chartData.dong_gong.officer?.chinese || ''} 議 (originally 凶) — ${chartData.dong_gong.consult.reason}`
                         : `董公: ${chartData.dong_gong.officer?.chinese || ''} ${chartData.dong_gong.rating.chinese}`
                     }

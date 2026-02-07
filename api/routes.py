@@ -54,6 +54,88 @@ from library.pattern_engine.integration import analyze_with_pattern_engine
 # Import Narrative Interpretation System
 from library.narrative import generate_narrative, generate_pillar_stories
 
+# sxtwl solar term indices for Four Extinction (四絕) and Four Separation (四離)
+# Four Extinction: day before start-of-season terms (Li Chun, Li Xia, Li Qiu, Li Dong)
+# Four Separation: day before mid-season terms (Chun Fen, Xia Zhi, Qiu Fen, Dong Zhi)
+# sxtwl index mapping (verified empirically):
+#   0=Dong Zhi, 1=Xiao Han, 2=Da Han, 3=Li Chun, 4=Yu Shui, 5=Jing Zhe,
+#   6=Chun Fen, 7=Qing Ming, 8=Gu Yu, 9=Li Xia, 10=Xiao Man, 11=Mang Zhong,
+#   12=Xia Zhi, 13=Xiao Shu, 14=Da Shu, 15=Li Qiu, 16=Chu Shu, 17=Bai Lu,
+#   18=Qiu Fen, 19=Han Lu, 20=Shuang Jiang, 21=Li Dong, 22=Xiao Xue, 23=Da Xue
+FOUR_EXTINCTION_INDICES = {3, 9, 15, 21}   # Li Chun, Li Xia, Li Qiu, Li Dong
+FOUR_SEPARATION_INDICES = {0, 6, 12, 18}   # Dong Zhi, Chun Fen, Xia Zhi, Qiu Fen
+
+JIEQI_NAMES = {
+    3: ("li_chun", "立春", "Li Chun"),
+    9: ("li_xia", "立夏", "Li Xia"),
+    15: ("li_qiu", "立秋", "Li Qiu"),
+    21: ("li_dong", "立冬", "Li Dong"),
+    0: ("dong_zhi", "冬至", "Dong Zhi"),
+    6: ("chun_fen", "春分", "Chun Fen"),
+    12: ("xia_zhi", "夏至", "Xia Zhi"),
+    18: ("qiu_fen", "秋分", "Qiu Fen"),
+}
+
+UNIVERSAL_CORRECTION = 0.105  # 6.3 minutes in hours (same as chart_constructor)
+
+
+def check_four_extinction_separation(
+    analysis_year: int, analysis_month: int, analysis_day: int,
+    analysis_hour: Optional[float] = None,
+) -> Optional[dict]:
+    """Check if the analysis datetime falls within the 24 hours before a
+    Four Extinction (四絕) or Four Separation (四離) solar term.
+
+    Returns dict with type/name info if it's a forbidden day, else None.
+    The 24-hour window before the exact solar term time can span 2 calendar days,
+    so we check both the current day and next day for solar terms.
+    """
+    from datetime import datetime as dt
+
+    analysis_date = date(analysis_year, analysis_month, analysis_day)
+    # Default to noon if no hour provided (conservative - catches most cases)
+    analysis_hour_val = analysis_hour if analysis_hour is not None else 12.0
+
+    # Check current day and next day for relevant solar terms
+    for day_offset in range(2):
+        check_date = analysis_date + timedelta(days=day_offset)
+        lunar_day = sxtwl.fromSolar(check_date.year, check_date.month, check_date.day)
+
+        if not lunar_day.hasJieQi():
+            continue
+
+        jq_idx = lunar_day.getJieQi()
+        if jq_idx not in FOUR_EXTINCTION_INDICES and jq_idx not in FOUR_SEPARATION_INDICES:
+            continue
+
+        # Get exact solar term time
+        jq_jd = lunar_day.getJieQiJD()
+        jd_fraction = jq_jd % 1
+        apparent_solar_hour = (jd_fraction * 24 + 12) % 24
+        transition_hour = (apparent_solar_hour - UNIVERSAL_CORRECTION) % 24
+
+        # Convert analysis datetime and solar term datetime to comparable values
+        # (hours since analysis_date midnight)
+        analysis_total_hours = analysis_hour_val
+        term_total_hours = (day_offset * 24) + transition_hour
+
+        # The forbidden window is the 24 hours BEFORE the solar term
+        hours_before_term = term_total_hours - analysis_total_hours
+        if 0 < hours_before_term <= 24:
+            jq_id, jq_chinese, jq_english = JIEQI_NAMES[jq_idx]
+            is_extinction = jq_idx in FOUR_EXTINCTION_INDICES
+            return {
+                "type": "four_extinction" if is_extinction else "four_separation",
+                "chinese": "四絕" if is_extinction else "四離",
+                "english": "Four Extinction" if is_extinction else "Four Separation",
+                "solar_term_id": jq_id,
+                "solar_term_chinese": jq_chinese,
+                "solar_term_english": jq_english,
+            }
+
+    return None
+
+
 # * =================
 # * API ENDPOINTS (endpoint.py)
 # * =================
@@ -591,17 +673,42 @@ async def analyze_bazi(
                 "description_english": day_info.get("description_english", "") if day_info else "",
             }
 
-            # Consult promotion: inauspicious days with positive indicators
-            consult = check_consult_promotion(rating, day_info)
-            if consult:
-                dong_gong_data["consult"] = {
-                    "promoted": True,
-                    "original_rating": dong_gong_data["rating"],
-                    "reason": consult["reason"],
-                }
-                dong_gong_data["rating"] = {"id": "consult", "value": 2.5, "symbol": "?", "chinese": "議"}
-            else:
+            # Check Four Extinction (四絕) / Four Separation (四離)
+            # The 24 hours before key solar terms are strictly inauspicious
+            analysis_hour_val = None
+            if analysis_time:
+                ah, am = extract_hour_minute(analysis_time)
+                if ah is not None:
+                    analysis_hour_val = ah + (am or 0) / 60
+
+            forbidden = check_four_extinction_separation(
+                analysis_year, analysis_month, analysis_day, analysis_hour_val
+            )
+
+            if forbidden:
+                # Four Extinction / Four Separation: never promote, override rating
+                dong_gong_data["forbidden"] = forbidden
                 dong_gong_data["consult"] = None
+                # Force dire rating for forbidden days
+                dong_gong_data["rating"] = {
+                    "id": "dire",
+                    "value": 1,
+                    "symbol": "✗",
+                    "chinese": forbidden["chinese"],  # 四絕 or 四離
+                }
+            else:
+                dong_gong_data["forbidden"] = None
+                # Consult promotion: inauspicious days with BOTH good_for AND positive description
+                consult = check_consult_promotion(rating, day_info)
+                if consult:
+                    dong_gong_data["consult"] = {
+                        "promoted": True,
+                        "original_rating": dong_gong_data["rating"],
+                        "reason": consult["reason"],
+                    }
+                    dong_gong_data["rating"] = {"id": "consult", "value": 2.5, "symbol": "?", "chinese": "議"}
+                else:
+                    dong_gong_data["consult"] = None
 
             response["dong_gong"] = dong_gong_data
 

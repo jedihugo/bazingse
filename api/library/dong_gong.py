@@ -2341,18 +2341,19 @@ CONSULT_POSITIVE_KEYWORDS = [
 
 
 def check_consult_promotion(rating: str, day_info: dict) -> dict | None:
-    """If an inauspicious rating has positive tone, return consult promotion info."""
+    """If an inauspicious rating has BOTH good_for activities AND positive
+    description tone, return consult promotion info.  Either condition alone
+    is not enough to warrant promotion."""
     if rating != "inauspicious" or not day_info:
         return None
 
     good_for = day_info.get("good_for", [])
     desc = (day_info.get("description_english", "") or "").lower()
+    has_positive_desc = any(kw in desc for kw in CONSULT_POSITIVE_KEYWORDS)
 
-    if good_for:
+    # Require BOTH conditions: good_for list AND positive description keywords
+    if good_for and has_positive_desc:
         activities = ", ".join(a.replace("_", " ") for a in good_for)
         return {"promoted": True, "reason": f"Good for: {activities}"}
-
-    if any(kw in desc for kw in CONSULT_POSITIVE_KEYWORDS):
-        return {"promoted": True, "reason": "Description indicates conditional positive use"}
 
     return None
