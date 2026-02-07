@@ -255,23 +255,11 @@ def generate_bazi_chart(year: int, month: int, day: int, hour: Optional[int] = N
             jieqi_jd = lunar_day.getJieQiJD()
             jd_fraction = jieqi_jd % 1
             
-            # The sxtwl library appears to return JD already localized for Beijing
-            # Standard conversion: Beijing hour = (JD_fraction * 24 + 12) % 24
-            # This gives us apparent solar time at Beijing meridian
-            
-            # Calculate apparent solar time
-            apparent_solar_hour = (jd_fraction * 24 + 12) % 24
-            
-            # Based on empirical testing with authoritative sources,
-            # a uniform correction of approximately 6.3 minutes works well
-            # This likely accounts for the combined effect of:
-            # - Ephemeris differences
-            # - Coordinate system conversions
-            # - Time standard differences
-            
-            UNIVERSAL_CORRECTION = 0.105  # 6.3 minutes in hours (best fit for known solar terms)
-            
-            transition_hour_beijing = (apparent_solar_hour - UNIVERSAL_CORRECTION) % 24
+            # sxtwl returns JD already in CST (Beijing time, UTC+8).
+            # Empirically verified: raw conversion matches authoritative
+            # solar term times to ~1 minute (e.g. Li Chun 2026 = 04:01 vs known 04:02).
+            # No additional correction needed.
+            transition_hour_beijing = (jd_fraction * 24 + 12) % 24
             
             # Get the birth time in hours
             birth_hour = hour + minute/60

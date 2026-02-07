@@ -76,9 +76,6 @@ JIEQI_NAMES = {
     18: ("qiu_fen", "秋分", "Qiu Fen"),
 }
 
-UNIVERSAL_CORRECTION = 0.105  # 6.3 minutes in hours (same as chart_constructor)
-
-
 def check_four_extinction_separation(
     year: int, month: int, day: int,
     hour: Optional[float] = None,
@@ -110,11 +107,12 @@ def check_four_extinction_separation(
         if jq_idx not in FOUR_EXTINCTION_INDICES and jq_idx not in FOUR_SEPARATION_INDICES:
             continue
 
-        # Get exact solar term time (hours from midnight of check_date)
+        # Get exact solar term time (hours from midnight of check_date).
+        # sxtwl returns JD already in CST (Beijing time, UTC+8).
+        # Raw conversion is accurate to ~1 minute — no correction needed.
         jq_jd = lunar_day.getJieQiJD()
         jd_fraction = jq_jd % 1
-        apparent_solar_hour = (jd_fraction * 24 + 12) % 24
-        transition_hour = (apparent_solar_hour - UNIVERSAL_CORRECTION) % 24
+        transition_hour = (jd_fraction * 24 + 12) % 24
 
         # Express everything in hours from analysis_date midnight
         term_total = day_offset * 24 + transition_hour
