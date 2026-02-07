@@ -21,6 +21,9 @@ export default function Header() {
           </h1>
         </Link>
         <div className="flex items-center gap-2">
+          <Link href="/calendar" className="tui-btn text-xs px-2 py-1 no-underline">
+            董公
+          </Link>
           <ThemeToggle />
         </div>
       </div>

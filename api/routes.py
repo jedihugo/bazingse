@@ -1,5 +1,6 @@
 
 import sxtwl
+import calendar as cal_module
 from datetime import datetime, date, timedelta
 from typing import Literal, Dict, List, Optional, Any
 from fastapi import APIRouter, Query, Depends, HTTPException
@@ -32,6 +33,9 @@ from library import (
     generate_learning_analysis,
     generate_ten_gods_detail,
 )
+
+# Import DONG_GONG data dict for calendar endpoint
+from library import DONG_GONG
 
 # Import from chart_constructor
 from chart_constructor import (
@@ -660,6 +664,118 @@ async def analyze_bazi(
     }
 
     return response
+
+
+# * =================
+# * DONG GONG CALENDAR
+# * =================
+
+@router.get("/dong_gong_calendar")
+async def dong_gong_calendar(
+    year: int = Query(..., description="Gregorian year"),
+    month: int = Query(..., ge=1, le=12, description="Gregorian month (1-12)"),
+) -> dict:
+    """
+    Return Dong Gong auspiciousness data for every day in a Gregorian month.
+    Each day includes its day stem/branch, Chinese month, rating, officer,
+    good_for/bad_for lists, and descriptions.
+    """
+    days_in_month = cal_module.monthrange(year, month)[1]
+    first_day_weekday = cal_module.weekday(year, month, 1)  # 0=Mon, 6=Sun
+    # Convert to Sunday=0 convention for calendar grid
+    first_day_weekday_sun = (first_day_weekday + 1) % 7
+
+    days = []
+    chinese_months_seen = {}
+
+    for day in range(1, days_in_month + 1):
+        lunar_day = sxtwl.fromSolar(year, month, day)
+
+        # Day stem + branch
+        day_gz = lunar_day.getDayGZ()
+        day_stem = GAN_MAP[Gan[day_gz.tg]]
+        day_branch = ZHI_MAP[Zhi[day_gz.dz]]
+
+        # Day stem Chinese characters
+        day_stem_chinese = Gan[day_gz.tg]
+        day_branch_chinese = Zhi[day_gz.dz]
+
+        # Month stem + branch (handles jieqi boundaries automatically)
+        month_gz = lunar_day.getMonthGZ()
+        month_branch = ZHI_MAP[Zhi[month_gz.dz]]
+
+        # Chinese month number from branch
+        chinese_month = DONG_GONG_BRANCH_TO_MONTH.get(month_branch)
+
+        # Track which Chinese months are spanned
+        if chinese_month and chinese_month not in chinese_months_seen:
+            month_info = DONG_GONG_MONTHS.get(chinese_month, {})
+            chinese_months_seen[chinese_month] = {
+                "month": chinese_month,
+                "chinese": month_info.get("chinese", ""),
+                "branch": month_info.get("branch", ""),
+            }
+
+        # Build day object
+        day_obj = {
+            "day": day,
+            "weekday": (first_day_weekday_sun + day - 1) % 7,
+            "day_stem": day_stem,
+            "day_branch": day_branch,
+            "day_stem_chinese": day_stem_chinese,
+            "day_branch_chinese": day_branch_chinese,
+            "pillar": f"{day_stem} {day_branch}",
+            "chinese_month": chinese_month,
+            "chinese_month_name": DONG_GONG_MONTHS.get(chinese_month, {}).get("chinese", "") if chinese_month else "",
+        }
+
+        if chinese_month and month_branch:
+            # Day officer
+            day_officer = get_dong_gong_officer(month_branch, day_branch)
+            officer_info = DONG_GONG_DAY_OFFICERS.get(day_officer, {})
+            day_obj["officer"] = {
+                "id": day_officer,
+                "chinese": officer_info.get("chinese", ""),
+                "english": officer_info.get("english", ""),
+            }
+
+            # Rating
+            rating = get_dong_gong_rating(chinese_month, day_branch, day_stem)
+            if rating:
+                rating_info = DONG_GONG_RATINGS.get(rating, {})
+                day_obj["rating"] = {
+                    "id": rating,
+                    "value": rating_info.get("value", 0),
+                    "symbol": rating_info.get("symbol", ""),
+                    "chinese": rating_info.get("chinese", ""),
+                }
+            else:
+                day_obj["rating"] = None
+
+            # Day info (good_for, bad_for, descriptions)
+            day_info = get_dong_gong_day_info(chinese_month, day_branch)
+            day_obj["good_for"] = day_info.get("good_for", []) if day_info else []
+            day_obj["bad_for"] = day_info.get("bad_for", []) if day_info else []
+            day_obj["description_chinese"] = day_info.get("description_chinese", "") if day_info else ""
+            day_obj["description_english"] = day_info.get("description_english", "") if day_info else ""
+        else:
+            day_obj["officer"] = None
+            day_obj["rating"] = None
+            day_obj["good_for"] = []
+            day_obj["bad_for"] = []
+            day_obj["description_chinese"] = ""
+            day_obj["description_english"] = ""
+
+        days.append(day_obj)
+
+    return {
+        "year": year,
+        "month": month,
+        "first_day_weekday": first_day_weekday_sun,
+        "days_in_month": days_in_month,
+        "days": days,
+        "chinese_months_spanned": list(chinese_months_seen.values()),
+    }
 
 
 # * =================

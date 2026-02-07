@@ -1,0 +1,38 @@
+{
+  "title": "Dong Gong Calendar",
+  "title_chinese": "董公日曆",
+  "weekdays": ["SU", "MO", "TU", "WE", "TH", "FR", "SA"],
+  "months": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+  "today": "Today",
+  "prev_month": "Previous month",
+  "next_month": "Next month",
+  "good_for": "Good for",
+  "bad_for": "Avoid",
+  "no_data": "No data",
+  "loading": "Loading...",
+  "officer": "Officer",
+  "rating_names": {
+    "excellent": "Excellent",
+    "auspicious": "Auspicious",
+    "fair": "Fair",
+    "inauspicious": "Inauspicious",
+    "dire": "Dire"
+  },
+  "activities": {
+    "construction": "Construction",
+    "marriage": "Marriage",
+    "contracts": "Contracts",
+    "important_activities": "Important activities",
+    "legal_matters": "Legal matters",
+    "travel": "Travel",
+    "moving": "Moving",
+    "opening_business": "Opening business",
+    "renovation": "Renovation",
+    "burial": "Burial",
+    "planting": "Planting",
+    "trading": "Trading",
+    "medical": "Medical",
+    "celebrations": "Celebrations"
+  },
+  "keyboard_hint": "[h/[] Prev  [l/]] Next  [t] Today"
+}

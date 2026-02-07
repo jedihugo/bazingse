@@ -1,0 +1,38 @@
+{
+  "title": "Kalender Dong Gong",
+  "title_chinese": "董公日曆",
+  "weekdays": ["MG", "SN", "SL", "RB", "KM", "JM", "SB"],
+  "months": ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"],
+  "today": "Hari ini",
+  "prev_month": "Bulan sebelumnya",
+  "next_month": "Bulan berikutnya",
+  "good_for": "Baik untuk",
+  "bad_for": "Hindari",
+  "no_data": "Tidak ada data",
+  "loading": "Memuat...",
+  "officer": "Pejabat",
+  "rating_names": {
+    "excellent": "Sangat Baik",
+    "auspicious": "Baik",
+    "fair": "Netral",
+    "inauspicious": "Buruk",
+    "dire": "Sangat Buruk"
+  },
+  "activities": {
+    "construction": "Konstruksi",
+    "marriage": "Pernikahan",
+    "contracts": "Kontrak",
+    "important_activities": "Kegiatan penting",
+    "legal_matters": "Urusan hukum",
+    "travel": "Perjalanan",
+    "moving": "Pindah rumah",
+    "opening_business": "Buka usaha",
+    "renovation": "Renovasi",
+    "burial": "Pemakaman",
+    "planting": "Menanam",
+    "trading": "Perdagangan",
+    "medical": "Medis",
+    "celebrations": "Perayaan"
+  },
+  "keyboard_hint": "[h/[] Sblm  [l/]] Slnjt  [t] Hari ini"
+}
