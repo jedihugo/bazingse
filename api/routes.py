@@ -27,6 +27,7 @@ from library import (
     get_dong_gong_officer,
     get_dong_gong_rating,
     get_dong_gong_day_info,
+    check_consult_promotion,
     # Life Aspects Analysis
     generate_health_analysis,
     generate_wealth_analysis,
@@ -566,7 +567,7 @@ async def analyze_bazi(
             # Get full day info (good_for, bad_for, descriptions)
             day_info = get_dong_gong_day_info(chinese_month, daily_branch)
 
-            response["dong_gong"] = {
+            dong_gong_data = {
                 "month": chinese_month,
                 "month_branch": monthly_branch,
                 "month_chinese": DONG_GONG_MONTHS.get(chinese_month, {}).get("chinese", ""),
@@ -589,6 +590,20 @@ async def analyze_bazi(
                 "description_chinese": day_info.get("description_chinese", "") if day_info else "",
                 "description_english": day_info.get("description_english", "") if day_info else "",
             }
+
+            # Consult promotion: inauspicious days with positive indicators
+            consult = check_consult_promotion(rating, day_info)
+            if consult:
+                dong_gong_data["consult"] = {
+                    "promoted": True,
+                    "original_rating": dong_gong_data["rating"],
+                    "reason": consult["reason"],
+                }
+                dong_gong_data["rating"] = {"id": "consult", "value": 2.5, "symbol": "?", "chinese": "議"}
+            else:
+                dong_gong_data["consult"] = None
+
+            response["dong_gong"] = dong_gong_data
 
     # Add mappings (using new structure where key is the id)
     response["mappings"] = {
@@ -758,6 +773,18 @@ async def dong_gong_calendar(
             day_obj["bad_for"] = day_info.get("bad_for", []) if day_info else []
             day_obj["description_chinese"] = day_info.get("description_chinese", "") if day_info else ""
             day_obj["description_english"] = day_info.get("description_english", "") if day_info else ""
+
+            # Consult promotion: inauspicious days with positive indicators
+            consult = check_consult_promotion(rating, day_info)
+            if consult:
+                day_obj["consult"] = {
+                    "promoted": True,
+                    "original_rating": day_obj["rating"],
+                    "reason": consult["reason"],
+                }
+                day_obj["rating"] = {"id": "consult", "value": 2.5, "symbol": "?", "chinese": "議"}
+            else:
+                day_obj["consult"] = None
         else:
             day_obj["officer"] = None
             day_obj["rating"] = None
@@ -765,6 +792,7 @@ async def dong_gong_calendar(
             day_obj["bad_for"] = []
             day_obj["description_chinese"] = ""
             day_obj["description_english"] = ""
+            day_obj["consult"] = None
 
         days.append(day_obj)
 

@@ -12,12 +12,14 @@ const MONTH_NAMES = [
 function ratingColor(value: number): string {
   if (value >= 4) return 'var(--tui-wood)';
   if (value === 3) return 'var(--tui-earth)';
+  if (value === 2.5) return 'var(--tui-water)';
   return 'var(--tui-fire)';
 }
 
 function ratingBg(value: number): string {
   if (value >= 4) return 'color-mix(in srgb, var(--tui-wood) 15%, var(--tui-bg))';
   if (value === 3) return 'color-mix(in srgb, var(--tui-earth) 15%, var(--tui-bg))';
+  if (value === 2.5) return 'color-mix(in srgb, var(--tui-water) 15%, var(--tui-bg))';
   return 'color-mix(in srgb, var(--tui-fire) 15%, var(--tui-bg))';
 }
 
@@ -301,6 +303,17 @@ function DayDetail({ day, onClose }: { day: DongGongDay; onClose: () => void }) 
           </span>
         )}
       </div>
+
+      {/* Consult promotion info */}
+      {day.consult?.promoted && (
+        <div className="mb-2 text-xs" style={{ color: 'var(--tui-text-muted)' }}>
+          <span className="tui-text-muted">
+            Originally: {day.consult.original_rating.symbol} {day.consult.original_rating.chinese}
+          </span>
+          <span className="mx-1">—</span>
+          <span style={{ color: 'var(--tui-water)' }}>{day.consult.reason}</span>
+        </div>
+      )}
 
       {/* Chinese month */}
       {day.chinese_month_name && (

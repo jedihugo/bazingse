@@ -161,6 +161,7 @@ from .dong_gong import (
     get_dong_gong_officer,
     get_dong_gong_rating,
     get_dong_gong_day_info,
+    check_consult_promotion,
 )
 
 # Unit Story Tracker
@@ -360,6 +361,7 @@ __all__ = [
     "get_dong_gong_officer",
     "get_dong_gong_rating",
     "get_dong_gong_day_info",
+    "check_consult_promotion",
     # Unit Story Tracker
     "UnitEvent",
     "UnitStory",

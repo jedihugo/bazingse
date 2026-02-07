@@ -16,8 +16,11 @@
     "auspicious": "Auspicious",
     "fair": "Fair",
     "inauspicious": "Inauspicious",
-    "dire": "Dire"
+    "dire": "Dire",
+    "consult": "Consult"
   },
+  "originally": "Originally",
+  "consult_reason": "Reason",
   "activities": {
     "construction": "Construction",
     "marriage": "Marriage",

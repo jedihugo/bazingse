@@ -16,8 +16,11 @@
     "auspicious": "Baik",
     "fair": "Netral",
     "inauspicious": "Buruk",
-    "dire": "Sangat Buruk"
+    "dire": "Sangat Buruk",
+    "consult": "Dikonsultasikan"
   },
+  "originally": "Aslinya",
+  "consult_reason": "Alasan",
   "activities": {
     "construction": "Konstruksi",
     "marriage": "Pernikahan",

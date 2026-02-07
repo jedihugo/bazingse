@@ -2330,3 +2330,29 @@ def get_dong_gong_day_info(month: int, day_branch: str) -> dict:
     if month not in DONG_GONG or not DONG_GONG[month]:
         return None
     return DONG_GONG[month].get(day_branch)
+
+
+# Keywords that indicate positive/conditional use in an inauspicious day's description
+CONSULT_POSITIVE_KEYWORDS = [
+    "suitable", "auspicious", "good for", "recommended", "benefit",
+    "prosper", "wealth", "noble", "gain", "positive outcome",
+    "secondarily", "moderately suitable", "fairly useable",
+]
+
+
+def check_consult_promotion(rating: str, day_info: dict) -> dict | None:
+    """If an inauspicious rating has positive tone, return consult promotion info."""
+    if rating != "inauspicious" or not day_info:
+        return None
+
+    good_for = day_info.get("good_for", [])
+    desc = (day_info.get("description_english", "") or "").lower()
+
+    if good_for:
+        activities = ", ".join(a.replace("_", " ") for a in good_for)
+        return {"promoted": True, "reason": f"Good for: {activities}"}
+
+    if any(kw in desc for kw in CONSULT_POSITIVE_KEYWORDS):
+        return {"promoted": True, "reason": "Description indicates conditional positive use"}
+
+    return None

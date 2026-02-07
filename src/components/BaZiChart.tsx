@@ -528,9 +528,14 @@ export default function BaZiChart({
                     style={{
                       color: chartData.dong_gong.rating.value >= 4 ? 'var(--tui-wood)'
                         : chartData.dong_gong.rating.value === 3 ? 'var(--tui-earth)'
+                        : chartData.dong_gong.rating.value === 2.5 ? 'var(--tui-water)'
                         : 'var(--tui-fire)',
                     }}
-                    title={`董公: ${chartData.dong_gong.officer?.chinese || ''} ${chartData.dong_gong.rating.chinese}`}
+                    title={
+                      chartData.dong_gong.consult?.promoted
+                        ? `董公: ${chartData.dong_gong.officer?.chinese || ''} 議 (originally 凶) — ${chartData.dong_gong.consult.reason}`
+                        : `董公: ${chartData.dong_gong.officer?.chinese || ''} ${chartData.dong_gong.rating.chinese}`
+                    }
                   >
                     {chartData.dong_gong.rating.symbol} {chartData.dong_gong.rating.chinese}
                   </span>

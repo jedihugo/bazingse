@@ -16,8 +16,11 @@
     "auspicious": "吉",
     "fair": "平",
     "inauspicious": "凶",
-    "dire": "大凶"
+    "dire": "大凶",
+    "consult": "議"
   },
+  "originally": "原本",
+  "consult_reason": "原因",
   "activities": {
     "construction": "起造",
     "marriage": "結婚",

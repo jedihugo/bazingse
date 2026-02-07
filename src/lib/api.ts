@@ -196,6 +196,12 @@ export interface DongGongRating {
   chinese: string;
 }
 
+export interface DongGongConsult {
+  promoted: boolean;
+  original_rating: DongGongRating;
+  reason: string;
+}
+
 export interface DongGongDay {
   day: number;
   weekday: number;
@@ -212,6 +218,7 @@ export interface DongGongDay {
   bad_for: string[];
   description_chinese: string;
   description_english: string;
+  consult?: DongGongConsult | null;
 }
 
 export interface DongGongCalendarResponse {
