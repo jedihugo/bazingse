@@ -6,29 +6,36 @@ interface PillarTagProps {
   position?: string;
 }
 
-// Color scheme based on pillar type
+// Theme-aware color helper
+const themeColor = (cssVar: string) => ({
+  bg: `color-mix(in srgb, ${cssVar} 15%, var(--tui-bg))`,
+  text: cssVar,
+  border: `color-mix(in srgb, ${cssVar} 40%, var(--tui-bg))`,
+});
+
+// Color scheme based on pillar type - theme-aware via CSS variables
 const POSITION_COLORS: Record<string, { bg: string; text: string; border: string }> = {
   // Natal pillars
-  h: { bg: '#fef3c7', text: '#92400e', border: '#f59e0b' },      // Hour - amber
-  d: { bg: '#f3e8ff', text: '#7e22ce', border: '#a855f7' },      // Day - purple
-  m: { bg: '#dbeafe', text: '#1e40af', border: '#3b82f6' },      // Month - blue
-  y: { bg: '#dcfce7', text: '#166534', border: '#22c55e' },      // Year - green
+  h: themeColor('var(--tui-earth)'),           // Hour - gold
+  d: themeColor('var(--tui-accent-purple)'),   // Day - purple
+  m: themeColor('var(--tui-water)'),           // Month - blue
+  y: themeColor('var(--tui-wood)'),            // Year - green
 
   // Luck pillars
-  '10yl': { bg: '#fce7f3', text: '#9d174d', border: '#ec4899' }, // 10Y Luck - pink
-  yl: { bg: '#e0e7ff', text: '#3730a3', border: '#6366f1' },     // Annual - indigo
-  ml: { bg: '#cffafe', text: '#0e7490', border: '#06b6d4' },     // Monthly - cyan
-  dl: { bg: '#fef9c3', text: '#854d0e', border: '#eab308' },     // Daily - yellow
-  hl: { bg: '#fed7aa', text: '#9a3412', border: '#f97316' },     // Hourly - orange
+  '10yl': themeColor('var(--tui-accent-pink)'),   // 10Y Luck - pink
+  yl: themeColor('var(--tui-accent-purple)'),     // Annual - indigo
+  ml: themeColor('var(--tui-accent-teal)'),       // Monthly - cyan
+  dl: themeColor('var(--tui-earth)'),             // Daily - yellow
+  hl: themeColor('var(--tui-accent-orange)'),     // Hourly - orange
 
   // Talisman pillars
-  ty: { bg: '#f1f5f9', text: '#475569', border: '#94a3b8' },     // Talisman Year - slate
-  tm: { bg: '#f1f5f9', text: '#475569', border: '#94a3b8' },     // Talisman Month
-  td: { bg: '#f1f5f9', text: '#475569', border: '#94a3b8' },     // Talisman Day
-  th: { bg: '#f1f5f9', text: '#475569', border: '#94a3b8' },     // Talisman Hour
+  ty: themeColor('var(--tui-metal)'),     // Talisman Year
+  tm: themeColor('var(--tui-metal)'),     // Talisman Month
+  td: themeColor('var(--tui-metal)'),     // Talisman Day
+  th: themeColor('var(--tui-metal)'),     // Talisman Hour
 
   // Default
-  unknown: { bg: '#f3f4f6', text: '#374151', border: '#9ca3af' },
+  unknown: themeColor('var(--tui-fg-muted)'),
 };
 
 // Node type indicators

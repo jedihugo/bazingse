@@ -226,10 +226,7 @@ export default function SearchableProfileList({
                       e.stopPropagation();
                       onDeleteProfile(profile.id, e);
                     }}
-                    className="tui-text-muted p-1 opacity-0 hover:opacity-100 transition-opacity"
-                    style={{ color: index === selectedIndex ? 'var(--tui-text-muted)' : '' }}
-                    onMouseEnter={(e) => e.currentTarget.style.color = 'var(--tui-fire)'}
-                    onMouseLeave={(e) => e.currentTarget.style.color = ''}
+                    className="delete-btn tui-text-muted p-1 opacity-0 hover:opacity-100 transition-opacity"
                     title="Delete profile"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">

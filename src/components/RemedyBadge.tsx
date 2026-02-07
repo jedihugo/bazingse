@@ -7,13 +7,20 @@ interface RemedyBadgeProps {
   direction?: string;
 }
 
-// Element colors
+// Theme-aware color helper
+const themeColor = (cssVar: string) => ({
+  bg: `color-mix(in srgb, ${cssVar} 15%, var(--tui-bg))`,
+  text: cssVar,
+  border: `color-mix(in srgb, ${cssVar} 40%, var(--tui-bg))`,
+});
+
+// Element colors - theme-aware via CSS variables
 const ELEMENT_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  Wood: { bg: '#dcfce7', text: '#166534', border: '#22c55e' },
-  Fire: { bg: '#fee2e2', text: '#991b1b', border: '#ef4444' },
-  Earth: { bg: '#fef3c7', text: '#92400e', border: '#f59e0b' },
-  Metal: { bg: '#f3f4f6', text: '#374151', border: '#9ca3af' },
-  Water: { bg: '#dbeafe', text: '#1e40af', border: '#3b82f6' },
+  Wood: themeColor('var(--tui-wood)'),
+  Fire: themeColor('var(--tui-fire)'),
+  Earth: themeColor('var(--tui-earth)'),
+  Metal: themeColor('var(--tui-metal)'),
+  Water: themeColor('var(--tui-water)'),
 };
 
 // Element Chinese characters

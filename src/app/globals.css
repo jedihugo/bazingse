@@ -649,6 +649,35 @@ body {
   background: var(--tui-bg);
 }
 
+/* TUI Back Button - visible, themed */
+.tui-back-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--tui-fg-dim);
+  padding: 0.25rem;
+  border: 1px solid var(--tui-border);
+  background: var(--tui-bg-alt);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.tui-back-btn:hover {
+  color: var(--tui-water);
+  border-color: var(--tui-water);
+  background: var(--tui-bg-panel);
+}
+
+.tui-back-btn:focus-visible {
+  outline: 1px solid var(--tui-water);
+  outline-offset: 2px;
+}
+
+/* Delete button hover - theme-aware */
+.delete-btn:hover {
+  color: var(--tui-error) !important;
+}
+
 /* TUI Progress Bar (ASCII style) */
 .tui-bar {
   font-family: 'JetBrains Mono', monospace;

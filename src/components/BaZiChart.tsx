@@ -157,9 +157,9 @@ export default function BaZiChart({
   const natalPillars = useMemo(() => {
     const hour = buildPillar('hs_h', 'eb_h', t('natal.pillar_labels.hour')) || {
       label: t('natal.pillar_labels.hour'),
-      stem: { chinese: '?', element: 'Unknown', color: '#808080' },
+      stem: { chinese: '?', element: 'Unknown', color: '' },
       stemName: '?',
-      branch: { chinese: '?', animal: '?', element: 'Unknown', color: '#808080' },
+      branch: { chinese: '?', animal: '?', element: 'Unknown', color: '' },
       branchName: '?',
       hiddenStems: {},
       hiddenQi: {},
@@ -184,9 +184,9 @@ export default function BaZiChart({
   // Empty placeholder pillar for alignment
   const createEmptyPillar = (label: string) => ({
     label,
-    stem: { chinese: '', element: 'Unknown', color: '#f3f4f6' },
+    stem: { chinese: '', element: 'Unknown', color: '' },
     stemName: '',
-    branch: { chinese: '', animal: '', element: 'Unknown', color: '#f3f4f6' },
+    branch: { chinese: '', animal: '', element: 'Unknown', color: '' },
     branchName: '',
     hiddenStems: {},
     hiddenQi: {},
