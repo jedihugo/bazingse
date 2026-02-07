@@ -881,17 +881,31 @@ async def dong_gong_calendar(
             day_obj["description_chinese"] = day_info.get("description_chinese", "") if day_info else ""
             day_obj["description_english"] = day_info.get("description_english", "") if day_info else ""
 
-            # Consult promotion: inauspicious days with positive indicators
-            consult = check_consult_promotion(rating, day_info)
-            if consult:
-                day_obj["consult"] = {
-                    "promoted": True,
-                    "original_rating": day_obj["rating"],
-                    "reason": consult["reason"],
-                }
-                day_obj["rating"] = {"id": "consult", "value": 2.5, "symbol": "?", "chinese": "議"}
-            else:
+            # Check Four Extinction (四絕) / Four Separation (四離)
+            forbidden = check_four_extinction_separation(year, month, day)
+
+            if forbidden:
+                day_obj["forbidden"] = forbidden
                 day_obj["consult"] = None
+                day_obj["rating"] = {
+                    "id": "dire",
+                    "value": 1,
+                    "symbol": "✗",
+                    "chinese": forbidden["chinese"],
+                }
+            else:
+                day_obj["forbidden"] = None
+                # Consult promotion: inauspicious days with BOTH good_for AND positive description
+                consult = check_consult_promotion(rating, day_info)
+                if consult:
+                    day_obj["consult"] = {
+                        "promoted": True,
+                        "original_rating": day_obj["rating"],
+                        "reason": consult["reason"],
+                    }
+                    day_obj["rating"] = {"id": "consult", "value": 2.5, "symbol": "?", "chinese": "議"}
+                else:
+                    day_obj["consult"] = None
         else:
             day_obj["officer"] = None
             day_obj["rating"] = None
@@ -900,6 +914,7 @@ async def dong_gong_calendar(
             day_obj["description_chinese"] = ""
             day_obj["description_english"] = ""
             day_obj["consult"] = None
+            day_obj["forbidden"] = None
 
         days.append(day_obj)
 

@@ -13,6 +13,7 @@ function ratingColor(value: number): string {
   if (value >= 4) return 'var(--tui-wood)';
   if (value === 3) return 'var(--tui-earth)';
   if (value === 2.5) return 'var(--tui-water)';
+  if (value <= 1) return '#000000';
   return 'var(--tui-fire)';
 }
 
@@ -20,6 +21,7 @@ function ratingBg(value: number): string {
   if (value >= 4) return 'color-mix(in srgb, var(--tui-wood) 15%, var(--tui-bg))';
   if (value === 3) return 'color-mix(in srgb, var(--tui-earth) 15%, var(--tui-bg))';
   if (value === 2.5) return 'color-mix(in srgb, var(--tui-water) 15%, var(--tui-bg))';
+  if (value <= 1) return 'color-mix(in srgb, #000000 15%, var(--tui-bg))';
   return 'color-mix(in srgb, var(--tui-fire) 15%, var(--tui-bg))';
 }
 
@@ -303,6 +305,13 @@ function DayDetail({ day, onClose }: { day: DongGongDay; onClose: () => void }) 
           </span>
         )}
       </div>
+
+      {/* Forbidden day info (Four Extinction / Four Separation) */}
+      {day.forbidden && (
+        <div className="mb-2 text-xs font-bold" style={{ color: '#000000' }}>
+          {day.forbidden.chinese} ({day.forbidden.english}) — {day.forbidden.solar_term_chinese} {day.forbidden.solar_term_english}
+        </div>
+      )}
 
       {/* Consult promotion info */}
       {day.consult?.promoted && (

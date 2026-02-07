@@ -202,6 +202,15 @@ export interface DongGongConsult {
   reason: string;
 }
 
+export interface DongGongForbidden {
+  type: string;
+  chinese: string;
+  english: string;
+  solar_term_id: string;
+  solar_term_chinese: string;
+  solar_term_english: string;
+}
+
 export interface DongGongDay {
   day: number;
   weekday: number;
@@ -219,6 +228,7 @@ export interface DongGongDay {
   description_chinese: string;
   description_english: string;
   consult?: DongGongConsult | null;
+  forbidden?: DongGongForbidden | null;
 }
 
 export interface DongGongCalendarResponse {
