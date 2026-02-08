@@ -148,7 +148,7 @@ export default function PillarCard({ pillar, type, index, mappings, isLuck, isEm
                   key={stemName}
                   className="flex items-center justify-center overflow-hidden"
                   style={{
-                    flex: idx === 0 ? '2' : idx === 1 ? '1.5' : '1',
+                    flex: '1',
                     borderRight: idx < numStems - 1 ? '1px solid var(--tui-border)' : 'none',
                     minWidth: 0,
                   }}
