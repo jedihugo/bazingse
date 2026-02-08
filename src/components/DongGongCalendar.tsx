@@ -37,6 +37,25 @@ function ratingBg(value: number): string {
   return 'color-mix(in srgb, var(--tui-fire) 15%, var(--tui-bg))';
 }
 
+/** Map stem pinyin → CSS variable for its element color (with yin/yang) */
+const STEM_COLOR: Record<string, string> = {
+  Jia: 'var(--tui-wood)', Yi: 'var(--tui-wood-yin)',
+  Bing: 'var(--tui-fire)', Ding: 'var(--tui-fire-yin)',
+  Wu: 'var(--tui-earth)', Ji: 'var(--tui-earth-yin)',
+  Geng: 'var(--tui-metal)', Xin: 'var(--tui-metal-yin)',
+  Ren: 'var(--tui-water)', Gui: 'var(--tui-water-yin)',
+};
+
+/** Map branch pinyin → CSS variable for its main element color */
+const BRANCH_COLOR: Record<string, string> = {
+  Zi: 'var(--tui-water)', Chou: 'var(--tui-earth-yin)',
+  Yin: 'var(--tui-wood)', Mao: 'var(--tui-wood-yin)',
+  Chen: 'var(--tui-earth)', Si: 'var(--tui-fire-yin)',
+  Wu: 'var(--tui-fire)', Wei: 'var(--tui-earth-yin)',
+  Shen: 'var(--tui-metal)', You: 'var(--tui-metal-yin)',
+  Xu: 'var(--tui-earth)', Hai: 'var(--tui-water-yin)',
+};
+
 export default function DongGongCalendar() {
   const today = new Date();
   const [year, setYear] = useState(today.getFullYear());
@@ -257,9 +276,17 @@ export default function DongGongCalendar() {
                     </div>
                   )}
 
-                  {/* Day stem-branch (abbreviated) */}
-                  <div className="text-[9px] tui-text-muted mt-0.5 leading-none">
-                    {dayData.day_stem_chinese}{dayData.day_branch_chinese}
+                  {/* Day stem-branch with element colors */}
+                  <div className="mt-0.5 leading-none">
+                    <div className="text-[9px]">
+                      <span style={{ color: STEM_COLOR[dayData.day_stem] }}>{dayData.day_stem_chinese}</span>
+                      <span style={{ color: BRANCH_COLOR[dayData.day_branch] }}>{dayData.day_branch_chinese}</span>
+                    </div>
+                    <div className="text-[7px]">
+                      <span style={{ color: STEM_COLOR[dayData.day_stem] }}>{dayData.day_stem}</span>
+                      {' '}
+                      <span style={{ color: BRANCH_COLOR[dayData.day_branch] }}>{dayData.day_branch}</span>
+                    </div>
                   </div>
                 </button>
               );
@@ -292,8 +319,14 @@ function DayDetail({ day, onClose }: { day: DongGongDay; onClose: () => void }) 
     >
       {/* Header: date + pillar */}
       <div className="flex items-center justify-between mb-2">
-        <div className="font-bold tui-text text-sm">
-          {day.day} &middot; {day.day_stem_chinese}{day.day_branch_chinese} {day.pillar}
+        <div className="font-bold text-sm">
+          <span className="tui-text">{day.day} &middot; </span>
+          <span style={{ color: STEM_COLOR[day.day_stem] }}>{day.day_stem_chinese}</span>
+          <span style={{ color: BRANCH_COLOR[day.day_branch] }}>{day.day_branch_chinese}</span>
+          <span className="tui-text"> </span>
+          <span style={{ color: STEM_COLOR[day.day_stem] }}>{day.day_stem}</span>
+          {' '}
+          <span style={{ color: BRANCH_COLOR[day.day_branch] }}>{day.day_branch}</span>
         </div>
         <button onClick={onClose} className="tui-btn text-xs px-1.5 py-0.5">
           &times;
