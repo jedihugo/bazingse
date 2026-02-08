@@ -17,6 +17,16 @@
   font-family: 'JetBrains Mono', monospace;
 }
 
+/* Reset button appearance - prevent dark system buttons on iOS/dark mode */
+button {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
 /* Base font size - uniform, readable */
 html {
   font-size: 14px;
@@ -1629,6 +1639,7 @@ header .text-xl {
   border-left: 3px solid #ccc;
   color: #1a1a1a;
 }
+
 
 .narrative-card-positive {
   border-left-color: #22c55e;
