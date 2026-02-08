@@ -40,23 +40,16 @@ const ICON_MAP: Record<string, string> = {
   flow: 'FL',
 };
 
-// Theme-aware color helper
-const themeColor = (cssVar: string) => ({
-  text: cssVar,
-  bg: `color-mix(in srgb, ${cssVar} 15%, var(--tui-bg))`,
-  border: `color-mix(in srgb, ${cssVar} 40%, var(--tui-bg))`,
-});
-
-// Polarity to color mapping
-const POLARITY_COLORS: Record<string, { bg: string; border: string; text: string }> = {
-  positive: themeColor('var(--tui-success)'),
-  negative: themeColor('var(--tui-error)'),
-  neutral: { bg: 'var(--tui-bg-alt)', border: 'var(--tui-border)', text: 'var(--tui-fg)' },
+// Polarity → left border color (CSS variable)
+const POLARITY_BORDER: Record<string, string> = {
+  positive: 'var(--tui-success)',
+  negative: 'var(--tui-error)',
+  neutral: 'var(--tui-border)',
 };
 
 export default function NarrativeCard({ narrative, isExpanded, onToggle, mappings }: NarrativeCardProps) {
   const polarity = narrative.polarity || 'neutral';
-  const colors = POLARITY_COLORS[polarity] || POLARITY_COLORS.neutral;
+  const borderColor = POLARITY_BORDER[polarity] || POLARITY_BORDER.neutral;
   const icon = ICON_MAP[narrative.icon] || narrative.type?.slice(0, 2).toUpperCase() || '??';
 
   // Get element color if available
@@ -68,10 +61,9 @@ export default function NarrativeCard({ narrative, isExpanded, onToggle, mapping
     <div
       className="narrative-card"
       style={{
-        backgroundColor: colors.bg,
-        borderColor: colors.border,
-        borderWidth: '1px',
-        borderStyle: 'solid',
+        backgroundColor: 'var(--tui-bg-alt)',
+        border: '1px solid var(--tui-border)',
+        borderLeft: `3px solid ${borderColor}`,
       }}
     >
       {/* Card Header - Always Visible */}
@@ -83,7 +75,7 @@ export default function NarrativeCard({ narrative, isExpanded, onToggle, mapping
         <div
           className="shrink-0 w-7 h-7 flex items-center justify-center rounded text-[10px] font-bold"
           style={{
-            backgroundColor: elementColor || colors.border,
+            backgroundColor: elementColor || borderColor,
             color: 'var(--tui-bg)',
           }}
         >
@@ -93,18 +85,15 @@ export default function NarrativeCard({ narrative, isExpanded, onToggle, mapping
         {/* Title and Points */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5">
-            <span className="text-xs font-semibold" style={{ color: colors.text }}>
+            <span className="text-xs font-semibold tui-text">
               {narrative.title}
             </span>
 
             {/* Element indicator */}
             {narrative.element && (
               <span
-                className="px-1 py-0.5 text-[9px] rounded"
-                style={{
-                  backgroundColor: elementColor ? `color-mix(in srgb, ${elementColor} 20%, var(--tui-bg))` : 'var(--tui-bg-alt)',
-                  color: elementColor || 'var(--tui-fg-dim)',
-                }}
+                className="px-1 py-0.5 text-[9px] rounded tui-bg-panel"
+                style={{ color: elementColor || 'var(--tui-fg-dim)' }}
               >
                 {narrative.element}
               </span>
