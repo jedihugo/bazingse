@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import PasswordGate from '@/components/PasswordGate';
 import LocaleProvider from '@/components/LocaleProvider';
+import { Analytics } from '@vercel/analytics/next';
 
 export const metadata: Metadata = {
   title: 'BaZingSe - Chinese BaZi Astrology',
@@ -46,6 +47,7 @@ export default function RootLayout({
             {children}
           </LocaleProvider>
         </PasswordGate>
+        <Analytics />
       </body>
     </html>
   );
