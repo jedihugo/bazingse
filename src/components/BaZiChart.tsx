@@ -98,12 +98,10 @@ export default function BaZiChart({
       };
     }
 
-    // Get hidden stems (qi) data
-    const postQi = ebNode?.post_interaction_qi && Object.keys(ebNode.post_interaction_qi).length > 0
-      ? ebNode.post_interaction_qi : null;
+    // Get hidden stems (qi) data - use base_qi only (original branch composition)
     const baseQi = ebNode?.base_qi && Object.keys(ebNode.base_qi).length > 0
       ? ebNode.base_qi : null;
-    const hiddenQi = postQi || baseQi || {};
+    const hiddenQi = baseQi || {};
 
     // Map hidden stems to Ten Gods
     const hiddenStems: Record<string, string> = {};
