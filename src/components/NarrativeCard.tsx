@@ -4,8 +4,6 @@ import PillarTag from './PillarTag';
 
 interface NarrativeCardProps {
   narrative: any;
-  isExpanded: boolean;
-  onToggle: () => void;
   mappings?: any;
 }
 
@@ -26,6 +24,7 @@ const ICON_MAP: Record<string, string> = {
   harm: 'HI',
   destruction: 'PO',
   stem_conflict: 'KE',
+  cross_pillar: 'WX',
 
   // Balance
   excess: 'EX',
@@ -40,9 +39,10 @@ const ICON_MAP: Record<string, string> = {
   flow: 'FL',
 };
 
-export default function NarrativeCard({ narrative, isExpanded, onToggle, mappings }: NarrativeCardProps) {
+export default function NarrativeCard({ narrative, mappings }: NarrativeCardProps) {
   const polarity = narrative.polarity || 'neutral';
   const icon = ICON_MAP[narrative.icon] || narrative.type?.slice(0, 2).toUpperCase() || '??';
+  const seq = narrative.seq;
 
   // Get element color if available
   const elementColor = narrative.element
@@ -56,29 +56,37 @@ export default function NarrativeCard({ narrative, isExpanded, onToggle, mapping
       ? 'narrative-card-negative'
       : 'narrative-card-neutral';
 
+  // Formula color based on polarity
+  const formulaColor = polarity === 'positive'
+    ? 'var(--tui-success)'
+    : polarity === 'negative'
+      ? 'var(--tui-error)'
+      : 'var(--tui-text-muted)';
+
   return (
     <div className={`narrative-card ${polarityClass}`}>
-      {/* Card Header - Always Visible */}
-      <button
-        onClick={onToggle}
-        className="w-full flex items-start gap-2 text-left p-2"
-      >
-        {/* Icon Badge */}
-        <div
-          className="shrink-0 w-7 h-7 flex items-center justify-center rounded text-[10px] font-bold"
-          style={elementColor ? { backgroundColor: elementColor, color: '#fff' } : undefined}
-        >
-          {icon}
-        </div>
+      <div className="p-2">
+        {/* Row 1: Seq + Icon + Title + Element + Points */}
+        <div className="flex items-center gap-2">
+          {/* Sequence number */}
+          <span className="shrink-0 text-[9px] font-mono tui-text-dim w-4 text-right">
+            {seq}
+          </span>
 
-        {/* Title and Points */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5 flex-wrap">
+          {/* Icon Badge */}
+          <div
+            className="shrink-0 w-6 h-6 flex items-center justify-center rounded text-[9px] font-bold"
+            style={elementColor ? { backgroundColor: elementColor, color: '#fff' } : undefined}
+          >
+            {icon}
+          </div>
+
+          {/* Title + Element + Points */}
+          <div className="flex-1 min-w-0 flex items-center gap-1.5 flex-wrap">
             <span className="text-xs font-semibold tui-text">
               {narrative.title}
             </span>
 
-            {/* Element indicator */}
             {narrative.element && (
               <span
                 className="px-1 py-0.5 text-[9px] rounded font-medium"
@@ -88,67 +96,49 @@ export default function NarrativeCard({ narrative, isExpanded, onToggle, mapping
               </span>
             )}
 
-            {/* Points indicator */}
             {narrative.points && (
               <span className="text-[9px] tui-text-muted font-mono">
                 {narrative.points}
               </span>
             )}
           </div>
-
-          {/* Pillar Tags */}
-          {narrative.pillar_refs && narrative.pillar_refs.length > 0 && (
-            <div className="flex flex-wrap gap-1 mt-1">
-              {narrative.pillar_refs.map((ref: any, idx: number) => (
-                <PillarTag
-                  key={idx}
-                  text={ref.abbrev}
-                  nodeType={ref.node_type}
-                  position={ref.position}
-                />
-              ))}
-            </div>
-          )}
         </div>
 
-        {/* Expand/Collapse Arrow */}
-        <div className="shrink-0 tui-text-muted text-xs">
-          {isExpanded ? '▲' : '▼'}
-        </div>
-      </button>
-
-      {/* Expanded Content - Points focused */}
-      {isExpanded && (
-        <div className="px-2 pb-2 pt-0 border-t tui-border-color mt-1">
-          {narrative.status_detail && (
-            <div className="mt-1.5 text-[10px] tui-text-muted italic">
-              {narrative.status_detail}
-            </div>
-          )}
-
-          <div className="mt-1.5 flex items-center gap-3 text-[9px] tui-text-muted font-mono">
-            {narrative.distance && (
-              <span>Distance: {narrative.distance}</span>
-            )}
-            {narrative.priority_score && (
-              <span>Priority: {narrative.priority_score}</span>
-            )}
+        {/* Row 2: Formula (always visible, colored by polarity) */}
+        {narrative.formula && (
+          <div className="mt-1 ml-12 text-[10px] font-mono" style={{ color: formulaColor }}>
+            {narrative.formula}
           </div>
+        )}
 
-          {narrative.branches_display && (
-            <div className="mt-1.5 text-[10px] tui-text-muted">
-              <span className="font-medium">Branches: </span>
-              <span className="font-mono">{narrative.branches_display}</span>
-            </div>
-          )}
+        {/* Row 3: Match (always visible) */}
+        {narrative.match && (
+          <div className="mt-0.5 ml-12 text-[10px] tui-text-muted font-mono">
+            {narrative.match}
+          </div>
+        )}
 
-          {narrative.percentage !== undefined && (
-            <div className="mt-1.5 text-[10px] tui-text-muted font-mono">
-              {narrative.element}: {narrative.percentage?.toFixed(1)}%
-            </div>
-          )}
-        </div>
-      )}
+        {/* Row 4: Pillar Tags */}
+        {narrative.pillar_refs && narrative.pillar_refs.length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-1 ml-12">
+            {narrative.pillar_refs.map((ref: any, idx: number) => (
+              <PillarTag
+                key={idx}
+                text={ref.abbrev}
+                nodeType={ref.node_type}
+                position={ref.position}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Row 5: Math formula (scoring breakdown) */}
+        {narrative.math_formula && (
+          <div className="mt-0.5 ml-12 text-[9px] tui-text-dim font-mono">
+            {narrative.math_formula}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

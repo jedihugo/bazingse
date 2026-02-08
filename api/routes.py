@@ -619,6 +619,7 @@ async def analyze_bazi(
         special_stars=pattern_engine_analysis.get("special_stars", []),
         ten_gods_detail=response.get("ten_gods_detail", {}),  # Add Ten Gods for richer narratives
         nodes=response,  # Pass full response for pillar analysis
+        interaction_log=interaction_results.get("interaction_log", []),  # Raw chronological order
         locale="en",  # Default to English, can be parameterized later
         max_narratives=15,  # Increase limit for more comprehensive analysis
     )

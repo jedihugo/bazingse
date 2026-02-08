@@ -78,6 +78,7 @@ def generate_narrative(
     special_stars: Optional[List[Dict[str, Any]]] = None,
     ten_gods_detail: Optional[Dict[str, Any]] = None,
     nodes: Optional[Dict[str, Any]] = None,
+    interaction_log: Optional[List[Dict[str, Any]]] = None,
     locale: str = "en",
     max_narratives: int = 15,
 ) -> Dict[str, Any]:
@@ -200,9 +201,13 @@ def generate_narrative(
         locale=locale
     )
 
+    # Build chronological list from raw interaction_log (preserves engine processing order)
+    all_chronological = _build_all_chronological(interaction_log or [], locale)
+
     return {
         "narratives": prioritized,
         "narratives_by_category": grouped,
+        "all_chronological": all_chronological,
         "element_context": element_context,
         "remedies": remedies,
         "quick_remedies": quick,
@@ -283,6 +288,193 @@ def _process_interaction(interaction: Dict[str, Any], locale: str) -> Optional[D
         narrative["branches_display"] = format_branches_display(interaction["branches"], locale)
 
     return narrative
+
+
+# =============================================================================
+# CHRONOLOGICAL INTERACTION LIST
+# =============================================================================
+
+# Chinese names for interaction types (used in formula display)
+_TYPE_CHINESE = {
+    "THREE_MEETINGS": "三会",
+    "THREE_COMBINATIONS": "三合",
+    "SIX_HARMONIES": "六合",
+    "HALF_MEETINGS": "半会",
+    "HALF_MEETING": "半会",
+    "HALF_COMBINATIONS": "半合",
+    "HALF_COMBINATION": "半合",
+    "ARCHED_COMBINATIONS": "拱合",
+    "ARCHED_COMBINATION": "拱合",
+    "STEM_COMBINATIONS": "干合",
+    "STEM_COMBINATION": "干合",
+    "CLASHES": "冲",
+    "CLASH": "冲",
+    "PUNISHMENTS": "刑",
+    "HARMS": "害",
+    "HARM": "害",
+    "DESTRUCTION": "破",
+    "STEM_CONFLICTS": "干克",
+    "STEM_CONFLICT": "干克",
+    "CROSS_PILLAR_WUXING": "五行",
+    "PILLAR_WUXING": "干支五行",
+    "SEASONAL_ADJUSTMENT": "旺相休囚死",
+    "ENERGY_FLOW": "流通",
+}
+
+# Polarity inference for types without templates
+_TYPE_POLARITY = {
+    "THREE_MEETINGS": "positive",
+    "THREE_COMBINATIONS": "positive",
+    "SIX_HARMONIES": "positive",
+    "HALF_MEETINGS": "positive",
+    "HALF_MEETING": "positive",
+    "HALF_COMBINATIONS": "positive",
+    "HALF_COMBINATION": "positive",
+    "ARCHED_COMBINATIONS": "positive",
+    "ARCHED_COMBINATION": "positive",
+    "STEM_COMBINATIONS": "positive",
+    "STEM_COMBINATION": "positive",
+    "ENERGY_FLOW": "positive",
+    "CLASHES": "negative",
+    "CLASH": "negative",
+    "PUNISHMENTS": "negative",
+    "HARMS": "negative",
+    "HARM": "negative",
+    "DESTRUCTION": "negative",
+    "STEM_CONFLICTS": "negative",
+    "STEM_CONFLICT": "negative",
+    "CROSS_PILLAR_WUXING": "neutral",
+    "PILLAR_WUXING": "neutral",
+    "SEASONAL_ADJUSTMENT": "neutral",
+}
+
+
+def _build_formula_string(interaction: Dict[str, Any]) -> str:
+    """
+    Build a formula string like "Mao + Xu → Fire 六合" from interaction data.
+    """
+    itype = interaction.get("type", "")
+    chinese = _TYPE_CHINESE.get(itype, "")
+
+    # Get branches or stems involved
+    branches = interaction.get("branches", [])
+    stems = interaction.get("stems", [])
+    pattern = interaction.get("pattern", "")
+
+    # Parse pattern if no branches/stems
+    if not branches and not stems and pattern and "-" in pattern:
+        parts = pattern.split("-")
+        if all(p in STEM_NAMES for p in parts):
+            stems = parts
+        else:
+            branches = parts
+
+    element = interaction.get("element", "")
+    arrow_target = f" {element}" if element else ""
+
+    if branches:
+        formula = " + ".join(branches) + f" →{arrow_target} {chinese}" if chinese else " + ".join(branches) + f" →{arrow_target}"
+    elif stems:
+        formula = " + ".join(stems) + f" →{arrow_target} {chinese}" if chinese else " + ".join(stems) + f" →{arrow_target}"
+    elif pattern:
+        formula = f"{pattern} →{arrow_target} {chinese}" if chinese else f"{pattern} →{arrow_target}"
+    else:
+        # Fallback: just type name + chinese
+        human_type = itype.replace("_", " ").title()
+        formula = f"{human_type} {chinese}".strip()
+
+    return formula
+
+
+def _build_match_string(interaction: Dict[str, Any], locale: str) -> str:
+    """
+    Build a match string like "Month EB + Hour EB" from node IDs.
+    """
+    node_ids = interaction.get("nodes", [])
+    if not node_ids:
+        return ""
+
+    refs = []
+    for node_id in node_ids:
+        ref = format_pillar_reference(node_id, locale)
+        refs.append(ref.get("abbrev", node_id))
+
+    return " + ".join(refs)
+
+
+def _build_chronological_entry(interaction: Dict[str, Any], seq: int, locale: str) -> Dict[str, Any]:
+    """
+    Process one raw interaction into a chronological display entry.
+    Uses existing template if available, otherwise creates fallback.
+    """
+    itype = interaction.get("type", "")
+    template = NARRATIVE_TEMPLATES.get(itype, None)
+
+    # Title: from template or humanized type name
+    if template:
+        locale_text = template.get(locale, template.get("en", {}))
+        title = locale_text.get("title", itype.replace("_", " ").title())
+        category = template.get("category", "energy")
+        polarity = template.get("polarity", "neutral")
+        icon = template.get("icon", "")
+    else:
+        title = itype.replace("_", " ").title()
+        category = "energy"
+        polarity = _TYPE_POLARITY.get(itype, "neutral")
+        icon = ""
+
+    # Element
+    element = interaction.get("element", "")
+    if not element:
+        element = _derive_element_from_interaction(interaction)
+
+    # Formula and match
+    formula = _build_formula_string(interaction)
+    match = _build_match_string(interaction, locale)
+
+    # Points
+    points = interaction.get("points", "")
+
+    # Math formula (scoring breakdown)
+    math_formula = interaction.get("math_formula", "")
+
+    # Pillar references
+    pillar_refs = [
+        format_pillar_reference(node, locale)
+        for node in interaction.get("nodes", [])
+    ]
+
+    entry = {
+        "seq": seq,
+        "type": itype,
+        "category": category,
+        "polarity": polarity,
+        "icon": icon,
+        "title": title,
+        "element": element,
+        "points": str(points) if points else "",
+        "formula": formula,
+        "match": match,
+        "math_formula": str(math_formula) if math_formula else "",
+        "pillar_refs": pillar_refs,
+        "nodes": interaction.get("nodes", []),
+        "transformed": interaction.get("transformed", False),
+        "distance": interaction.get("distance", ""),
+    }
+
+    return entry
+
+
+def _build_all_chronological(interaction_log: List[Dict[str, Any]], locale: str) -> List[Dict[str, Any]]:
+    """
+    Build a flat chronological list of ALL interactions in engine-processing order.
+    No filtering, no priority sorting - raw sequence.
+    """
+    entries = []
+    for idx, interaction in enumerate(interaction_log):
+        entry = _build_chronological_entry(interaction, seq=idx + 1, locale=locale)
+        entries.append(entry)
+    return entries
 
 
 def _derive_element_from_interaction(interaction: Dict[str, Any]) -> str:

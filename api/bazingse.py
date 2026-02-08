@@ -5145,6 +5145,7 @@ def analyze_8_node_interactions(
         "natal_element_score": natal_ten_elements, # Natal chart only, AFTER interactions (internal dynamics)
         "post_element_score": post_ten_elements,   # All nodes + location, AFTER interactions (full situation)
         "interactions": interactions_dict,
+        "interaction_log": interaction_log,  # Raw chronological order for narrative engine
         "daymaster_analysis": daymaster_analysis,
         "wealth_storage_analysis": wealth_storage_analysis,  # NEW: Wealth storage detection
         "unit_tracker": unit_tracker.to_dict() if unit_tracker else None,  # Unit Story tracking
