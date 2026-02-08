@@ -198,21 +198,28 @@ export default function DongGongCalendar() {
                   ))}
                   <span className="tui-text-muted"> 年</span>
                 </div>
-                {/* Month pillar(s) */}
-                <div>
-                  {data.chinese_months_spanned.map((cm, i) => (
-                    <span key={cm.month}>
-                      {i > 0 && <span className="tui-text-muted"> / </span>}
-                      <span className="tui-text-muted">{cm.chinese} </span>
-                      <span style={{ color: STEM_COLOR[cm.stem] }}>{cm.stem_chinese}</span>
-                      <span style={{ color: BRANCH_COLOR[cm.branch_id] }}>{cm.branch_chinese}</span>
-                      <span className="tui-text-muted"> · </span>
-                      <span style={{ color: STEM_COLOR[cm.stem] }}>{cm.stem}</span>
-                      {' '}
-                      <span style={{ color: BRANCH_COLOR[cm.branch_id] }}>{cm.branch_id}</span>
-                    </span>
-                  ))}
-                </div>
+                {/* Month pillar — reactive to selected day */}
+                {(() => {
+                  const monthsList = activeDayData
+                    ? data.chinese_months_spanned.filter(cm => cm.month === activeDayData.chinese_month)
+                    : data.chinese_months_spanned;
+                  return (
+                    <div>
+                      {monthsList.map((cm, i) => (
+                        <span key={cm.month}>
+                          {i > 0 && <span className="tui-text-muted"> / </span>}
+                          <span className="tui-text-muted">{cm.chinese} </span>
+                          <span style={{ color: STEM_COLOR[cm.stem] }}>{cm.stem_chinese}</span>
+                          <span style={{ color: BRANCH_COLOR[cm.branch_id] }}>{cm.branch_chinese}</span>
+                          <span className="tui-text-muted"> · </span>
+                          <span style={{ color: STEM_COLOR[cm.stem] }}>{cm.stem}</span>
+                          {' '}
+                          <span style={{ color: BRANCH_COLOR[cm.branch_id] }}>{cm.branch_id}</span>
+                        </span>
+                      ))}
+                    </div>
+                  );
+                })()}
               </div>
             );
           })()}
