@@ -813,6 +813,14 @@ async def dong_gong_calendar(
     days = []
     chinese_months_seen = {}
 
+    # Year pillar from first day of month
+    first_lunar = sxtwl.fromSolar(year, month, 1)
+    year_gz = first_lunar.getYearGZ()
+    year_stem = GAN_MAP[Gan[year_gz.tg]]
+    year_stem_chinese = Gan[year_gz.tg]
+    year_branch = ZHI_MAP[Zhi[year_gz.dz]]
+    year_branch_chinese = Zhi[year_gz.dz]
+
     for day in range(1, days_in_month + 1):
         lunar_day = sxtwl.fromSolar(year, month, day)
 
@@ -827,7 +835,10 @@ async def dong_gong_calendar(
 
         # Month stem + branch (handles jieqi boundaries automatically)
         month_gz = lunar_day.getMonthGZ()
+        month_stem = GAN_MAP[Gan[month_gz.tg]]
+        month_stem_chinese = Gan[month_gz.tg]
         month_branch = ZHI_MAP[Zhi[month_gz.dz]]
+        month_branch_chinese = Zhi[month_gz.dz]
 
         # Chinese month number from branch
         chinese_month = DONG_GONG_BRANCH_TO_MONTH.get(month_branch)
@@ -839,6 +850,10 @@ async def dong_gong_calendar(
                 "month": chinese_month,
                 "chinese": month_info.get("chinese", ""),
                 "branch": month_info.get("branch", ""),
+                "stem": month_stem,
+                "stem_chinese": month_stem_chinese,
+                "branch_id": month_branch,
+                "branch_chinese": month_branch_chinese,
             }
 
         # Build day object
@@ -923,6 +938,10 @@ async def dong_gong_calendar(
         "days_in_month": days_in_month,
         "days": days,
         "chinese_months_spanned": list(chinese_months_seen.values()),
+        "year_stem": year_stem,
+        "year_stem_chinese": year_stem_chinese,
+        "year_branch": year_branch,
+        "year_branch_chinese": year_branch_chinese,
     }
 
 

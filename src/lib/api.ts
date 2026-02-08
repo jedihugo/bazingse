@@ -239,7 +239,19 @@ export interface DongGongCalendarResponse {
   first_day_weekday: number;
   days_in_month: number;
   days: DongGongDay[];
-  chinese_months_spanned: { month: number; chinese: string; branch: string }[];
+  chinese_months_spanned: {
+    month: number;
+    chinese: string;
+    branch: string;
+    stem: string;
+    stem_chinese: string;
+    branch_id: string;
+    branch_chinese: string;
+  }[];
+  year_stem: string;
+  year_stem_chinese: string;
+  year_branch: string;
+  year_branch_chinese: string;
 }
 
 export async function getDongGongCalendar(year: number, month: number): Promise<DongGongCalendarResponse> {

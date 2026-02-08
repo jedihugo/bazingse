@@ -174,14 +174,33 @@ export default function DongGongCalendar() {
         </button>
         <div className="text-center">
           <span className="font-bold tui-text">{MONTH_NAMES[month - 1]} {year}</span>
-          {data && data.chinese_months_spanned.length > 0 && (
-            <div className="text-xs tui-text-muted mt-0.5">
-              {data.chinese_months_spanned.map((cm, i) => (
-                <span key={cm.month}>
-                  {i > 0 && ' / '}
-                  {cm.chinese} ({cm.branch})
-                </span>
-              ))}
+          {data && (
+            <div className="text-xs mt-0.5 leading-relaxed">
+              {/* Year pillar */}
+              <div>
+                <span style={{ color: STEM_COLOR[data.year_stem] }}>{data.year_stem_chinese}</span>
+                <span style={{ color: BRANCH_COLOR[data.year_branch] }}>{data.year_branch_chinese}</span>
+                <span className="tui-text-muted"> · </span>
+                <span style={{ color: STEM_COLOR[data.year_stem] }}>{data.year_stem}</span>
+                {' '}
+                <span style={{ color: BRANCH_COLOR[data.year_branch] }}>{data.year_branch}</span>
+                <span className="tui-text-muted"> 年</span>
+              </div>
+              {/* Month pillar(s) */}
+              <div>
+                {data.chinese_months_spanned.map((cm, i) => (
+                  <span key={cm.month}>
+                    {i > 0 && <span className="tui-text-muted"> / </span>}
+                    <span className="tui-text-muted">{cm.chinese} </span>
+                    <span style={{ color: STEM_COLOR[cm.stem] }}>{cm.stem_chinese}</span>
+                    <span style={{ color: BRANCH_COLOR[cm.branch_id] }}>{cm.branch_chinese}</span>
+                    <span className="tui-text-muted"> · </span>
+                    <span style={{ color: STEM_COLOR[cm.stem] }}>{cm.stem}</span>
+                    {' '}
+                    <span style={{ color: BRANCH_COLOR[cm.branch_id] }}>{cm.branch_id}</span>
+                  </span>
+                ))}
+              </div>
             </div>
           )}
         </div>
