@@ -242,6 +242,12 @@ from .narrative import (
     SUPPORTED_LOCALES,
 )
 
+# Physics School (Yin/Yang polarity threshold)
+from .physics import (
+    YIN_YANG_THRESHOLD,
+    should_skip_yin_yang,
+)
+
 # Export all symbols for "from library import *"
 __all__ = [
     # PRIMARY: Core data
@@ -422,4 +428,7 @@ __all__ = [
     "build_narrative_text",
     "get_localized_template",
     "SUPPORTED_LOCALES",
+    # Physics School
+    "YIN_YANG_THRESHOLD",
+    "should_skip_yin_yang",
 ]

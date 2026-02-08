@@ -226,7 +226,8 @@ def analyze_8_node_interactions(
     talisman_day_eb: str = None,
     talisman_hour_hs: str = None,
     talisman_hour_eb: str = None,
-    location: str = None
+    location: str = None,
+    school: str = "classic"
 ) -> Dict:
     """
     BaZi interaction calculator V7 - Extensible architecture with talisman support.
@@ -946,6 +947,56 @@ def analyze_8_node_interactions(
 
                 # Label for display: Primary Qi or Hidden Stem
                 qi_type_label = "Primary Qi" if qi_type == "PRIMARY_QI" else "Hidden Stem"
+
+                # === PHYSICS SCHOOL: Yin/Yang Polarity Threshold ===
+                if school == "physics" and should_skip_yin_yang(hs_polarity, qi_polarity, hs_current_qi, eb_qi_current):
+                    # Determine which is Yin and which is Yang for the log message
+                    if hs_polarity == "Yin":
+                        yin_stem, yin_qi_val, yang_stem, yang_qi_val = hs_node.value, hs_current_qi, qi_stem_id, eb_qi_current
+                    else:
+                        yin_stem, yin_qi_val, yang_stem, yang_qi_val = qi_stem_id, eb_qi_current, hs_node.value, hs_current_qi
+                    threshold_needed = round(YIN_YANG_THRESHOLD * yang_qi_val, 2)
+                    yin_qi_rounded = round(yin_qi_val, 1)
+                    yang_qi_rounded = round(yang_qi_val, 1)
+                    math_formula = (
+                        f"Condition: Yin qi >= {YIN_YANG_THRESHOLD} × Yang qi | "
+                        f"{yin_stem}(Yin {yin_qi_rounded}) vs {yang_stem}(Yang {yang_qi_rounded}) | "
+                        f"Need: {YIN_YANG_THRESHOLD} × {yang_qi_rounded} = {threshold_needed} | "
+                        f"Have: {yin_qi_rounded} | "
+                        f"{yin_qi_rounded} < {threshold_needed} → SKIP"
+                    )
+                    pillar_interactions.append({
+                        "type": "SKIPPED_YIN_YANG",
+                        "pattern": f"{hs_node.value}-{qi_stem_id}",
+                        "interaction_type": "skipped_yin_yang",
+                        "hs_stem": hs_node.value,
+                        "eb_stem": eb_node.value,
+                        "eb_qi_stem": qi_stem_id,
+                        "hs_element": hs_element,
+                        "hs_polarity": hs_polarity,
+                        "eb_qi_element": qi_element,
+                        "eb_qi_polarity": qi_polarity,
+                        "qi_type": qi_type,
+                        "distance": effective_distance,
+                        "distance_multiplier": distance_multiplier,
+                        "source_loss": 0,
+                        "target_change": 0,
+                        "math_formula": math_formula,
+                        "nodes": [hs_id, eb_id],
+                        "position": pos_code,
+                        "hs_stem": hs_node.value,
+                        "eb_stem": eb_node.value,
+                        "hs_qi_before": round(hs_current_qi, 1),
+                        "hs_qi_after": round(hs_current_qi, 1),
+                        "eb_qi_before": round(eb_qi_current, 1),
+                        "eb_qi_after": round(eb_qi_current, 1),
+                        "yin_stem": yin_stem,
+                        "yang_stem": yang_stem,
+                        "threshold": YIN_YANG_THRESHOLD,
+                        "threshold_needed": threshold_needed,
+                        "description": f"SKIPPED: {yin_stem} (Yin, {yin_qi_rounded} qi) < {threshold_needed} needed ({YIN_YANG_THRESHOLD} × {yang_stem} Yang {yang_qi_rounded} qi)"
+                    })
+                    continue
 
                 # === CONTROL RELATIONSHIPS (克) ===
                 if hs_controls == qi_element:

@@ -77,6 +77,11 @@
       "birthplace_4": "鄉4 Birthplace 4"
     }
   },
+  "school": {
+    "label": "School",
+    "classic": "Classic",
+    "physics": "Physics"
+  },
   "quick_test": {
     "label": "Quick Test",
     "select_preset": "Select a preset..."

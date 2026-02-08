@@ -12,6 +12,7 @@ import {
 import ProfileInfoBlock from './ProfileInfoBlock';
 import LifeEventBlock from './LifeEventBlock';
 import InlineLifeEventForm from './InlineLifeEventForm';
+import InlineSelector from './chat-form/InlineSelector';
 
 interface LifeEventWithChart {
   event: LifeEvent;
@@ -31,6 +32,11 @@ function sortEventsByDate(a: LifeEvent, b: LifeEvent): number {
   return (a.day || 0) - (b.day || 0);
 }
 
+const SCHOOL_OPTIONS = [
+  { value: 'classic', label: 'Classic' },
+  { value: 'physics', label: 'Physics' },
+];
+
 export default function ProfilePage({ profileId }: ProfilePageProps) {
   const router = useRouter();
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -39,6 +45,7 @@ export default function ProfilePage({ profileId }: ProfilePageProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [school, setSchool] = useState<'classic' | 'physics'>('classic');
 
   // Fetch chart data for a life event
   const fetchChartForEvent = useCallback(async (
@@ -58,8 +65,9 @@ export default function ProfilePage({ profileId }: ProfilePageProps) {
       includeDailyLuck: !!event.day,
       showLocation: !!event.is_abroad,
       locationType: event.is_abroad ? 'overseas' : null,
+      school,
     });
-  }, []);
+  }, [school]);
 
   // Load profile and all chart data
   const loadProfile = useCallback(async () => {
@@ -76,6 +84,7 @@ export default function ProfilePage({ profileId }: ProfilePageProps) {
         birthTime: profileData.birth_time || '',
         gender: profileData.gender as 'male' | 'female',
         unknownHour: !profileData.birth_time,
+        school,
       });
       setNatalChartData(natalChart);
 
@@ -116,7 +125,7 @@ export default function ProfilePage({ profileId }: ProfilePageProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [profileId, fetchChartForEvent]);
+  }, [profileId, fetchChartForEvent, school]);
 
   useEffect(() => {
     loadProfile();
@@ -295,6 +304,16 @@ export default function ProfilePage({ profileId }: ProfilePageProps) {
         onProfileUpdate={handleProfileUpdate}
         onBack={() => router.push('/')}
       />
+
+      {/* School Toggle */}
+      <div className="px-4 pt-2 flex items-center gap-2">
+        <span className="tui-text-muted text-sm">School:</span>
+        <InlineSelector
+          options={SCHOOL_OPTIONS}
+          value={school}
+          onChange={(v) => setSchool(v as 'classic' | 'physics')}
+        />
+      </div>
 
       {/* Main content */}
       <div className="px-4 pb-8 space-y-4">

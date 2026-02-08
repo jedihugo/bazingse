@@ -77,6 +77,11 @@
       "birthplace_4": "鄉4 Tempat Lahir 4"
     }
   },
+  "school": {
+    "label": "Aliran",
+    "classic": "Klasik",
+    "physics": "Fisika"
+  },
   "quick_test": {
     "label": "Tes Cepat",
     "select_preset": "Pilih preset..."

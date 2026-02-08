@@ -193,7 +193,8 @@ async def analyze_bazi(
     talisman_day_eb: Optional[str] = Query(None, description="Talisman pillar 3 EB - any of 60 pillars"),
     talisman_hour_hs: Optional[str] = Query(None, description="Talisman pillar 4 HS - any of 60 pillars"),
     talisman_hour_eb: Optional[str] = Query(None, description="Talisman pillar 4 EB - any of 60 pillars"),
-    location: Optional[Literal["overseas", "birthplace"]] = Query(None, description="Location status: 'overseas' (Water boost from Ren-Zi + Gui-Hai) or 'birthplace' (Earth boost from 4 Earth pillars at 50%)")
+    location: Optional[Literal["overseas", "birthplace"]] = Query(None, description="Location status: 'overseas' (Water boost from Ren-Zi + Gui-Hai) or 'birthplace' (Earth boost from 4 Earth pillars at 50%)"),
+    school: Literal["classic", "physics"] = Query("classic", description="Analysis school: 'classic' (standard) or 'physics' (Yin/Yang polarity threshold)")
 ) -> dict:
     """
     Core BaZi analysis from first principles - analyzing natal chart with time periods.
@@ -401,7 +402,8 @@ async def analyze_bazi(
         talisman_day_eb=talisman_day_eb,
         talisman_hour_hs=talisman_hour_hs,
         talisman_hour_eb=talisman_hour_eb,
-        location=location
+        location=location,
+        school=school
     )
     
     # 6. Build response
@@ -783,6 +785,8 @@ async def analyze_bazi(
             "Water": {"hex_color": "#3b82f6", "hex_color_yang": "#2563eb", "hex_color_yin": "#60a5fa"},
         }
     }
+
+    response["school"] = school
 
     return response
 
