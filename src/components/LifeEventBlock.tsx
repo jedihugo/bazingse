@@ -187,6 +187,12 @@ export default function LifeEventBlock({
                 style={{ background: 'var(--tui-accent-purple)', color: 'var(--tui-bg)' }}
               >Birth</span>
             )}
+            {chartData?.school && chartData.school !== 'classic' && (
+              <span
+                className="text-xs px-2 py-0.5"
+                style={{ background: 'var(--tui-water)', color: 'var(--tui-bg)' }}
+              >{chartData.school}</span>
+            )}
             {chartData?.hs_10yl?.misc && (
               <span className="text-xs tui-text-muted">
                 10Y: {chartData.hs_10yl.misc.start_date?.split('-')[0]} - {chartData.hs_10yl.misc.end_date?.split('-')[0]}
