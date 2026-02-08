@@ -40,16 +40,8 @@ const ICON_MAP: Record<string, string> = {
   flow: 'FL',
 };
 
-// Polarity → left border color (CSS variable)
-const POLARITY_BORDER: Record<string, string> = {
-  positive: 'var(--tui-success)',
-  negative: 'var(--tui-error)',
-  neutral: 'var(--tui-border)',
-};
-
 export default function NarrativeCard({ narrative, isExpanded, onToggle, mappings }: NarrativeCardProps) {
   const polarity = narrative.polarity || 'neutral';
-  const borderColor = POLARITY_BORDER[polarity] || POLARITY_BORDER.neutral;
   const icon = ICON_MAP[narrative.icon] || narrative.type?.slice(0, 2).toUpperCase() || '??';
 
   // Get element color if available
@@ -57,15 +49,15 @@ export default function NarrativeCard({ narrative, isExpanded, onToggle, mapping
     ? mappings?.elements?.[narrative.element]?.hex_color
     : null;
 
+  // Polarity class for left border
+  const polarityClass = polarity === 'positive'
+    ? 'narrative-card-positive'
+    : polarity === 'negative'
+      ? 'narrative-card-negative'
+      : 'narrative-card-neutral';
+
   return (
-    <div
-      className="narrative-card"
-      style={{
-        backgroundColor: 'var(--tui-bg-alt)',
-        border: '1px solid var(--tui-border)',
-        borderLeft: `3px solid ${borderColor}`,
-      }}
-    >
+    <div className={`narrative-card ${polarityClass}`}>
       {/* Card Header - Always Visible */}
       <button
         onClick={onToggle}
@@ -74,17 +66,14 @@ export default function NarrativeCard({ narrative, isExpanded, onToggle, mapping
         {/* Icon Badge */}
         <div
           className="shrink-0 w-7 h-7 flex items-center justify-center rounded text-[10px] font-bold"
-          style={{
-            backgroundColor: elementColor || borderColor,
-            color: 'var(--tui-bg)',
-          }}
+          style={elementColor ? { backgroundColor: elementColor, color: '#fff' } : undefined}
         >
           {icon}
         </div>
 
         {/* Title and Points */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 flex-wrap">
             <span className="text-xs font-semibold tui-text">
               {narrative.title}
             </span>
@@ -92,8 +81,8 @@ export default function NarrativeCard({ narrative, isExpanded, onToggle, mapping
             {/* Element indicator */}
             {narrative.element && (
               <span
-                className="px-1 py-0.5 text-[9px] rounded tui-bg-panel"
-                style={{ color: elementColor || 'var(--tui-fg-dim)' }}
+                className="px-1 py-0.5 text-[9px] rounded font-medium"
+                style={elementColor ? { color: elementColor } : undefined}
               >
                 {narrative.element}
               </span>
@@ -131,14 +120,12 @@ export default function NarrativeCard({ narrative, isExpanded, onToggle, mapping
       {/* Expanded Content - Points focused */}
       {isExpanded && (
         <div className="px-2 pb-2 pt-0 border-t tui-border-color mt-1">
-          {/* Status Detail (Transformed/Partial) */}
           {narrative.status_detail && (
             <div className="mt-1.5 text-[10px] tui-text-muted italic">
               {narrative.status_detail}
             </div>
           )}
 
-          {/* Distance/Priority */}
           <div className="mt-1.5 flex items-center gap-3 text-[9px] tui-text-muted font-mono">
             {narrative.distance && (
               <span>Distance: {narrative.distance}</span>
@@ -148,7 +135,6 @@ export default function NarrativeCard({ narrative, isExpanded, onToggle, mapping
             )}
           </div>
 
-          {/* Branches Display */}
           {narrative.branches_display && (
             <div className="mt-1.5 text-[10px] tui-text-muted">
               <span className="font-medium">Branches: </span>
@@ -156,7 +142,6 @@ export default function NarrativeCard({ narrative, isExpanded, onToggle, mapping
             </div>
           )}
 
-          {/* Percentage for balance items */}
           {narrative.percentage !== undefined && (
             <div className="mt-1.5 text-[10px] tui-text-muted font-mono">
               {narrative.element}: {narrative.percentage?.toFixed(1)}%
