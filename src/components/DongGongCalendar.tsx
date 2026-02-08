@@ -174,35 +174,48 @@ export default function DongGongCalendar() {
         </button>
         <div className="text-center">
           <span className="font-bold tui-text">{MONTH_NAMES[month - 1]} {year}</span>
-          {data && (
-            <div className="text-xs mt-0.5 leading-relaxed">
-              {/* Year pillar */}
-              <div>
-                <span style={{ color: STEM_COLOR[data.year_stem] }}>{data.year_stem_chinese}</span>
-                <span style={{ color: BRANCH_COLOR[data.year_branch] }}>{data.year_branch_chinese}</span>
-                <span className="tui-text-muted"> · </span>
-                <span style={{ color: STEM_COLOR[data.year_stem] }}>{data.year_stem}</span>
-                {' '}
-                <span style={{ color: BRANCH_COLOR[data.year_branch] }}>{data.year_branch}</span>
-                <span className="tui-text-muted"> 年</span>
+          {data && (() => {
+            // Reactive year: use selected day's year pillar, or show all spanned
+            const activeDayData = selectedDayData || data.days.find(d => isToday(d.day));
+            const yearsList = activeDayData
+              ? [{ stem: activeDayData.year_stem, stem_chinese: activeDayData.year_stem_chinese, branch: activeDayData.year_branch, branch_chinese: activeDayData.year_branch_chinese }]
+              : data.chinese_years_spanned;
+
+            return (
+              <div className="text-xs mt-0.5 leading-relaxed">
+                {/* Year pillar(s) */}
+                <div>
+                  {yearsList.map((yr, i) => (
+                    <span key={`${yr.stem}${yr.branch}`}>
+                      {i > 0 && <span className="tui-text-muted"> → </span>}
+                      <span style={{ color: STEM_COLOR[yr.stem] }}>{yr.stem_chinese}</span>
+                      <span style={{ color: BRANCH_COLOR[yr.branch] }}>{yr.branch_chinese}</span>
+                      <span className="tui-text-muted"> · </span>
+                      <span style={{ color: STEM_COLOR[yr.stem] }}>{yr.stem}</span>
+                      {' '}
+                      <span style={{ color: BRANCH_COLOR[yr.branch] }}>{yr.branch}</span>
+                    </span>
+                  ))}
+                  <span className="tui-text-muted"> 年</span>
+                </div>
+                {/* Month pillar(s) */}
+                <div>
+                  {data.chinese_months_spanned.map((cm, i) => (
+                    <span key={cm.month}>
+                      {i > 0 && <span className="tui-text-muted"> / </span>}
+                      <span className="tui-text-muted">{cm.chinese} </span>
+                      <span style={{ color: STEM_COLOR[cm.stem] }}>{cm.stem_chinese}</span>
+                      <span style={{ color: BRANCH_COLOR[cm.branch_id] }}>{cm.branch_chinese}</span>
+                      <span className="tui-text-muted"> · </span>
+                      <span style={{ color: STEM_COLOR[cm.stem] }}>{cm.stem}</span>
+                      {' '}
+                      <span style={{ color: BRANCH_COLOR[cm.branch_id] }}>{cm.branch_id}</span>
+                    </span>
+                  ))}
+                </div>
               </div>
-              {/* Month pillar(s) */}
-              <div>
-                {data.chinese_months_spanned.map((cm, i) => (
-                  <span key={cm.month}>
-                    {i > 0 && <span className="tui-text-muted"> / </span>}
-                    <span className="tui-text-muted">{cm.chinese} </span>
-                    <span style={{ color: STEM_COLOR[cm.stem] }}>{cm.stem_chinese}</span>
-                    <span style={{ color: BRANCH_COLOR[cm.branch_id] }}>{cm.branch_chinese}</span>
-                    <span className="tui-text-muted"> · </span>
-                    <span style={{ color: STEM_COLOR[cm.stem] }}>{cm.stem}</span>
-                    {' '}
-                    <span style={{ color: BRANCH_COLOR[cm.branch_id] }}>{cm.branch_id}</span>
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
+            );
+          })()}
         </div>
         <button onClick={goToNextMonth} className="tui-btn px-2 py-0.5 text-sm" title="Next month">
           &gt;

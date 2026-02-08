@@ -221,6 +221,10 @@ export interface DongGongDay {
   day_stem_chinese: string;
   day_branch_chinese: string;
   pillar: string;
+  year_stem: string;
+  year_branch: string;
+  year_stem_chinese: string;
+  year_branch_chinese: string;
   chinese_month: number | null;
   chinese_month_name: string;
   officer: DongGongOfficer | null;
@@ -248,10 +252,12 @@ export interface DongGongCalendarResponse {
     branch_id: string;
     branch_chinese: string;
   }[];
-  year_stem: string;
-  year_stem_chinese: string;
-  year_branch: string;
-  year_branch_chinese: string;
+  chinese_years_spanned: {
+    stem: string;
+    stem_chinese: string;
+    branch: string;
+    branch_chinese: string;
+  }[];
 }
 
 export async function getDongGongCalendar(year: number, month: number): Promise<DongGongCalendarResponse> {

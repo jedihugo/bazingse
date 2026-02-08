@@ -812,17 +812,27 @@ async def dong_gong_calendar(
 
     days = []
     chinese_months_seen = {}
-
-    # Year pillar from first day of month
-    first_lunar = sxtwl.fromSolar(year, month, 1)
-    year_gz = first_lunar.getYearGZ()
-    year_stem = GAN_MAP[Gan[year_gz.tg]]
-    year_stem_chinese = Gan[year_gz.tg]
-    year_branch = ZHI_MAP[Zhi[year_gz.dz]]
-    year_branch_chinese = Zhi[year_gz.dz]
+    chinese_years_seen = {}
 
     for day in range(1, days_in_month + 1):
         lunar_day = sxtwl.fromSolar(year, month, day)
+
+        # Year stem + branch (changes at Li Chun, not Jan 1)
+        year_gz = lunar_day.getYearGZ()
+        yr_stem = GAN_MAP[Gan[year_gz.tg]]
+        yr_stem_chinese = Gan[year_gz.tg]
+        yr_branch = ZHI_MAP[Zhi[year_gz.dz]]
+        yr_branch_chinese = Zhi[year_gz.dz]
+
+        # Track which Chinese years are spanned
+        yr_key = f"{yr_stem}{yr_branch}"
+        if yr_key not in chinese_years_seen:
+            chinese_years_seen[yr_key] = {
+                "stem": yr_stem,
+                "stem_chinese": yr_stem_chinese,
+                "branch": yr_branch,
+                "branch_chinese": yr_branch_chinese,
+            }
 
         # Day stem + branch
         day_gz = lunar_day.getDayGZ()
@@ -865,6 +875,10 @@ async def dong_gong_calendar(
             "day_stem_chinese": day_stem_chinese,
             "day_branch_chinese": day_branch_chinese,
             "pillar": f"{day_stem} {day_branch}",
+            "year_stem": yr_stem,
+            "year_branch": yr_branch,
+            "year_stem_chinese": yr_stem_chinese,
+            "year_branch_chinese": yr_branch_chinese,
             "chinese_month": chinese_month,
             "chinese_month_name": DONG_GONG_MONTHS.get(chinese_month, {}).get("chinese", "") if chinese_month else "",
         }
@@ -938,10 +952,7 @@ async def dong_gong_calendar(
         "days_in_month": days_in_month,
         "days": days,
         "chinese_months_spanned": list(chinese_months_seen.values()),
-        "year_stem": year_stem,
-        "year_stem_chinese": year_stem_chinese,
-        "year_branch": year_branch,
-        "year_branch_chinese": year_branch_chinese,
+        "chinese_years_spanned": list(chinese_years_seen.values()),
     }
 
 
