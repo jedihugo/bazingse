@@ -4,14 +4,14 @@
 # Core dynamic calculation system for BaZi combinations and conflicts.
 # Points are NO LONGER static - calculated based on current qi of interacting nodes.
 #
-# User-Specified Multipliers:
-# - Three Meetings (三會): 0.618
-# - Three Combinations (三合): 0.5
-# - HS Stem Combinations: 0.5
+# User-Specified Multipliers (untransformed / combined only):
+# - Three Meetings (三會): 0.382
+# - Three Combinations (三合): 0.238
+# - HS Stem Combinations: 0.238
 # - Half Meetings (半會): 0.382
-# - Six Harmonies (六合): 0.382
-# - Arched Combinations (拱合): 0.238
-# - Transformation Bonus: 1.618
+# - Six Harmonies (六合): 0.238
+# - Arched Combinations (拱合): 0.146
+# - Transformation Bonus: 2.0
 
 from .core import BRANCHES, STEMS
 from .unity import WUXING_COMBAT, get_distance_multiplier
@@ -20,16 +20,16 @@ from .unity import WUXING_COMBAT, get_distance_multiplier
 # COMBINATION MULTIPLIERS
 # =========================
 COMBINATION_MULTIPLIERS = {
-    "THREE_MEETINGS": 0.618,
-    "THREE_COMBINATIONS": 0.5,
-    "STEM_COMBINATIONS": 0.5,
+    "THREE_MEETINGS": 0.382,
+    "THREE_COMBINATIONS": 0.238,
+    "STEM_COMBINATIONS": 0.238,
     "HALF_MEETINGS": 0.382,
-    "SIX_HARMONIES": 0.382,
-    "ARCHED_COMBINATIONS": 0.238,
+    "SIX_HARMONIES": 0.238,
+    "ARCHED_COMBINATIONS": 0.146,
 }
 
-# Transformation Bonus (Golden Ratio)
-TRANSFORMATION_BONUS = 1.618
+# Transformation Bonus (successful transformation multiplier)
+TRANSFORMATION_BONUS = 2.0
 
 
 def get_primary_qi_info(branch_value):

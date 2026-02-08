@@ -11,7 +11,7 @@
 
 WUXING_COMBAT = {
     # Base interaction formula
-    "ENGAGEMENT_RATE": 0.5,      # 50% - interaction_point = min(qi) × 0.5
+    "ENGAGEMENT_RATE": 0.382,    # φ² - interaction_point = min(qi) × 0.382
     "SOURCE_RATIO": 0.618,       # Golden ratio φ - source loses 0.618 of interaction
     "TARGET_RATIO": 1.0,         # Target loses/gains 1.0 of interaction
 

@@ -1245,52 +1245,6 @@ def analyze_8_node_interactions(
     # their strength and effects on the chart.
     # ========================================================================
     
-    # Helper function to apply seasonal transformation rules
-    def get_seasonal_transformation_multiplier(element, month_branch):
-        """
-        Get transformation score multiplier based on season.
-        
-        Classical BaZi principle: Transformations are stronger in favorable seasons
-        and weaker in unfavorable seasons (controlling element's season).
-        
-        Returns:
-            float: Multiplier (1.15 for favorable, 0.85 for unfavorable, 1.0 neutral)
-        """
-        if not month_branch or element not in TRANSFORMATION_SEASONAL_RULES:
-            return 1.0
-        
-        rules = TRANSFORMATION_SEASONAL_RULES[element]
-        
-        if month_branch in rules["favorable_seasons"]:
-            return rules["bonus_multiplier"]
-        elif month_branch in rules["unfavorable_seasons"]:
-            return rules["penalty_multiplier"]
-        else:
-            return 1.0
-    
-    # Helper function to check daymaster involvement
-    def get_daymaster_multiplier(affected_ids):
-        """
-        Get transformation score multiplier based on Day Master involvement.
-        
-        Classical BaZi principle: Transformations involving the Day Pillar
-        have greater significance to the chart owner.
-        
-        Returns:
-            float: Multiplier (1.35 if both, 1.25 for HS, 1.20 for EB, 1.0 none)
-        """
-        hs_d_involved = "hs_d" in affected_ids
-        eb_d_involved = "eb_d" in affected_ids
-        
-        if hs_d_involved and eb_d_involved:
-            return DAYMASTER_TRANSFORMATION_RULES["both_involved"]["multiplier"]
-        elif hs_d_involved:
-            return DAYMASTER_TRANSFORMATION_RULES["day_stem_involved"]["multiplier"]
-        elif eb_d_involved:
-            return DAYMASTER_TRANSFORMATION_RULES["day_branch_involved"]["multiplier"]
-        else:
-            return 1.0
-    
     # 1. THREE MEETINGS (三會) - Highest Priority
     if unit_tracker:
         unit_tracker.start_phase("three_meetings", "Three Meetings (三會)")
