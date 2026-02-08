@@ -5,6 +5,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import BaZiChart from './BaZiChart';
 import ElementAnalysis from './ElementAnalysis';
 import NarrativeDisplay from './NarrativeDisplay';
+import PhysicsAnalysisDisplay from './PhysicsAnalysisDisplay';
 import { type LifeEvent, updateLifeEvent } from '@/lib/api';
 
 // Helper to get localized analysis text from API response
@@ -286,6 +287,11 @@ export default function LifeEventBlock({
 
             {/* Element Analysis */}
             <ElementAnalysis chartData={chartData} />
+
+            {/* Physics Analysis (only shown when school=physics and data exists) */}
+            {chartData?.physics_analysis && (
+              <PhysicsAnalysisDisplay physicsAnalysis={chartData.physics_analysis} mappings={chartData.mappings} />
+            )}
 
             {/* Interaction-Based Narratives (collapsed) */}
             {isNatal && chartData?.narrative_analysis && (

@@ -12,6 +12,7 @@ import {
 import ProfileInfoBlock from './ProfileInfoBlock';
 import LifeEventBlock from './LifeEventBlock';
 import InlineLifeEventForm from './InlineLifeEventForm';
+import InlineSelector from './chat-form/InlineSelector';
 
 interface LifeEventWithChart {
   event: LifeEvent;
@@ -39,6 +40,7 @@ export default function ProfilePage({ profileId }: ProfilePageProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [school, setSchool] = useState<'classic' | 'physics'>('classic');
 
   // Fetch chart data for a life event
   const fetchChartForEvent = useCallback(async (
@@ -58,8 +60,9 @@ export default function ProfilePage({ profileId }: ProfilePageProps) {
       includeDailyLuck: !!event.day,
       showLocation: !!event.is_abroad,
       locationType: event.is_abroad ? 'overseas' : null,
+      ...(school !== 'classic' ? { school } : {}),
     });
-  }, []);
+  }, [school]);
 
   // Load profile and all chart data
   const loadProfile = useCallback(async () => {
@@ -76,6 +79,7 @@ export default function ProfilePage({ profileId }: ProfilePageProps) {
         birthTime: profileData.birth_time || '',
         gender: profileData.gender as 'male' | 'female',
         unknownHour: !profileData.birth_time,
+        ...(school !== 'classic' ? { school } : {}),
       });
       setNatalChartData(natalChart);
 
@@ -116,7 +120,7 @@ export default function ProfilePage({ profileId }: ProfilePageProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [profileId, fetchChartForEvent]);
+  }, [profileId, fetchChartForEvent, school]);
 
   useEffect(() => {
     loadProfile();
@@ -295,6 +299,20 @@ export default function ProfilePage({ profileId }: ProfilePageProps) {
         onProfileUpdate={handleProfileUpdate}
         onBack={() => router.push('/')}
       />
+
+      {/* School toggle bar */}
+      <div className="px-4 mb-2 flex items-center gap-2">
+        <span className="text-xs tui-text-muted">School:</span>
+        <InlineSelector
+          options={[
+            { value: 'classic', label: 'Classic', shortcut: 'c' },
+            { value: 'physics', label: 'Physics', shortcut: 'p' },
+          ]}
+          value={school}
+          onChange={(val) => setSchool(val as 'classic' | 'physics')}
+          className="text-xs"
+        />
+      </div>
 
       {/* Main content */}
       <div className="px-4 pb-8 space-y-4">
