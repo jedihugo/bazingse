@@ -328,9 +328,9 @@ export default function DongGongCalendar() {
                     </div>
                   </div>
 
-                  {/* Moon phase — bottom-left corner */}
+                  {/* Moon phase */}
                   {dayData.moon_phase && (
-                    <div className="absolute bottom-1.5 left-1 text-[8px] leading-none opacity-60">
+                    <div className="text-[8px] leading-none opacity-60 mt-0.5">
                       {dayData.moon_phase.emoji}
                     </div>
                   )}
