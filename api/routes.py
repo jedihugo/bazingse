@@ -795,6 +795,24 @@ async def analyze_bazi(
 # * DONG GONG CALENDAR
 # * =================
 
+MOON_PHASES = [
+    (1,  1,  "🌑", "New Moon",        "新月"),
+    (2,  6,  "🌒", "Waxing Crescent", "蛾眉月"),
+    (7,  8,  "🌓", "First Quarter",   "上弦月"),
+    (9,  14, "🌔", "Waxing Gibbous",  "盈凸月"),
+    (15, 15, "🌕", "Full Moon",        "满月"),
+    (16, 21, "🌖", "Waning Gibbous",  "亏凸月"),
+    (22, 23, "🌗", "Last Quarter",     "下弦月"),
+    (24, 30, "🌘", "Waning Crescent", "残月"),
+]
+
+def get_moon_phase(lunar_day_num: int) -> dict:
+    for start, end, emoji, english, chinese in MOON_PHASES:
+        if start <= lunar_day_num <= end:
+            return {"emoji": emoji, "english": english, "chinese": chinese, "lunar_day": lunar_day_num}
+    return {"emoji": "🌑", "english": "New Moon", "chinese": "新月", "lunar_day": lunar_day_num}
+
+
 @router.get("/dong_gong_calendar")
 async def dong_gong_calendar(
     year: int = Query(..., description="Gregorian year"),
@@ -881,6 +899,7 @@ async def dong_gong_calendar(
             "year_branch_chinese": yr_branch_chinese,
             "chinese_month": chinese_month,
             "chinese_month_name": DONG_GONG_MONTHS.get(chinese_month, {}).get("chinese", "") if chinese_month else "",
+            "moon_phase": get_moon_phase(lunar_day.getLunarDay()),
         }
 
         if chinese_month and month_branch:

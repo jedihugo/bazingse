@@ -327,6 +327,13 @@ export default function DongGongCalendar() {
                       <span style={{ color: BRANCH_COLOR[dayData.day_branch] }}>{dayData.day_branch}</span>
                     </div>
                   </div>
+
+                  {/* Moon phase — bottom-left corner */}
+                  {dayData.moon_phase && (
+                    <div className="absolute bottom-0.5 left-0.5 text-[8px] leading-none opacity-60">
+                      {dayData.moon_phase.emoji}
+                    </div>
+                  )}
                 </button>
               );
             })}
@@ -388,6 +395,11 @@ function DayDetail({ day, onClose }: { day: DongGongDay; onClose: () => void }) 
             }}
           >
             {day.rating.symbol} {day.rating.chinese}
+          </span>
+        )}
+        {day.moon_phase && (
+          <span className="tui-text-muted text-xs">
+            {day.moon_phase.emoji} {day.moon_phase.chinese} {day.moon_phase.english}
           </span>
         )}
       </div>

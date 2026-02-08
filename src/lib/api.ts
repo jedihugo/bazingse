@@ -235,6 +235,7 @@ export interface DongGongDay {
   description_english: string;
   consult?: DongGongConsult | null;
   forbidden?: DongGongForbidden | null;
+  moon_phase: { emoji: string; english: string; chinese: string; lunar_day: number };
 }
 
 export interface DongGongCalendarResponse {
