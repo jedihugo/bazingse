@@ -277,6 +277,8 @@ export interface AnalyzeBaziParams {
   // Location
   showLocation?: boolean;
   locationType?: 'overseas' | 'birthplace' | null;
+  // School
+  school?: 'classic' | 'physics';
 }
 
 export async function analyzeBazi(params: AnalyzeBaziParams) {
@@ -317,6 +319,11 @@ export async function analyzeBazi(params: AnalyzeBaziParams) {
   // Add location parameter
   if (params.showLocation && params.locationType) {
     apiUrl += `&location=${params.locationType}`;
+  }
+
+  // Add school parameter (only when not classic/default)
+  if (params.school && params.school !== 'classic') {
+    apiUrl += `&school=${params.school}`;
   }
 
   const response = await fetch(apiUrl);
@@ -373,6 +380,7 @@ export interface StoredFormData {
   talismanHourEB: string | null;
   showLocation: boolean;
   locationType: 'overseas' | 'birthplace' | null;
+  school: 'classic' | 'physics';
 }
 
 export function loadFromStorage(): StoredFormData | null {

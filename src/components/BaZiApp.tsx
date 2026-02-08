@@ -8,6 +8,8 @@ import TalismanInputPanel from './TalismanInputPanel';
 import BaZiChart from './BaZiChart';
 import ElementAnalysis from './ElementAnalysis';
 import NarrativeDisplay from './NarrativeDisplay';
+import PhysicsAnalysisDisplay from './PhysicsAnalysisDisplay';
+import InlineSelector from './chat-form/InlineSelector';
 
 // Quick test presets
 interface TestPreset {
@@ -72,6 +74,7 @@ const DEFAULT_FORM: StoredFormData = {
   talismanHourEB: null,
   showLocation: false,
   locationType: null,
+  school: 'classic',
 };
 
 export default function BaZiApp() {
@@ -163,6 +166,11 @@ export default function BaZiApp() {
         params.locationType = formData.locationType;
       }
 
+      // Add school parameter
+      if (formData.school && formData.school !== 'classic') {
+        params.school = formData.school;
+      }
+
       const data = await analyzeBazi(params);
       setChartData(data);
     } catch (err) {
@@ -206,7 +214,8 @@ export default function BaZiApp() {
       formData.showTalismans, formData.talismanYearHS, formData.talismanYearEB,
       formData.talismanMonthHS, formData.talismanMonthEB, formData.talismanDayHS,
       formData.talismanDayEB, formData.talismanHourHS, formData.talismanHourEB,
-      formData.showLocation, formData.locationType, isValidBirthDate, generateChart]);
+      formData.showLocation, formData.locationType, formData.school,
+      isValidBirthDate, generateChart]);
 
   // Check if comparison/luck row should be shown
   const hasLuckData = chartData?.analysis_info?.has_luck_pillar ||
@@ -231,6 +240,15 @@ export default function BaZiApp() {
         <div className="tui-frame-title flex items-center justify-between">
           <span>BAZINGSE 八字</span>
           <div className="flex items-center gap-2">
+            <InlineSelector
+              options={[
+                { value: 'classic', label: 'Classic', shortcut: 'c' },
+                { value: 'physics', label: 'Physics', shortcut: 'p' },
+              ]}
+              value={formData.school}
+              onChange={(val) => updateFormData({ school: val as 'classic' | 'physics' })}
+              className="text-xs"
+            />
             {isLoading && <span className="tui-text-muted">...</span>}
             <button
               onClick={() => setShowPresets(!showPresets)}
@@ -337,6 +355,11 @@ export default function BaZiApp() {
       {/* Element Analysis */}
       {chartData && (
         <ElementAnalysis chartData={chartData} />
+      )}
+
+      {/* Physics Analysis (only shown when school=physics and data exists) */}
+      {chartData?.physics_analysis && (
+        <PhysicsAnalysisDisplay physicsAnalysis={chartData.physics_analysis} mappings={chartData.mappings} />
       )}
 
       {/* Interaction-Based Narratives */}

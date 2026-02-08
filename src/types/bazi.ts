@@ -144,6 +144,60 @@ export interface NatalChartResponse {
   current_luck_pillar?: LuckPillarData
   // Unit Story tracker (video game style qi tracking)
   unit_tracker?: UnitTrackerResponse
+  // Physics school analysis
+  school?: 'classic' | 'physics'
+  physics_analysis?: PhysicsAnalysis | null
+}
+
+// Physics school types
+export interface PhysicsElementState {
+  state_id: string
+  base_element: string
+  trigger_element: string
+  ratio: number
+  threshold: number
+  name_en: string
+  name_zh: string
+  name_id: string
+  blocked_action: string
+  production_factor: number
+  description_en: string
+  description_zh: string
+  description_id: string
+}
+
+export interface PhysicsChainReaction {
+  trigger_state: string
+  trigger_name_en: string
+  trigger_name_zh: string
+  steps: {
+    step: number
+    cause: string
+    effect: string
+    affected_element: string
+    effect_type: string
+    factor: number
+  }[]
+}
+
+export interface PhysicsStemInteraction {
+  source: string
+  target: string
+  outcome: string
+  imagery: string
+  en: string
+  zh: string
+  state_blocked: boolean
+  state_name?: string
+}
+
+export interface PhysicsAnalysis {
+  element_states: PhysicsElementState[]
+  chain_reactions: PhysicsChainReaction[]
+  stem_interactions: PhysicsStemInteraction[]
+  total_physics_effects: number
+  total_states_active: number
+  total_chain_reactions: number
 }
 
 // Legacy structures for backward compatibility
