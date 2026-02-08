@@ -402,6 +402,63 @@ def _build_match_string(interaction: Dict[str, Any], locale: str) -> str:
     return " + ".join(refs)
 
 
+def _build_qi_changes(interaction: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """
+    Build before→after qi change entries for display.
+    Returns list of {stem, before, after} dicts.
+    """
+    itype = interaction.get("type", "")
+    changes = []
+
+    if itype == "PILLAR_WUXING":
+        hs_stem = interaction.get("hs_stem", "")
+        eb_stem = interaction.get("eb_stem", "")
+        hs_before = interaction.get("hs_qi_before")
+        hs_after = interaction.get("hs_qi_after")
+        eb_before = interaction.get("eb_qi_before")
+        eb_after = interaction.get("eb_qi_after")
+        # Use the actual qi stem name for EB (hidden stem or primary qi)
+        eb_qi_stem = interaction.get("eb_qi_stem", eb_stem)
+
+        if hs_before is not None and hs_after is not None:
+            changes.append({
+                "stem": hs_stem,
+                "before": hs_before,
+                "after": hs_after,
+            })
+        if eb_before is not None and eb_after is not None:
+            changes.append({
+                "stem": eb_qi_stem,
+                "before": eb_before,
+                "after": eb_after,
+            })
+
+    elif itype == "SAME_ELEMENT":
+        hs_stem = interaction.get("hs_stem", "")
+        eb_qi_stem = interaction.get("eb_qi_stem", "")
+        hs_qi = interaction.get("hs_qi")
+        eb_qi = interaction.get("eb_qi")
+        strength = interaction.get("strength", "")
+        qi_type = interaction.get("qi_type", "")
+
+        if hs_qi is not None:
+            changes.append({
+                "stem": hs_stem,
+                "before": hs_qi,
+                "after": hs_qi,  # No change for same element
+                "note": f"{'strong ' if strength == 'strong' else ''}rooting",
+            })
+        if eb_qi is not None:
+            changes.append({
+                "stem": eb_qi_stem,
+                "before": eb_qi,
+                "after": eb_qi,  # No change for same element
+                "note": "Primary Qi" if qi_type == "PRIMARY_QI" else "Hidden Stem",
+            })
+
+    return changes
+
+
 def _build_chronological_entry(interaction: Dict[str, Any], seq: int, locale: str) -> Dict[str, Any]:
     """
     Process one raw interaction into a chronological display entry.
@@ -444,6 +501,9 @@ def _build_chronological_entry(interaction: Dict[str, Any], seq: int, locale: st
         for node in interaction.get("nodes", [])
     ]
 
+    # Build before→after qi display for PILLAR_WUXING and SAME_ELEMENT
+    qi_changes = _build_qi_changes(interaction)
+
     entry = {
         "seq": seq,
         "type": itype,
@@ -456,6 +516,7 @@ def _build_chronological_entry(interaction: Dict[str, Any], seq: int, locale: st
         "formula": formula,
         "match": match,
         "math_formula": str(math_formula) if math_formula else "",
+        "qi_changes": qi_changes,
         "pillar_refs": pillar_refs,
         "nodes": interaction.get("nodes", []),
         "transformed": interaction.get("transformed", False),

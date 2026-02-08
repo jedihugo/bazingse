@@ -1058,11 +1058,24 @@ def analyze_8_node_interactions(
                         "distance": effective_distance,
                         "nodes": [hs_id, eb_id],
                         "position": pos_code,
+                        "hs_stem": hs_node.value,
+                        "eb_stem": eb_node.value,
+                        "hs_qi": round(hs_current_qi, 1),
+                        "eb_qi": round(eb_qi_current, 1),
                         "description": f"{hs_node.value} ({hs_element}) has {'strong ' if strength == 'strong' else ''}rooting in {qi_stem_id} ({qi_type_label})"
                     })
 
                 # Log the interaction if any Wu Xing interaction occurred
                 if interaction_type:
+                    # Calculate before/after qi for display
+                    # hs_current_qi and eb_qi_current were captured before score changes
+                    if interaction_type in ["hs_controls_eb", "hs_produces_eb"]:
+                        hs_qi_after = round(hs_current_qi - source_loss, 1)
+                        eb_qi_after = round(eb_qi_current + target_change, 1)
+                    else:  # eb_controls_hs, eb_produces_hs
+                        eb_qi_after = round(eb_qi_current - source_loss, 1)
+                        hs_qi_after = round(hs_current_qi + target_change, 1)
+
                     pillar_interactions.append({
                         "type": "PILLAR_WUXING",
                         "pattern": f"{hs_node.value}-{eb_node.value}",
@@ -1077,7 +1090,13 @@ def analyze_8_node_interactions(
                         "target_change": round(target_change, 2),
                         "math_formula": math_formula,
                         "nodes": [hs_id, eb_id],
-                        "position": pos_code
+                        "position": pos_code,
+                        "hs_stem": hs_node.value,
+                        "eb_stem": eb_node.value,
+                        "hs_qi_before": round(hs_current_qi, 1),
+                        "hs_qi_after": hs_qi_after,
+                        "eb_qi_before": round(eb_qi_current, 1),
+                        "eb_qi_after": eb_qi_after,
                     })
 
                     # Record interaction in unit tracker

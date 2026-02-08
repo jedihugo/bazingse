@@ -118,7 +118,25 @@ export default function NarrativeCard({ narrative, mappings }: NarrativeCardProp
           </div>
         )}
 
-        {/* Row 4: Pillar Tags */}
+        {/* Row 4: Qi before→after changes */}
+        {narrative.qi_changes && narrative.qi_changes.length > 0 && (
+          <div className="mt-1 ml-12 flex flex-wrap gap-x-3 gap-y-0.5">
+            {narrative.qi_changes.map((qc: any, idx: number) => (
+              <span key={idx} className="text-[10px] font-mono tui-text-muted">
+                {qc.stem}: {qc.before}
+                {qc.before !== qc.after ? (
+                  <span style={{ color: qc.after > qc.before ? 'var(--tui-success)' : 'var(--tui-error)' }}>
+                    →{qc.after}
+                  </span>
+                ) : (
+                  qc.note && <span className="tui-text-dim"> ({qc.note})</span>
+                )}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Row 5: Pillar Tags */}
         {narrative.pillar_refs && narrative.pillar_refs.length > 0 && (
           <div className="flex flex-wrap gap-1 mt-1 ml-12">
             {narrative.pillar_refs.map((ref: any, idx: number) => (
@@ -132,7 +150,7 @@ export default function NarrativeCard({ narrative, mappings }: NarrativeCardProp
           </div>
         )}
 
-        {/* Row 5: Math formula (scoring breakdown) */}
+        {/* Row 6: Math formula (scoring breakdown) */}
         {narrative.math_formula && (
           <div className="mt-0.5 ml-12 text-[9px] tui-text-dim font-mono">
             {narrative.math_formula}
