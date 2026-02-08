@@ -225,18 +225,6 @@ from .life_aspects import (
     generate_ten_gods_detail,
 )
 
-# Physics School Engine (Stem Imagery & Element States)
-from .physics import (
-    STEM_IMAGERY,
-    ELEMENT_STATES,
-    get_stem_interaction,
-    detect_element_states,
-    detect_chain_reactions,
-    get_physics_modifier_for_interaction,
-    apply_physics_to_classic_result,
-    build_physics_analysis,
-)
-
 # Narrative Interpretation System
 from .narrative import (
     generate_narrative,
@@ -420,15 +408,6 @@ __all__ = [
     "TEN_GOD_PILLAR_MEANINGS",
     "get_ten_god_for_stem",
     "generate_ten_gods_detail",
-    # Physics School Engine
-    "STEM_IMAGERY",
-    "ELEMENT_STATES",
-    "get_stem_interaction",
-    "detect_element_states",
-    "detect_chain_reactions",
-    "get_physics_modifier_for_interaction",
-    "apply_physics_to_classic_result",
-    "build_physics_analysis",
     # Narrative Interpretation System
     "generate_narrative",
     "NARRATIVE_TEMPLATES",

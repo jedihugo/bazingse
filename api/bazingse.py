@@ -226,8 +226,7 @@ def analyze_8_node_interactions(
     talisman_day_eb: str = None,
     talisman_hour_hs: str = None,
     talisman_hour_eb: str = None,
-    location: str = None,
-    school: str = "classic"
+    location: str = None
 ) -> Dict:
     """
     BaZi interaction calculator V7 - Extensible architecture with talisman support.
@@ -819,11 +818,6 @@ def analyze_8_node_interactions(
                         )
         unit_tracker.end_phase()
 
-    # ============= PHYSICS SCHOOL STATE (initialized for modifier layer) =============
-    # When school="physics", we track element states that can modify interaction results.
-    # Start with empty states; they'll be updated after each major phase.
-    physics_active_states = []
-
     # ============= STEM-BRANCH UNITY (干支一體) =============
     # Classical principle: HS and EB within the same pillar form a unified energy
     # This is processed FIRST before other interactions as it represents
@@ -953,9 +947,6 @@ def analyze_8_node_interactions(
                 # Label for display: Primary Qi or Hidden Stem
                 qi_type_label = "Primary Qi" if qi_type == "PRIMARY_QI" else "Hidden Stem"
 
-                # Physics modifier data (populated only when school="physics")
-                physics_data = None
-
                 # === CONTROL RELATIONSHIPS (克) ===
                 if hs_controls == qi_element:
                     # HS controls EB qi (e.g., Water controls Fire)
@@ -966,17 +957,6 @@ def analyze_8_node_interactions(
                     is_control = True
                     target_change = -target_change  # Loss for controlled
                     interaction_type = "hs_controls_eb"
-
-                    # Physics modifier layer
-                    if school == "physics":
-                        physics_data = get_physics_modifier_for_interaction(
-                            hs_node.value, qi_stem_id, hs_element, qi_element,
-                            "control", physics_active_states
-                        )
-                        if physics_data["has_physics_effect"]:
-                            source_loss, target_change = apply_physics_to_classic_result(
-                                source_loss, target_change, physics_data
-                            )
 
                     math_formula = format_interaction_math(
                         hs_current_qi, eb_qi_current, distance_multiplier,
@@ -995,17 +975,6 @@ def analyze_8_node_interactions(
                     is_control = True
                     target_change = -target_change  # Loss for controlled
                     interaction_type = "eb_controls_hs"
-
-                    # Physics modifier layer
-                    if school == "physics":
-                        physics_data = get_physics_modifier_for_interaction(
-                            qi_stem_id, hs_node.value, qi_element, hs_element,
-                            "control", physics_active_states
-                        )
-                        if physics_data["has_physics_effect"]:
-                            source_loss, target_change = apply_physics_to_classic_result(
-                                source_loss, target_change, physics_data
-                            )
 
                     math_formula = format_interaction_math(
                         eb_qi_current, hs_current_qi, distance_multiplier,
@@ -1026,17 +995,6 @@ def analyze_8_node_interactions(
                     is_control = False
                     interaction_type = "hs_produces_eb"
 
-                    # Physics modifier layer
-                    if school == "physics":
-                        physics_data = get_physics_modifier_for_interaction(
-                            hs_node.value, qi_stem_id, hs_element, qi_element,
-                            "generation", physics_active_states
-                        )
-                        if physics_data["has_physics_effect"]:
-                            source_loss, target_change = apply_physics_to_classic_result(
-                                source_loss, target_change, physics_data
-                            )
-
                     math_formula = format_interaction_math(
                         hs_current_qi, eb_qi_current, distance_multiplier,
                         source_loss, target_change, is_control=False
@@ -1053,17 +1011,6 @@ def analyze_8_node_interactions(
                     )
                     is_control = False
                     interaction_type = "eb_produces_hs"
-
-                    # Physics modifier layer
-                    if school == "physics":
-                        physics_data = get_physics_modifier_for_interaction(
-                            qi_stem_id, hs_node.value, qi_element, hs_element,
-                            "generation", physics_active_states
-                        )
-                        if physics_data["has_physics_effect"]:
-                            source_loss, target_change = apply_physics_to_classic_result(
-                                source_loss, target_change, physics_data
-                            )
 
                     math_formula = format_interaction_math(
                         eb_qi_current, hs_current_qi, distance_multiplier,
@@ -1155,9 +1102,6 @@ def analyze_8_node_interactions(
                         "eb_qi_before": round(eb_qi_current, 1),
                         "eb_qi_after": eb_qi_after,
                     }
-                    # Add physics data if present
-                    if physics_data and physics_data.get("has_physics_effect"):
-                        interaction_entry["physics"] = physics_data
                     pillar_interactions.append(interaction_entry)
 
                     # Record interaction in unit tracker
@@ -3566,19 +3510,6 @@ def analyze_8_node_interactions(
                     producer_loss = result['producer_loss']
                     receiver_gain = result['receiver_gain']
 
-                    # Physics modifier for cross-pillar generation
-                    cross_physics_data = None
-                    if school == "physics":
-                        cross_physics_data = get_physics_modifier_for_interaction(
-                            source_node.value, target_node.value,
-                            source_element, target_element,
-                            "generation", physics_active_states
-                        )
-                        if cross_physics_data["has_physics_effect"]:
-                            producer_loss, receiver_gain = apply_physics_to_classic_result(
-                                producer_loss, receiver_gain, cross_physics_data
-                            )
-
                     # Source loses energy by generating
                     reduce_element_score(source_node, source_element, producer_loss)
                     source_node.interactions.append(f"Cross-Pillar Gen: -{producer_loss:.1f}pts generating {target_element}")
@@ -3606,8 +3537,6 @@ def analyze_8_node_interactions(
                         "relationship": f"{source_element} generates {target_element}",
                         "description": f"{source_id} exhausts itself generating energy for {target_id}"
                     }
-                    if cross_physics_data and cross_physics_data.get("has_physics_effect"):
-                        log_entry["physics"] = cross_physics_data
                     natural_log.append(log_entry)
                     interaction_found = True
 
@@ -3617,19 +3546,6 @@ def analyze_8_node_interactions(
                     result = calculate_wuxing_generation(target_qi, source_qi, distance)
                     producer_loss = result['producer_loss']
                     receiver_gain = result['receiver_gain']
-
-                    # Physics modifier for cross-pillar generation
-                    cross_physics_data = None
-                    if school == "physics":
-                        cross_physics_data = get_physics_modifier_for_interaction(
-                            target_node.value, source_node.value,
-                            target_element, source_element,
-                            "generation", physics_active_states
-                        )
-                        if cross_physics_data["has_physics_effect"]:
-                            producer_loss, receiver_gain = apply_physics_to_classic_result(
-                                producer_loss, receiver_gain, cross_physics_data
-                            )
 
                     # Target loses energy by generating
                     reduce_element_score(target_node, target_element, producer_loss)
@@ -3658,8 +3574,6 @@ def analyze_8_node_interactions(
                         "relationship": f"{target_element} generates {source_element}",
                         "description": f"{target_id} exhausts itself generating energy for {source_id}"
                     }
-                    if cross_physics_data and cross_physics_data.get("has_physics_effect"):
-                        log_entry["physics"] = cross_physics_data
                     natural_log.append(log_entry)
                     interaction_found = True
 
@@ -3669,20 +3583,6 @@ def analyze_8_node_interactions(
                     result = calculate_wuxing_control(source_qi, target_qi, distance)
                     controller_loss = result['controller_loss']
                     controlled_loss = result['controlled_loss']
-
-                    # Physics modifier for cross-pillar control
-                    cross_physics_data = None
-                    if school == "physics":
-                        cross_physics_data = get_physics_modifier_for_interaction(
-                            source_node.value, target_node.value,
-                            source_element, target_element,
-                            "control", physics_active_states
-                        )
-                        if cross_physics_data["has_physics_effect"]:
-                            controller_loss, neg_controlled = apply_physics_to_classic_result(
-                                controller_loss, -controlled_loss, cross_physics_data
-                            )
-                            controlled_loss = abs(neg_controlled)
 
                     # Source (controller) loses energy (golden ratio)
                     reduce_element_score(source_node, source_element, controller_loss)
@@ -3708,8 +3608,6 @@ def analyze_8_node_interactions(
                         "relationship": f"{source_element} controls {target_element}",
                         "description": f"{source_id} uses energy (-{controller_loss:.1f}) to control {target_id} (-{controlled_loss:.1f})"
                     }
-                    if cross_physics_data and cross_physics_data.get("has_physics_effect"):
-                        log_entry["physics"] = cross_physics_data
                     natural_log.append(log_entry)
                     interaction_found = True
 
@@ -3719,20 +3617,6 @@ def analyze_8_node_interactions(
                     result = calculate_wuxing_control(target_qi, source_qi, distance)
                     controller_loss = result['controller_loss']
                     controlled_loss = result['controlled_loss']
-
-                    # Physics modifier for cross-pillar control
-                    cross_physics_data = None
-                    if school == "physics":
-                        cross_physics_data = get_physics_modifier_for_interaction(
-                            target_node.value, source_node.value,
-                            target_element, source_element,
-                            "control", physics_active_states
-                        )
-                        if cross_physics_data["has_physics_effect"]:
-                            controller_loss, neg_controlled = apply_physics_to_classic_result(
-                                controller_loss, -controlled_loss, cross_physics_data
-                            )
-                            controlled_loss = abs(neg_controlled)
 
                     # Target (controller) loses energy (golden ratio)
                     reduce_element_score(target_node, target_element, controller_loss)
@@ -3758,8 +3642,6 @@ def analyze_8_node_interactions(
                         "relationship": f"{target_element} controls {source_element}",
                         "description": f"{target_id} uses energy (-{controller_loss:.1f}) to control {source_id} (-{controlled_loss:.1f})"
                     }
-                    if cross_physics_data and cross_physics_data.get("has_physics_effect"):
-                        log_entry["physics"] = cross_physics_data
                     natural_log.append(log_entry)
                     interaction_found = True
 
@@ -3812,16 +3694,6 @@ def analyze_8_node_interactions(
                 reduction = amount * (yin_score / total)
                 node.elements[yin_key]["score"] = max(0, node.elements[yin_key]["score"] - reduction)
     
-    # Update physics element states before cross-pillar interactions
-    if school == "physics":
-        # Build current element scores from all nodes for state detection
-        current_element_scores = {}
-        for node_id, node in nodes.items():
-            for elem_key, elem_data in node.elements.items():
-                if elem_data["score"] > 0:
-                    current_element_scores[elem_key] = current_element_scores.get(elem_key, 0) + elem_data["score"]
-        physics_active_states = detect_element_states(current_element_scores)
-
     # Apply natural interactions and log them
     if unit_tracker:
         unit_tracker.start_phase("cross_pillar", "Cross-Pillar Wuxing")
@@ -5294,15 +5166,6 @@ def analyze_8_node_interactions(
         if node_id in node_interaction_map:
             nodes_state[node_id]["interaction_ids"] = node_interaction_map[node_id]
     
-    # ============= PHYSICS POST-PROCESSING =============
-    # After all interactions, build the physics analysis from final element scores
-    physics_analysis = None
-    if school == "physics":
-        physics_analysis = build_physics_analysis(
-            element_scores=post_ten_elements,
-            interaction_log=interaction_log,
-        )
-
     return {
         "nodes": nodes_state,
         # 3-tier element scoring (Jan 2026): base → natal → post progression
@@ -5316,7 +5179,6 @@ def analyze_8_node_interactions(
         "unit_tracker": unit_tracker.to_dict() if unit_tracker else None,  # Unit Story tracking
         "transformed_chart": transformed_chart,
         "transformations": transformations,
-        "physics_analysis": physics_analysis,  # Physics school analysis (None if classic)
         "summary": {
             "total_interactions": len(interaction_log),
             "total_transformations": len(transformations),

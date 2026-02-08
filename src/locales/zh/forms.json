@@ -77,11 +77,6 @@
       "birthplace_4": "故乡4"
     }
   },
-  "school": {
-    "label": "流派",
-    "classic": "传统",
-    "physics": "物理派"
-  },
   "quick_test": {
     "label": "快速测试",
     "select_preset": "选择预设..."
