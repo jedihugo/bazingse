@@ -8,7 +8,6 @@ import TalismanInputPanel from './TalismanInputPanel';
 import BaZiChart from './BaZiChart';
 import ElementAnalysis from './ElementAnalysis';
 import NarrativeDisplay from './NarrativeDisplay';
-import PillarStoryDisplay from './PillarStoryDisplay';
 
 // Quick test presets
 interface TestPreset {
@@ -338,11 +337,6 @@ export default function BaZiApp() {
       {/* Element Analysis */}
       {chartData && (
         <ElementAnalysis chartData={chartData} />
-      )}
-
-      {/* Pillar Story (Node-by-Node) */}
-      {chartData && chartData.pillar_stories && (
-        <PillarStoryDisplay chartData={chartData} />
       )}
 
       {/* Interaction-Based Narratives */}

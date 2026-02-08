@@ -5,7 +5,6 @@ import { useTranslations, useLocale } from 'next-intl';
 import BaZiChart from './BaZiChart';
 import ElementAnalysis from './ElementAnalysis';
 import NarrativeDisplay from './NarrativeDisplay';
-import PillarStoryDisplay from './PillarStoryDisplay';
 import { type LifeEvent, updateLifeEvent } from '@/lib/api';
 
 // Helper to get localized analysis text from API response
@@ -287,11 +286,6 @@ export default function LifeEventBlock({
 
             {/* Element Analysis */}
             <ElementAnalysis chartData={chartData} />
-
-            {/* Pillar Story (Node-by-Node) for Natal Chart */}
-            {isNatal && chartData?.pillar_stories && (
-              <PillarStoryDisplay chartData={chartData} />
-            )}
 
             {/* Interaction-Based Narratives (collapsed) */}
             {isNatal && chartData?.narrative_analysis && (

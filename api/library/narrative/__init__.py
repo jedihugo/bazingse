@@ -41,7 +41,6 @@ from .qi_phase import (
     QI_PHASE_INFO,
     QI_PHASE_ORDER,
 )
-from .pillar_story import generate_pillar_stories
 
 __all__ = [
     # Main entry point
@@ -63,6 +62,4 @@ __all__ = [
     "build_narrative_text",
     "get_localized_template",
     "SUPPORTED_LOCALES",
-    # Pillar-based stories
-    "generate_pillar_stories",
 ]

@@ -52,7 +52,7 @@ from bazingse import analyze_8_node_interactions
 from library.pattern_engine.integration import analyze_with_pattern_engine
 
 # Import Narrative Interpretation System
-from library.narrative import generate_narrative, generate_pillar_stories
+from library.narrative import generate_narrative
 
 # sxtwl solar term indices for Four Extinction (四絕) and Four Separation (四離)
 # Four Extinction: day before start-of-season terms (Li Chun, Li Xia, Li Qiu, Li Dong)
@@ -623,17 +623,6 @@ async def analyze_bazi(
         max_narratives=15,  # Increase limit for more comprehensive analysis
     )
     response["narrative_analysis"] = narrative_analysis
-
-    # Generate Pillar-Based Stories (node-by-node narrative with minimap)
-    pillar_stories = generate_pillar_stories(
-        nodes_data=response,  # Contains all node data (hs_d, eb_d, etc.)
-        daymaster_analysis=interaction_results.get("daymaster_analysis", {}),
-        element_context=narrative_analysis.get("element_context", {}),
-        special_stars=pattern_engine_analysis.get("special_stars", []),
-        interactions=interaction_results.get("interactions", {}),
-        locale="en",
-    )
-    response["pillar_stories"] = pillar_stories
 
     # Add Dong Gong Date Selection info when daily luck is present
     if analysis_year and analysis_month and analysis_day and "daily_luck" in chart_dict and "monthly_luck" in chart_dict:
