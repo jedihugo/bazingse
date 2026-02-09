@@ -2,52 +2,121 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { type Profile, type ProfileUpdate, updateProfile } from '@/lib/api';
+import GuidedDateInput from './chat-form/GuidedDateInput';
+import GuidedTimeInput from './chat-form/GuidedTimeInput';
 
 interface ProfileInfoBlockProps {
   profile: Profile;
   onProfileUpdate: (profile: Profile) => void;
   onBack?: () => void;
+  onBirthDataChange?: () => void;
 }
 
 export default function ProfileInfoBlock({
   profile,
   onProfileUpdate,
   onBack,
+  onBirthDataChange,
 }: ProfileInfoBlockProps) {
   const [editingField, setEditingField] = useState<string | null>(null);
   const [editValue, setEditValue] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Structured date/time editing state
+  const [dateYear, setDateYear] = useState<string | number>('');
+  const [dateMonth, setDateMonth] = useState<string | number>('');
+  const [dateDay, setDateDay] = useState<string | number>('');
+  const [timeHour, setTimeHour] = useState('');
+  const [timeMinute, setTimeMinute] = useState('');
+  const [timeUnknown, setTimeUnknown] = useState(false);
+
   useEffect(() => {
-    if (editingField && inputRef.current) {
+    if (editingField && editingField !== 'birth_date' && editingField !== 'birth_time' && inputRef.current) {
       inputRef.current.focus();
       inputRef.current.select();
     }
   }, [editingField]);
 
   const handleEdit = (field: string, value: string) => {
+    if (field === 'birth_date') {
+      const parts = profile.birth_date.split('-');
+      setDateYear(parts[0] || '');
+      setDateMonth(parts[1] ? String(parseInt(parts[1])) : '');
+      setDateDay(parts[2] ? String(parseInt(parts[2])) : '');
+    } else if (field === 'birth_time') {
+      if (profile.birth_time) {
+        const parts = profile.birth_time.split(':');
+        setTimeHour(parts[0] || '');
+        setTimeMinute(parts[1] || '');
+        setTimeUnknown(false);
+      } else {
+        setTimeHour('');
+        setTimeMinute('');
+        setTimeUnknown(true);
+      }
+    } else {
+      setEditValue(value);
+    }
     setEditingField(field);
-    setEditValue(value);
   };
 
   const handleSave = async () => {
     if (!editingField || isSaving) return;
 
-    const trimmedValue = editValue.trim();
-
     // Build update payload
     const updateData: ProfileUpdate = {};
-    if (editingField === 'name' && trimmedValue !== profile.name) {
-      if (!trimmedValue) {
+    let isBirthDataChange = false;
+
+    if (editingField === 'birth_date') {
+      const y = String(dateYear).padStart(4, '0');
+      const m = String(dateMonth).padStart(2, '0');
+      const d = String(dateDay).padStart(2, '0');
+      const newDate = `${y}-${m}-${d}`;
+      // Basic validation
+      const yNum = parseInt(y); const mNum = parseInt(m); const dNum = parseInt(d);
+      if (yNum < 1900 || yNum > 2100 || mNum < 1 || mNum > 12 || dNum < 1 || dNum > 31) {
         setEditingField(null);
-        return; // Don't save empty name
+        return;
       }
-      updateData.name = trimmedValue;
-    } else if (editingField === 'place_of_birth' && trimmedValue !== (profile.place_of_birth || '')) {
-      updateData.place_of_birth = trimmedValue || undefined;
-    } else if (editingField === 'phone' && trimmedValue !== (profile.phone || '')) {
-      updateData.phone = trimmedValue || undefined;
+      if (newDate !== profile.birth_date) {
+        updateData.birth_date = newDate;
+        isBirthDataChange = true;
+      }
+    } else if (editingField === 'birth_time') {
+      if (timeUnknown) {
+        // Clear birth time
+        if (profile.birth_time) {
+          updateData.birth_time = '';
+          isBirthDataChange = true;
+        }
+      } else {
+        const h = timeHour.padStart(2, '0');
+        const min = timeMinute.padStart(2, '0');
+        const hNum = parseInt(h); const minNum = parseInt(min);
+        if (isNaN(hNum) || hNum < 0 || hNum > 23 || isNaN(minNum) || minNum < 0 || minNum > 59) {
+          setEditingField(null);
+          return;
+        }
+        const newTime = `${h}:${min}`;
+        if (newTime !== (profile.birth_time || '')) {
+          updateData.birth_time = newTime;
+          isBirthDataChange = true;
+        }
+      }
+    } else {
+      const trimmedValue = editValue.trim();
+      if (editingField === 'name' && trimmedValue !== profile.name) {
+        if (!trimmedValue) {
+          setEditingField(null);
+          return;
+        }
+        updateData.name = trimmedValue;
+      } else if (editingField === 'place_of_birth' && trimmedValue !== (profile.place_of_birth || '')) {
+        updateData.place_of_birth = trimmedValue || undefined;
+      } else if (editingField === 'phone' && trimmedValue !== (profile.phone || '')) {
+        updateData.phone = trimmedValue || undefined;
+      }
     }
 
     // Only save if there are changes
@@ -60,6 +129,9 @@ export default function ProfileInfoBlock({
       setIsSaving(true);
       const updated = await updateProfile(profile.id, updateData);
       onProfileUpdate(updated);
+      if (isBirthDataChange) {
+        onBirthDataChange?.();
+      }
     } catch (err) {
       console.error('Failed to save:', err);
     } finally {
@@ -74,14 +146,6 @@ export default function ProfileInfoBlock({
     } else if (e.key === 'Escape') {
       setEditingField(null);
     }
-  };
-
-  const formatBirthInfo = () => {
-    const parts = [profile.birth_date];
-    if (profile.birth_time) {
-      parts.push(profile.birth_time);
-    }
-    return parts.join(' ');
   };
 
   return (
@@ -124,9 +188,61 @@ export default function ProfileInfoBlock({
         )}
       </div>
 
-      {/* Birth info row (not editable for safety) */}
+      {/* Birth info row */}
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm tui-text-dim mb-2">
-        <span>{formatBirthInfo()}</span>
+        {editingField === 'birth_date' ? (
+          <div className="flex items-center gap-2" onKeyDown={(e) => {
+            if (e.key === 'Escape') setEditingField(null);
+            if (e.key === 'Enter') handleSave();
+          }}>
+            <GuidedDateInput
+              year={dateYear}
+              month={dateMonth}
+              day={dateDay}
+              onYearChange={setDateYear}
+              onMonthChange={setDateMonth}
+              onDayChange={setDateDay}
+              autoFocusYear
+            />
+            <button onClick={handleSave} className="text-xs tui-btn px-2 py-0.5" style={{ color: 'var(--tui-water)' }}>OK</button>
+            <button onClick={() => setEditingField(null)} className="text-xs tui-text-muted px-1">Esc</button>
+          </div>
+        ) : (
+          <span
+            onClick={() => handleEdit('birth_date', '')}
+            className="cursor-pointer px-1 -mx-1"
+            title="Click to edit birth date"
+          >
+            {profile.birth_date}
+          </span>
+        )}
+        {editingField === 'birth_time' ? (
+          <div className="flex items-center gap-2" onKeyDown={(e) => {
+            if (e.key === 'Escape') setEditingField(null);
+            if (e.key === 'Enter') handleSave();
+          }}>
+            <GuidedTimeInput
+              hour={timeHour}
+              minute={timeMinute}
+              onHourChange={setTimeHour}
+              onMinuteChange={setTimeMinute}
+              showUnknownToggle
+              isUnknown={timeUnknown}
+              onUnknownChange={setTimeUnknown}
+              autoFocus
+            />
+            <button onClick={handleSave} className="text-xs tui-btn px-2 py-0.5" style={{ color: 'var(--tui-water)' }}>OK</button>
+            <button onClick={() => setEditingField(null)} className="text-xs tui-text-muted px-1">Esc</button>
+          </div>
+        ) : (
+          <span
+            onClick={() => handleEdit('birth_time', '')}
+            className={`cursor-pointer px-1 -mx-1 ${profile.birth_time ? '' : 'tui-text-muted italic'}`}
+            title="Click to edit birth time"
+          >
+            {profile.birth_time || 'Add time...'}
+          </span>
+        )}
         <span className="tui-text-muted">|</span>
         <span style={{ color: profile.gender === 'female' ? 'var(--tui-accent-pink)' : 'var(--tui-water)' }}>
           {profile.gender === 'female' ? '\u2640 Female' : '\u2642 Male'}

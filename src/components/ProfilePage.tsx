@@ -303,6 +303,7 @@ export default function ProfilePage({ profileId }: ProfilePageProps) {
         profile={profile}
         onProfileUpdate={handleProfileUpdate}
         onBack={() => router.push('/')}
+        onBirthDataChange={loadProfile}
       />
 
       {/* School Toggle */}
