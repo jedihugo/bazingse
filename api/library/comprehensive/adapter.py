@@ -22,7 +22,7 @@ from .ten_gods import (
     classify_ten_god_strength, analyze_ten_god_patterns,
     check_spouse_star, check_children_star,
 )
-from .strength import count_elements
+from .strength import count_elements, count_all_elements
 
 
 # =============================================================================
@@ -269,23 +269,25 @@ def build_daymaster_analysis(strength: StrengthAssessment,
 
 def build_element_scores(chart: ChartData) -> Tuple[dict, dict, dict]:
     """
-    Compute 3-tier element scores from pillar data.
-    Since the new engine doesn't mutate qi, all 3 tiers use the same values.
+    2-tier element scores: natal (4 pillars) vs full (natal + LP + time-period).
     Returns (base_element_score, natal_element_score, post_element_score)
     as {stem_name: float} dicts.
     """
-    # Count raw elements in the chart
-    elem_counts = count_elements(chart)
+    natal_counts = count_elements(chart)      # Natal 4 pillars only
+    full_counts = count_all_elements(chart)    # Everything
 
-    # Convert to stem-based scores (each stem gets proportional share)
-    stem_scores = {}
-    for stem_id in STEMS:
-        stem_elem = STEMS[stem_id]["element"]
-        # Give each stem a score proportional to its element's count
-        # Distribute among the 2 stems of each element
-        stem_scores[stem_id] = round(elem_counts.get(stem_elem, 0) * 50, 1)
+    def _to_stem_scores(elem_counts):
+        scores = {}
+        for stem_id in STEMS:
+            stem_elem = STEMS[stem_id]["element"]
+            scores[stem_id] = round(elem_counts.get(stem_elem, 0) * 50, 1)
+        return scores
 
-    return stem_scores, dict(stem_scores), dict(stem_scores)
+    natal_scores = _to_stem_scores(natal_counts)
+    full_scores = _to_stem_scores(full_counts)
+
+    # base = natal, natal = natal, post = full (includes LP + time periods)
+    return natal_scores, dict(natal_scores), full_scores
 
 
 # =============================================================================
@@ -1036,6 +1038,297 @@ def build_mappings() -> dict:
 
 
 # =============================================================================
+# CLIENT SUMMARY (structured JSON for non-technical frontend)
+# =============================================================================
+
+def _summary_chart_overview(chart: ChartData) -> dict:
+    """Section: chart overview with DM nature."""
+    from .templates import DM_NATURE, _pick
+    dm_info = STEMS[chart.day_master]
+    key = (dm_info["element"], dm_info["polarity"].capitalize())
+    nature = DM_NATURE.get(key, {})
+    items = [
+        {"label": "Day Master", "value": f"{nature.get('name', chart.day_master)} ({nature.get('chinese', dm_info['chinese'])}) — {_pick(nature.get('nature', ['']))}"},
+        {"label": "Personality", "value": nature.get("personality", "")},
+    ]
+    return {
+        "id": "chart_overview",
+        "title": "Your Chart",
+        "title_zh": "命盤概覽",
+        "items": items,
+    }
+
+
+def _summary_strength(strength: StrengthAssessment) -> dict:
+    """Section: DM strength assessment."""
+    from .templates import STRENGTH_VERDICTS, _pick
+    text = _pick(STRENGTH_VERDICTS.get(strength.verdict, ["No assessment available."]))
+    items = [
+        {"label": "Score", "value": f"{strength.score}/100"},
+        {"label": "Useful God", "value": f"{strength.useful_god}"},
+        {"label": "Favorable", "value": ", ".join(strength.favorable_elements)},
+        {"label": "Unfavorable", "value": ", ".join(strength.unfavorable_elements)},
+    ]
+    severity = "strong" if strength.verdict in ("strong", "extremely_strong") else "weak" if strength.verdict in ("weak", "extremely_weak") else "neutral"
+    return {
+        "id": "strength",
+        "title": "Strength Assessment",
+        "title_zh": "日主強弱",
+        "severity": severity,
+        "text": text,
+        "items": items,
+    }
+
+
+def _summary_ten_gods(chart: ChartData, tg_classification: Dict[str, dict]) -> dict:
+    """Section: ten gods profile."""
+    from .templates import TEN_GOD_INTERPRETATIONS, _pick
+    items = []
+    dominant = []
+    for abbr, info in tg_classification.items():
+        strength_level = info.get("strength", "ABSENT")
+        templates = TEN_GOD_INTERPRETATIONS.get(abbr, {})
+        text = _pick(templates.get(strength_level, templates.get("PRESENT", [""])))
+        if not text:
+            text = f"{info.get('english', abbr)} ({info.get('chinese', '')}) is {strength_level}"
+        severity = "warning" if strength_level == "PROMINENT" and abbr in ("7K", "HO", "RW") else "info" if strength_level == "PROMINENT" else "alert" if strength_level == "ABSENT" and abbr in ("DW", "DO") else None
+        items.append({
+            "label": f"{abbr} ({info.get('chinese', '')})",
+            "value": text,
+            **({"severity": severity} if severity else {}),
+        })
+        if strength_level == "PROMINENT":
+            dominant.append(info.get("english", abbr))
+    text = f"Dominant: {', '.join(dominant)}" if dominant else "No dominant ten gods"
+    return {
+        "id": "ten_gods",
+        "title": "Ten Gods Profile",
+        "title_zh": "十神分析",
+        "text": text,
+        "items": items,
+    }
+
+
+def _summary_interactions(interactions: List[BranchInteraction]) -> dict:
+    """Section: branch interactions summary."""
+    positive_types = {"harmony", "three_harmony", "half_three_harmony", "directional_combo"}
+    pos_count = sum(1 for i in interactions if i.interaction_type in positive_types)
+    neg_count = len(interactions) - pos_count
+    items = []
+    for inter in interactions[:8]:
+        polarity = "positive" if inter.interaction_type in positive_types else "negative"
+        severity = "positive" if polarity == "positive" else inter.severity
+        palaces_str = " vs ".join(inter.palaces) if inter.palaces else ""
+        items.append({
+            "label": f"{inter.chinese_name} {inter.interaction_type.replace('_', ' ').title()}",
+            "value": f"{palaces_str} — {inter.description}" if palaces_str else inter.description,
+            "severity": severity,
+        })
+    return {
+        "id": "interactions",
+        "title": "Branch Interactions",
+        "title_zh": "地支關係",
+        "text": f"{pos_count} positive, {neg_count} negative interactions found",
+        "items": items,
+    }
+
+
+def _summary_shen_sha(shen_sha: List[ShenShaResult]) -> dict:
+    """Section: special stars."""
+    from .templates import SHEN_SHA_IMPACTS, _pick
+    items = []
+    for s in shen_sha:
+        if not s.present:
+            continue
+        templates = SHEN_SHA_IMPACTS.get(s.name_chinese, {})
+        text = _pick(templates.get("present", [f"{s.name_english} present"]))
+        severity = "positive" if s.nature == "auspicious" else "negative" if s.nature == "inauspicious" else "info"
+        items.append({
+            "label": f"{s.name_chinese} {s.name_english}",
+            "value": text,
+            "severity": severity,
+        })
+    return {
+        "id": "shen_sha",
+        "title": "Special Stars",
+        "title_zh": "神煞",
+        "items": items,
+    }
+
+
+def _summary_red_flags(flags: Dict[str, List[RedFlag]]) -> dict:
+    """Section: red flags grouped by life area."""
+    items = []
+    for area, area_flags in flags.items():
+        for f in area_flags:
+            items.append({
+                "label": area.capitalize(),
+                "value": f"{f.indicator_name} — {f.description}",
+                "severity": f.severity,
+            })
+    return {
+        "id": "red_flags",
+        "title": "Red Flags",
+        "title_zh": "警示",
+        "items": items,
+    }
+
+
+def _summary_luck_pillar(chart: ChartData, strength: StrengthAssessment) -> Optional[dict]:
+    """Section: current luck pillar (full tier only)."""
+    if not chart.luck_pillar:
+        return None
+    lp = chart.luck_pillar
+    lp_stem_info = STEMS[lp.stem]
+    from ..derived import get_ten_god
+    tg = get_ten_god(chart.day_master, lp.stem)
+    tg_label = f"{tg[1]} ({tg[2]})" if tg else ""
+    text = f"{lp.stem_chinese}{lp.branch_chinese} ({lp.stem} {lp.branch}) — {tg_label} decade"
+    return {
+        "id": "luck_pillar",
+        "title": "Current Luck Pillar",
+        "title_zh": "大運分析",
+        "text": text,
+    }
+
+
+def _summary_health(chart: ChartData) -> dict:
+    """Section: health based on element balance."""
+    from .templates import HEALTH_ELEMENT_MAP
+    elem_counts = count_elements(chart)
+    items = []
+    for elem in ["Wood", "Fire", "Earth", "Metal", "Water"]:
+        count = elem_counts.get(elem, 0)
+        organ_info = HEALTH_ELEMENT_MAP.get(elem, {})
+        yin_organ = organ_info.get("yin_organ", elem)
+        if count < 1.0:
+            items.append({
+                "label": f"{yin_organ} ({elem})",
+                "value": f"Low {elem} — {organ_info.get('deficiency', 'potential vulnerability')}",
+                "severity": "warning",
+            })
+        elif count > 3.0:
+            items.append({
+                "label": f"{yin_organ} ({elem})",
+                "value": f"Excess {elem} — {organ_info.get('excess', 'overactive')}",
+                "severity": "warning",
+            })
+    return {
+        "id": "health",
+        "title": "Health",
+        "title_zh": "健康",
+        "items": items,
+    }
+
+
+def _summary_remedies(strength: StrengthAssessment) -> dict:
+    """Section: remedies based on useful god."""
+    from .templates import ELEMENT_REMEDIES
+    remedies = ELEMENT_REMEDIES.get(strength.useful_god, {})
+    items = []
+    if remedies:
+        colors = ", ".join(remedies.get("colors", []))
+        items.append({"label": "Colors", "value": f"Wear {colors} ({strength.useful_god} element)"})
+        items.append({"label": "Direction", "value": remedies.get("direction", "")})
+        industries = ", ".join(remedies.get("industries", [])[:5])
+        items.append({"label": "Industries", "value": industries})
+        avoid = ", ".join(remedies.get("avoid_colors", []))
+        if avoid:
+            items.append({"label": "Avoid Colors", "value": avoid})
+    return {
+        "id": "remedies",
+        "title": "Remedies",
+        "title_zh": "化解建議",
+        "items": items,
+    }
+
+
+def _summary_predictions(predictions: Dict[str, list]) -> Optional[dict]:
+    """Section: prediction highlights (full tier only)."""
+    items = []
+    for event_type, events in predictions.items():
+        for ev in events[:2]:
+            items.append({
+                "label": event_type.replace("_", " ").title(),
+                "value": f"Year {ev.year} (age {ev.age}) — score {ev.score:.0f}",
+            })
+    if not items:
+        return None
+    return {
+        "id": "predictions",
+        "title": "Predictions",
+        "title_zh": "預測",
+        "items": items[:8],
+    }
+
+
+def _summary_honest(chart: ChartData, strength: StrengthAssessment) -> dict:
+    """Section: honest life lesson summary."""
+    from .templates import LIFE_LESSON_TEMPLATES, _pick
+    dm_element = chart.dm_element
+    if strength.is_following_chart:
+        key = "following"
+    elif strength.verdict in ("weak", "extremely_weak"):
+        key = f"weak_{dm_element.lower()}"
+    else:
+        key = "strong_general"
+    templates = LIFE_LESSON_TEMPLATES.get(key, LIFE_LESSON_TEMPLATES.get("strong_general", [""]))
+    text = _pick(templates)
+    return {
+        "id": "summary",
+        "title": "Honest Summary",
+        "title_zh": "總結",
+        "text": text,
+    }
+
+
+def build_client_summary(chart: ChartData, results: dict,
+                          flags: Dict[str, List[RedFlag]]) -> dict:
+    """Build structured client summary for non-technical frontend display."""
+    strength = results["strength"]
+    tg_classification = results["ten_god_classification"]
+    interactions = results["interactions"]
+    shen_sha = results["shen_sha"]
+    predictions = results["predictions"]
+
+    has_luck = chart.luck_pillar is not None
+    has_time_period = len(chart.time_period_pillars) > 0
+    is_full = has_luck or has_time_period
+    tier = "full" if is_full else "natal"
+
+    sections = [
+        _summary_chart_overview(chart),
+        _summary_strength(strength),
+        _summary_ten_gods(chart, tg_classification),
+        _summary_interactions(interactions),
+        _summary_shen_sha(shen_sha),
+        _summary_red_flags(flags),
+    ]
+
+    # Luck pillar section (full tier only)
+    if is_full:
+        lp_section = _summary_luck_pillar(chart, strength)
+        if lp_section:
+            sections.append(lp_section)
+
+    sections.append(_summary_health(chart))
+    sections.append(_summary_remedies(strength))
+
+    # Predictions (full tier only)
+    if is_full:
+        pred_section = _summary_predictions(predictions)
+        if pred_section:
+            sections.append(pred_section)
+
+    sections.append(_summary_honest(chart, strength))
+
+    return {
+        "tier": tier,
+        "sections": sections,
+    }
+
+
+# =============================================================================
 # MASTER ADAPTER FUNCTION
 # =============================================================================
 
@@ -1126,5 +1419,8 @@ def adapt_to_frontend(chart: ChartData, results: dict) -> dict:
 
     # Comprehensive report (new field)
     response["comprehensive_report"] = comprehensive_report
+
+    # Client summary (structured JSON for frontend)
+    response["client_summary"] = build_client_summary(chart, results, flags)
 
     return response

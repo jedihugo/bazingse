@@ -121,6 +121,27 @@ def count_elements(chart: ChartData) -> Dict[str, float]:
     return element_counts
 
 
+def count_all_elements(chart: ChartData) -> Dict[str, float]:
+    """Count element weights across ALL pillars (natal + luck + time-period)."""
+    element_counts = count_elements(chart)  # Start with natal
+
+    # Add luck pillar
+    if chart.luck_pillar:
+        stem_element = STEMS[chart.luck_pillar.stem]["element"]
+        element_counts[stem_element] += 1.0
+        for stem, score in get_all_branch_qi(chart.luck_pillar.branch):
+            element_counts[STEMS[stem]["element"]] += score / 100.0
+
+    # Add time-period pillars
+    for pos, pillar in chart.time_period_pillars.items():
+        stem_element = STEMS[pillar.stem]["element"]
+        element_counts[stem_element] += 1.0
+        for stem, score in get_all_branch_qi(pillar.branch):
+            element_counts[STEMS[stem]["element"]] += score / 100.0
+
+    return element_counts
+
+
 def count_support_vs_drain(chart: ChartData) -> Tuple[float, float]:
     """
     Count supporting vs draining element weights.
