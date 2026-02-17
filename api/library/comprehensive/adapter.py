@@ -1243,29 +1243,335 @@ def _summary_remedies(strength: StrengthAssessment) -> dict:
     }
 
 
-def _summary_predictions(predictions: Dict[str, list]) -> Optional[dict]:
-    """Section: prediction highlights (full tier only)."""
+def _summary_predictions_timeline(predictions: Dict[str, list]) -> Optional[dict]:
+    """Section: year-specific prediction highlights (full/timeline tier only)."""
     items = []
     for event_type, events in predictions.items():
         for ev in events[:2]:
+            factors_str = "; ".join(ev.factors[:2]) if ev.factors else ""
             items.append({
                 "label": event_type.replace("_", " ").title(),
-                "value": f"Year {ev.year} (age {ev.age}) — score {ev.score:.0f}",
+                "value": f"Year {ev.year} (age {ev.age}) — score {ev.score:.0f}. {factors_str}",
             })
     if not items:
         return None
     return {
         "id": "predictions",
-        "title": "Predictions",
-        "title_zh": "預測",
+        "title": "Year Predictions",
+        "title_zh": "流年預測",
         "items": items[:8],
     }
 
 
-def _summary_honest(chart: ChartData, strength: StrengthAssessment) -> dict:
-    """Section: honest life lesson summary."""
-    from .templates import LIFE_LESSON_TEMPLATES, _pick
+def _summary_natal_predictions(chart: ChartData,
+                                tg_classification: Dict[str, dict],
+                                strength: StrengthAssessment,
+                                predictions: Dict[str, list],
+                                flags: Dict[str, List[RedFlag]]) -> dict:
+    """Section: life predictions from natal chart structure.
+    Marriage, divorce risk, children, wealth potential — with reasons.
+    """
+    from .ten_gods import check_spouse_star, check_children_star
+    items = []
+
+    # --- MARRIAGE ---
+    spouse = check_spouse_star(chart, tg_classification)
+    spouse_star = spouse["star"]
+    spouse_label = spouse["label"]
+    spouse_strength = spouse["strength"]
+
+    # Peach Blossom / romance indicators
+    rw_strength = tg_classification.get("RW", {}).get("strength", "ABSENT")
+    ho_strength = tg_classification.get("HO", {}).get("strength", "ABSENT")
+
+    marriage_reasons = []
+    if spouse_strength == "ABSENT":
+        marriage_outlook = "DIFFICULT"
+        marriage_reasons.append(f"{spouse_label} completely absent from natal chart")
+        severity = "severe"
+    elif spouse_strength == "HIDDEN_ONLY":
+        marriage_outlook = "LATE"
+        marriage_reasons.append(f"{spouse_label} only in hidden stems — marriage comes late or needs effort")
+        severity = "warning"
+    elif spouse_strength == "PROMINENT":
+        marriage_outlook = "STRONG"
+        marriage_reasons.append(f"{spouse_label} is prominent — strong marriage affinity")
+        severity = "positive"
+    else:
+        marriage_outlook = "NORMAL"
+        marriage_reasons.append(f"{spouse_label} is present — marriage attainable")
+        severity = "info"
+
+    # Check for marriage-damaging patterns
+    if ho_strength == "PROMINENT" and chart.gender == "female":
+        marriage_reasons.append("Hurting Officer prominent — conflicts with husband star")
+        if marriage_outlook != "DIFFICULT":
+            marriage_outlook = "CHALLENGING"
+            severity = "warning"
+    if rw_strength == "PROMINENT":
+        marriage_reasons.append("Rob Wealth prominent — competition/interference in relationships")
+        if marriage_outlook in ("NORMAL", "STRONG"):
+            marriage_outlook = "CHALLENGING"
+            severity = "warning"
+
+    # Marriage flags
+    marriage_flags = flags.get("marriage", [])
+    for mf in marriage_flags[:2]:
+        marriage_reasons.append(mf.description)
+
+    # Top marriage years
+    marriage_preds = predictions.get("marriage", [])
+    if marriage_preds:
+        top = marriage_preds[0]
+        top_reasons = "; ".join(top.factors[:2])
+        marriage_reasons.append(f"Best year: {top.year} (age {top.age}, score {top.score:.0f}) — {top_reasons}")
+
+    items.append({
+        "label": f"Marriage: {marriage_outlook}",
+        "value": " | ".join(marriage_reasons),
+        "severity": severity,
+    })
+
+    # --- DIVORCE RISK ---
+    divorce_preds = predictions.get("divorce", [])
+    divorce_reasons = []
+
+    # Check natal chart indicators
+    day_branch_clashed = False
+    for inter_flag in flags.get("marriage", []):
+        if "clash" in inter_flag.indicator_name.lower() or "冲" in inter_flag.indicator_name:
+            day_branch_clashed = True
+            break
+
+    if spouse_strength == "ABSENT" and rw_strength in ("PROMINENT", "PRESENT"):
+        divorce_risk = "HIGH"
+        divorce_reasons.append("No spouse star + Rob Wealth present = partner drained away")
+        severity = "severe"
+    elif day_branch_clashed and ho_strength in ("PROMINENT", "PRESENT"):
+        divorce_risk = "ELEVATED"
+        divorce_reasons.append("Spouse palace clashed + Hurting Officer = marriage instability")
+        severity = "warning"
+    elif day_branch_clashed:
+        divorce_risk = "MODERATE"
+        divorce_reasons.append("Spouse palace has clash — periodic marriage tension")
+        severity = "warning"
+    elif ho_strength == "PROMINENT":
+        divorce_risk = "MODERATE"
+        divorce_reasons.append("Prominent Hurting Officer — sharp tongue damages relationships")
+        severity = "warning"
+    else:
+        divorce_risk = "LOW"
+        divorce_reasons.append("No major divorce indicators in natal chart")
+        severity = "positive"
+
+    if divorce_preds:
+        top = divorce_preds[0]
+        if top.score >= 40:
+            top_reasons = "; ".join(top.factors[:2])
+            divorce_reasons.append(f"Highest risk year: {top.year} (age {top.age}, score {top.score:.0f}) — {top_reasons}")
+
+    items.append({
+        "label": f"Divorce Risk: {divorce_risk}",
+        "value": " | ".join(divorce_reasons),
+        "severity": severity,
+    })
+
+    # --- CHILDREN ---
+    children = check_children_star(chart, tg_classification)
+    child_reasons = []
+
+    primary_star = children["primary_star"]
+    secondary_star = children["secondary_star"]
+    p_strength = children["primary_strength"]
+    s_strength = children["secondary_strength"]
+
+    # Estimate children count based on star visibility
+    child_count_est = 0
+    if chart.gender == "male":
+        sons_label, daughters_label = f"7K ({tg_classification.get('7K',{}).get('chinese','七殺')})", f"DO ({tg_classification.get('DO',{}).get('chinese','正官')})"
+    else:
+        sons_label, daughters_label = f"HO ({tg_classification.get('HO',{}).get('chinese','傷官')})", f"EG ({tg_classification.get('EG',{}).get('chinese','食神')})"
+
+    p_count = tg_classification.get(primary_star, {}).get("total_count", 0)
+    s_count = tg_classification.get(secondary_star, {}).get("total_count", 0)
+
+    if p_strength == "PROMINENT":
+        child_reasons.append(f"{sons_label} is prominent — likely multiple sons")
+        child_count_est += 2
+    elif p_strength in ("PRESENT", "HIDDEN_ONLY"):
+        child_reasons.append(f"{sons_label} present — sons likely")
+        child_count_est += 1
+    else:
+        child_reasons.append(f"{sons_label} absent — sons less likely naturally")
+
+    if s_strength == "PROMINENT":
+        child_reasons.append(f"{daughters_label} is prominent — likely multiple daughters")
+        child_count_est += 2
+    elif s_strength in ("PRESENT", "HIDDEN_ONLY"):
+        child_reasons.append(f"{daughters_label} present — daughters likely")
+        child_count_est += 1
+    else:
+        child_reasons.append(f"{daughters_label} absent — daughters less likely naturally")
+
+    # Hour pillar (children palace) strength
+    hour_branch = chart.pillars["hour"].branch
+    hour_qi = get_all_branch_qi(hour_branch)
+    hour_has_child_star = False
+    for hs, score in hour_qi:
+        tg = get_ten_god(chart.day_master, hs)
+        if tg and tg[0] in (primary_star, secondary_star):
+            hour_has_child_star = True
+            break
+    if hour_has_child_star:
+        child_reasons.append("Children star in hour pillar (children palace) — strong fertility indicator")
+    else:
+        child_reasons.append("No children star in hour pillar — may need more effort")
+
+    est_label = f"{child_count_est}+" if child_count_est > 0 else "uncertain"
+    severity = "positive" if child_count_est >= 2 else "info" if child_count_est == 1 else "warning"
+
+    # Top children years
+    child_preds = predictions.get("children", [])
+    if child_preds:
+        top = child_preds[0]
+        child_reasons.append(f"Best year: {top.year} (age {top.age})")
+
+    items.append({
+        "label": f"Children: est. {est_label}",
+        "value": " | ".join(child_reasons),
+        "severity": severity,
+    })
+
+    # --- WEALTH POTENTIAL ---
+    dw_strength = tg_classification.get("DW", {}).get("strength", "ABSENT")
+    iw_strength = tg_classification.get("IW", {}).get("strength", "ABSENT")
+    eg_strength = tg_classification.get("EG", {}).get("strength", "ABSENT")
+    do_strength = tg_classification.get("DO", {}).get("strength", "ABSENT")
+
+    wealth_reasons = []
     dm_element = chart.dm_element
+    wealth_element = ELEMENT_CYCLES["controlling"].get(dm_element, "")
+
+    # Wealth star assessment
+    has_direct_wealth = dw_strength not in ("ABSENT",)
+    has_indirect_wealth = iw_strength not in ("ABSENT",)
+
+    # DM strength vs wealth capacity
+    can_handle = strength.verdict not in ("extremely_weak",)
+    is_strong_dm = strength.verdict in ("strong", "extremely_strong")
+
+    # Wealth tier estimation
+    wealth_score = 0
+
+    if has_direct_wealth:
+        wealth_score += 2
+        wealth_reasons.append(f"Direct Wealth present — steady income capacity")
+    if has_indirect_wealth:
+        wealth_score += 2
+        wealth_reasons.append(f"Indirect Wealth present — windfall/investment capacity")
+    if iw_strength == "PROMINENT":
+        wealth_score += 2
+        wealth_reasons.append("Prominent Indirect Wealth — strong speculative/business luck")
+    if dw_strength == "PROMINENT":
+        wealth_score += 1
+        wealth_reasons.append("Prominent Direct Wealth — strong salary/stable income")
+    if is_strong_dm and (has_direct_wealth or has_indirect_wealth):
+        wealth_score += 2
+        wealth_reasons.append("Strong DM can hold wealth — good earning capacity")
+    elif not can_handle:
+        wealth_score -= 2
+        wealth_reasons.append("Extremely weak DM — struggles to hold onto wealth")
+    if eg_strength == "PROMINENT":
+        wealth_score += 1
+        wealth_reasons.append("Eating God prominent — wealth through creativity/talent")
+    if rw_strength == "PROMINENT":
+        wealth_score -= 2
+        wealth_reasons.append("Rob Wealth prominent — money drains through competition/others")
+
+    # Wealth flags
+    wealth_flags = flags.get("wealth", [])
+    for wf in wealth_flags[:2]:
+        wealth_reasons.append(f"Warning: {wf.description}")
+        wealth_score -= 1
+
+    # Map score to tier
+    if wealth_score >= 6:
+        wealth_tier = "8-9 figures possible"
+        tier_detail = "Strong wealth indicators — 8-figure potential with right timing. 9-figure if Indirect Wealth is prominent + strong DM."
+        severity = "positive"
+    elif wealth_score >= 4:
+        wealth_tier = "7-8 figures possible"
+        tier_detail = "Good wealth capacity — 7-figure achievable. 8-figure possible in favorable luck decades."
+        severity = "positive"
+    elif wealth_score >= 2:
+        wealth_tier = "7 figures possible"
+        tier_detail = "Moderate wealth indicators — comfortable living, 7-figure achievable with effort."
+        severity = "info"
+    elif wealth_score >= 0:
+        wealth_tier = "6-7 figures"
+        tier_detail = "Average wealth capacity — steady income but unlikely to break into high wealth without favorable luck."
+        severity = "info"
+    else:
+        wealth_tier = "Wealth challenged"
+        tier_detail = "Wealth stars weak or drained — financial stability requires careful management and favorable timing."
+        severity = "warning"
+
+    wealth_reasons.append(tier_detail)
+
+    # Top career years
+    career_preds = predictions.get("career", [])
+    if career_preds:
+        top = career_preds[0]
+        wealth_reasons.append(f"Best career year: {top.year} (age {top.age})")
+
+    items.append({
+        "label": f"Wealth: {wealth_tier}",
+        "value": " | ".join(wealth_reasons),
+        "severity": severity,
+    })
+
+    return {
+        "id": "natal_predictions",
+        "title": "Life Predictions",
+        "title_zh": "命理預測",
+        "text": "Based on natal chart structure — what your birth chart says about marriage, children, and wealth potential",
+        "items": items,
+    }
+
+
+def _summary_predictions_timeline(predictions: Dict[str, list]) -> Optional[dict]:
+    """Section: year-specific prediction highlights (full/timeline tier only)."""
+    items = []
+    for event_type, events in predictions.items():
+        for ev in events[:2]:
+            factors_str = "; ".join(ev.factors[:2]) if ev.factors else ""
+            items.append({
+                "label": event_type.replace("_", " ").title(),
+                "value": f"Year {ev.year} (age {ev.age}) — score {ev.score:.0f}. {factors_str}",
+            })
+    if not items:
+        return None
+    return {
+        "id": "predictions",
+        "title": "Year Predictions",
+        "title_zh": "流年預測",
+        "items": items[:8],
+    }
+
+
+def _summary_honest(chart: ChartData, strength: StrengthAssessment,
+                     tg_classification: Dict[str, dict],
+                     flags: Dict[str, List[RedFlag]]) -> dict:
+    """Section: comprehensive honest life summary."""
+    from .templates import LIFE_LESSON_TEMPLATES, DM_NATURE, _pick
+    from .ten_gods import check_spouse_star
+
+    dm_element = chart.dm_element
+    dm_info = STEMS[chart.day_master]
+    dm_key = (dm_info["element"], dm_info["polarity"].capitalize())
+    nature = DM_NATURE.get(dm_key, {})
+
+    # Life lesson
     if strength.is_following_chart:
         key = "following"
     elif strength.verdict in ("weak", "extremely_weak"):
@@ -1273,12 +1579,84 @@ def _summary_honest(chart: ChartData, strength: StrengthAssessment) -> dict:
     else:
         key = "strong_general"
     templates = LIFE_LESSON_TEMPLATES.get(key, LIFE_LESSON_TEMPLATES.get("strong_general", [""]))
-    text = _pick(templates)
+    life_lesson = _pick(templates)
+
+    # Build comprehensive text
+    parts = []
+
+    # Who you are
+    parts.append(f"You are {nature.get('name', chart.day_master)} ({nature.get('chinese', dm_info['chinese'])}). "
+                 f"Personality: {nature.get('personality', 'unknown')}.")
+
+    # Strength reality
+    score = strength.score
+    if score < 25:
+        parts.append(f"Your Day Master is extremely weak ({score:.0f}/100). "
+                     "You are easily overwhelmed by life's demands. "
+                     "Your biggest challenge is finding support systems and environments that sustain you.")
+    elif score < 42:
+        parts.append(f"Your Day Master is weak ({score:.0f}/100). "
+                     "You need more support than most people. "
+                     "Resource and companion elements are your lifeline.")
+    elif score < 58:
+        parts.append(f"Your Day Master is balanced ({score:.0f}/100). "
+                     "You have a flexible chart — small shifts in luck pillars have outsized effects on your life.")
+    elif score < 75:
+        parts.append(f"Your Day Master is strong ({score:.0f}/100). "
+                     "You have abundant energy but need productive outlets. "
+                     "Without channels for your strength, you become restless and domineering.")
+    else:
+        parts.append(f"Your Day Master is extremely strong ({score:.0f}/100). "
+                     "You have overwhelming energy. The risk is stagnation and bulldozing over others.")
+
+    # Marriage reality
+    spouse = check_spouse_star(chart, tg_classification)
+    marriage_flags = flags.get("marriage", [])
+    if spouse["is_critical_absent"]:
+        parts.append(f"Marriage: Your {spouse['label']} is ABSENT. "
+                     "This is the single hardest indicator — marriage comes very late, "
+                     "with great difficulty, or through unconventional paths. This is not a death sentence, "
+                     "but it requires conscious effort and the right luck decade.")
+    elif marriage_flags:
+        severe_count = sum(1 for f in marriage_flags if f.severity in ("severe", "critical"))
+        if severe_count >= 2:
+            parts.append("Marriage: Multiple severe marriage indicators. "
+                         "Relationships are a major life challenge requiring active management.")
+        elif severe_count == 1:
+            parts.append("Marriage: One significant marriage challenge exists. "
+                         "Awareness and timing can mitigate it.")
+    else:
+        parts.append("Marriage: No major obstacles in the natal chart. "
+                     "Timing and luck pillar alignment will determine when.")
+
+    # Wealth reality
+    dw = tg_classification.get("DW", {}).get("strength", "ABSENT")
+    iw = tg_classification.get("IW", {}).get("strength", "ABSENT")
+    rw = tg_classification.get("RW", {}).get("strength", "ABSENT")
+    if dw == "ABSENT" and iw == "ABSENT":
+        parts.append("Wealth: Both wealth stars absent. "
+                     "Money doesn't come naturally — must be actively pursued through favorable elements and timing.")
+    elif rw == "PROMINENT":
+        parts.append("Wealth: Rob Wealth is prominent — money comes but also leaves through others. "
+                     "Avoid partnerships and lending. Protect what you earn.")
+    elif iw == "PROMINENT":
+        parts.append("Wealth: Strong Indirect Wealth — windfall potential through speculation, business, or investments. "
+                     "Risk tolerance is high, but so is the upside.")
+
+    # The life lesson
+    parts.append(f"Life lesson: {life_lesson}")
+
+    # Useful God reminder
+    parts.append(f"Your useful god is {strength.useful_god}. "
+                 f"Favorable: {', '.join(strength.favorable_elements)}. "
+                 f"Unfavorable: {', '.join(strength.unfavorable_elements)}. "
+                 f"Everything in your life improves when you increase {strength.useful_god} element exposure.")
+
     return {
         "id": "summary",
         "title": "Honest Summary",
         "title_zh": "總結",
-        "text": text,
+        "text": " ".join(parts),
     }
 
 
@@ -1474,9 +1852,10 @@ def build_client_summary(chart: ChartData, results: dict,
             _summary_interactions(interactions),
             _summary_shen_sha(shen_sha),
             _summary_red_flags(flags),
+            _summary_natal_predictions(chart, tg_classification, strength, predictions, flags),
             _summary_health(chart),
             _summary_remedies(strength),
-            _summary_honest(chart, strength),
+            _summary_honest(chart, strength, tg_classification, flags),
         ]
     else:
         # FULL tier: diff-focused — what changed from natal
@@ -1512,10 +1891,10 @@ def build_client_summary(chart: ChartData, results: dict,
         if rf.get("items"):
             sections.append(rf)
 
-        # Predictions — only for year-level analysis
+        # Year predictions — only for year-level analysis
         is_year_only = "monthly" not in chart.time_period_pillars and "daily" not in chart.time_period_pillars
         if is_year_only:
-            pred_section = _summary_predictions(predictions)
+            pred_section = _summary_predictions_timeline(predictions)
             if pred_section:
                 sections.append(pred_section)
 
