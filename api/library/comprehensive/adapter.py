@@ -1314,8 +1314,9 @@ def build_client_summary(chart: ChartData, results: dict,
     sections.append(_summary_health(chart))
     sections.append(_summary_remedies(strength))
 
-    # Predictions (full tier only)
-    if is_full:
+    # Predictions — only for year-level analysis (not month/day granularity)
+    is_year_only = is_full and "monthly" not in chart.time_period_pillars and "daily" not in chart.time_period_pillars
+    if is_year_only:
         pred_section = _summary_predictions(predictions)
         if pred_section:
             sections.append(pred_section)
