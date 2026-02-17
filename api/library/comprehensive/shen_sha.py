@@ -1362,6 +1362,83 @@ def check_tong_zi(chart: ChartData) -> List[ShenShaResult]:
 
 
 # =============================================================================
+# 36. 財星 (Cai Xing / Wealth Star)
+# =============================================================================
+# When the DM's wealth element appears as primary qi in chart branches.
+# This is a minor auspicious star granting small fortune energy.
+# NOT the same as Wealth Storage (財庫) — no vault/opener mechanics.
+# Just the presence of wealth element energy in the chart.
+
+# DM stem → branches where DM's wealth element is the primary qi (本气)
+# Derived from: DM controls wealth element → wealth element's "home" branches
+WEALTH_STAR_TARGETS: Dict[str, Tuple[str, ...]] = {
+    # Wood DM: wealth=Earth → Earth primary branches
+    "Jia": ("Chen", "Chou", "Wei", "Xu"),
+    "Yi":  ("Chen", "Chou", "Wei", "Xu"),
+    # Fire DM: wealth=Metal → Metal primary branches
+    "Bing": ("Shen", "You"),
+    "Ding": ("Shen", "You"),
+    # Earth DM: wealth=Water → Water primary branches
+    "Wu":  ("Zi", "Hai"),
+    "Ji":  ("Zi", "Hai"),
+    # Metal DM: wealth=Wood → Wood primary branches
+    "Geng": ("Yin", "Mao"),
+    "Xin":  ("Yin", "Mao"),
+    # Water DM: wealth=Fire → Fire primary branches
+    "Ren": ("Si", "Wu"),
+    "Gui": ("Si", "Wu"),
+}
+
+# DM element → wealth element (controlling cycle)
+_DM_WEALTH = {
+    "Wood": "Earth", "Fire": "Metal", "Earth": "Water",
+    "Metal": "Wood", "Water": "Fire",
+}
+
+
+def check_wealth_star(chart: ChartData) -> List[ShenShaResult]:
+    dm = chart.day_master
+    targets = WEALTH_STAR_TARGETS.get(dm, ())
+    dm_elem = STEMS[dm]["element"]
+    wealth_elem = _DM_WEALTH.get(dm_elem, "")
+    results = []
+    found_any = False
+
+    for t in targets:
+        locs = _find_branch(chart, t)
+        if locs:
+            found_any = True
+            for loc in locs:
+                results.append(ShenShaResult(
+                    name_english="Wealth Star",
+                    name_chinese="財星",
+                    present=True,
+                    location=t,
+                    palace=loc["palace"],
+                    activated_by=loc["activated_by"],
+                    derivation=f"For {dm} DM ({dm_elem}): wealth={wealth_elem}. "
+                               f"{BRANCHES[t]['chinese']} ({t}) carries {wealth_elem} qi. "
+                               f"Found in {loc['palace'].replace('_', ' ')}.",
+                    nature="auspicious",
+                    life_areas=["wealth"],
+                    severity="mild",
+                ))
+
+    if not found_any:
+        target_names = ", ".join(BRANCHES[t]["chinese"] for t in targets)
+        results.append(ShenShaResult(
+            name_english="Wealth Star",
+            name_chinese="財星",
+            present=False,
+            location=None,
+            derivation=f"For {dm} DM ({dm_elem}): wealth={wealth_elem}. "
+                       f"Targets: {target_names}. None found.",
+        ))
+
+    return results
+
+
+# =============================================================================
 # MASTER FUNCTION: Run All Shen Sha Checks
 # =============================================================================
 
@@ -1403,6 +1480,7 @@ ALL_CHECKS = [
     check_xian_chi,
     check_bai_hu,
     check_tong_zi,
+    check_wealth_star,
 ]
 
 

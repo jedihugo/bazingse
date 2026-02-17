@@ -4392,398 +4392,201 @@ def analyze_8_node_interactions(
     # NOT post_five_elements (which includes luck pillars and inflates strength)
     daymaster_analysis = analyze_daymaster_strength(bazi_chart, natal_five_elements)
     
-    # ============= WEALTH/INFLUENCE STORAGE DETECTION (财库/官库分析) =============
+    # ============= WEALTH STORAGE DETECTION (財庫分析) =============
     #
-    # DUAL PERSPECTIVE LOGIC:
-    # 1. FROM DAY MASTER PERSPECTIVE (DM-based):
-    #    - Storage BRANCH determined by Day Master's wealth/influence element
-    #    - Fire DM → Wealth in Chou (stores Metal), Influence in Chen (stores Water)
-    #    - SPECIAL: Earth wealth (Wood DM) → ALL 4 库 branches contain Earth
-    # 2. FROM PILLAR PERSPECTIVE (Self-referential):
-    #    - Pillar combination where HS sits on its own wealth storage
-    #    - Wu-Chen: Wu (Earth) sits on Chen (Water storage) - Water is Wu's wealth
-    #    - Uses LARGE_WEALTH_STORAGE dictionary from library.py
-    # 3. Filler: wealth/influence stems in OTHER nodes (HS or primary qi of EB)
-    # 4. Opener: clash branch exists elsewhere
+    # Based on the Twelve Growth Stages (十二长生) cycle:
+    # Each element has a tomb/storage (墓/库) at a specific Earthly Branch.
+    # Wealth Storage = tomb of the Day Master's wealth element.
+    #
+    # DM → wealth element → wealth element's tomb branch:
+    #   Wood DM  → Earth wealth → 戌 (Xu)    [Earth tomb at Xu]
+    #   Fire DM  → Metal wealth → 丑 (Chou)  [Metal tomb at Chou]
+    #   Earth DM → Water wealth → 辰 (Chen)  [Water tomb at Chen]
+    #   Metal DM → Wood wealth  → 未 (Wei)   [Wood tomb at Wei]
+    #   Water DM → Fire wealth  → 戌 (Xu)    [Fire tomb at Xu]
+    #
+    # Activation requires:
+    #   1. FILLER (填庫): wealth element stems in other chart positions
+    #   2. OPENER (冲開): storage branch clashed by its partner
+    #   3. MAXIMUM: both filled AND opened = ultra-rich potential
 
     def detect_wealth_storage():
         """
-        Detect wealth and influence storage patterns from DUAL perspectives:
-        1. Day Master perspective - storage containing DM's wealth element
-        2. Pillar perspective - pillar sitting on its own wealth storage
+        Detect wealth storage (財庫) in the chart.
+        Single perspective: from Day Master, find the wealth storage branch,
+        check all instances for filler and opener, flag Large Wealth Storage pillars.
         """
         storages = []
-        pillar_storages = []  # Track pillar-based storages separately
 
-        # Get day master element and stem
+        # Get Day Master info
         dm_hs = nodes.get("hs_d")
         if not dm_hs or dm_hs.value not in HEAVENLY_STEMS:
-            return {"storages": [], "pillar_storages": [], "summary": "No day master found"}
+            return {
+                "storages": [], "all_storages": [],
+                "summary": "No day master found"
+            }
 
         dm_stem = dm_hs.value
         dm_element = HEAVENLY_STEMS[dm_stem]["element"]
-
-        # Wealth = element that DM controls, Influence = element that controls DM
         wealth_element = WUXING["controlling"].get(dm_element)
-        influence_element = WUXING["controlled_by"].get(dm_element)
-
-        # Stems that represent wealth and influence
         wealth_stems = WEALTH_ELEMENT_STEMS.get(wealth_element, [])
-        influence_stems = WEALTH_ELEMENT_STEMS.get(influence_element, [])
+        storage_branch = DM_WEALTH_STORAGE.get(dm_element)
+        opener_branch = STORAGE_OPENER.get(storage_branch)
 
-        # Map Day Master element directly to its Wealth Storage Branch
-        # This is the CORRECT traditional mapping:
-        # - Fire DM (wealth=Metal) → Chou (Metal storage)
-        # - Wood DM (wealth=Earth) → Chen (Earth doesn't have dedicated storage, Chen is assigned)
-        # - Earth DM (wealth=Water) → Chen (Water storage)
-        # - Metal DM (wealth=Wood) → Wei (Wood storage)
-        # - Water DM (wealth=Fire) → Xu (Fire storage)
-        DM_TO_WEALTH_STORAGE = {
-            "Wood": "Chen",   # Wood DM wealth storage
-            "Fire": "Chou",   # Fire DM wealth storage (Metal storage)
-            "Earth": "Chen",  # Earth DM wealth storage (Water storage)
-            "Metal": "Wei",   # Metal DM wealth storage (Wood storage)
-            "Water": "Xu"     # Water DM wealth storage (Fire storage)
-        }
+        if not storage_branch:
+            return {
+                "daymaster_element": dm_element,
+                "daymaster_stem": dm_stem,
+                "wealth_element": wealth_element,
+                "wealth_stems": wealth_stems,
+                "wealth_storage_branch": None,
+                "opener_branch": None,
+                "storages": [], "all_storages": [],
+                "summary": f"No storage mapping for {dm_element} DM"
+            }
 
-        # Map Day Master element to its Influence Storage Branch
-        # Influence = element that controls DM
-        # - Wood DM (influence=Metal) → Chou (Metal storage)
-        # - Fire DM (influence=Water) → Chen (Water storage)
-        # - Earth DM (influence=Wood) → Wei (Wood storage)
-        # - Metal DM (influence=Fire) → Xu (Fire storage)
-        # - Water DM (influence=Earth) → Chen (assigned, no dedicated Earth storage)
-        DM_TO_INFLUENCE_STORAGE = {
-            "Wood": "Chou",   # Wood DM influence storage (Metal storage)
-            "Fire": "Chen",   # Fire DM influence storage (Water storage)
-            "Earth": "Wei",   # Earth DM influence storage (Wood storage)
-            "Metal": "Xu",    # Metal DM influence storage (Fire storage)
-            "Water": "Chen"   # Water DM influence storage (assigned Chen)
-        }
-
-        # Get single wealth/influence storage branch for DM
-        wealth_storage_branch = DM_TO_WEALTH_STORAGE.get(dm_element)
-        influence_storage_branch = DM_TO_INFLUENCE_STORAGE.get(dm_element)
-
-        # Collect all nodes with their pillar combinations
-        all_hs_with_pos = []
-        all_eb_with_pos = []
-        all_pillars = {}  # pos -> {"hs": stem, "eb": branch}
+        # Collect all chart positions
+        all_hs = []       # (pos, stem_value)
+        all_eb = []       # (pos, branch_value, primary_stem)
+        all_pillars = {}  # pos -> {hs, eb}
 
         for pos in position_codes:
             hs_id = f"hs_{pos}"
             eb_id = f"eb_{pos}"
-            hs_value = None
-            eb_value = None
+            hs_val = nodes[hs_id].value if hs_id in nodes else None
+            eb_val = nodes[eb_id].value if eb_id in nodes else None
 
-            if hs_id in nodes:
-                hs_value = nodes[hs_id].value
-                all_hs_with_pos.append((pos, hs_value))
-            if eb_id in nodes:
-                eb_value = nodes[eb_id].value
-                primary_stem = None
-                if eb_value in EARTHLY_BRANCHES:
-                    qi_list = EARTHLY_BRANCHES[eb_value].get("qi", [])
+            if hs_val:
+                all_hs.append((pos, hs_val))
+            if eb_val:
+                primary = None
+                if eb_val in EARTHLY_BRANCHES:
+                    qi_list = EARTHLY_BRANCHES[eb_val].get("qi", [])
                     if qi_list:
-                        primary_stem = qi_list[0][0]  # qi is list of (stem, score) tuples
-                all_eb_with_pos.append((pos, eb_value, primary_stem))
+                        primary = qi_list[0][0]
+                all_eb.append((pos, eb_val, primary))
+            if hs_val and eb_val:
+                all_pillars[pos] = {"hs": hs_val, "eb": eb_val}
 
-            if hs_value and eb_value:
-                all_pillars[pos] = {"hs": hs_value, "eb": eb_value}
+        # Find all instances of the wealth storage branch in the chart
+        for pos, eb_val, primary_stem in all_eb:
+            if eb_val != storage_branch:
+                continue
 
-        def check_filler(target_stems, exclude_pos):
-            """Check if target stems exist in other nodes (HS or primary qi of EB)."""
+            eb_id = f"eb_{pos}"
+            eb_node = nodes.get(eb_id)
+            if not eb_node:
+                continue
+
+            # Check for Large Wealth Storage pillar (DM stem on own storage branch)
+            pillar_key = f"{all_pillars[pos]['hs']}-{all_pillars[pos]['eb']}" if pos in all_pillars else None
+            is_large = pillar_key in LARGE_WEALTH_STORAGE if pillar_key else False
+
+            # Check FILLER: wealth element stems in OTHER positions
             filler_positions = []
-            for pos, hs_val in all_hs_with_pos:
-                if pos != exclude_pos and hs_val in target_stems:
-                    filler_positions.append(f"{pos}(HS)")
-            for pos, eb_val, primary_stem in all_eb_with_pos:
-                if pos != exclude_pos and primary_stem in target_stems:
-                    filler_positions.append(f"{pos}(EB)")
-            return filler_positions
+            for p, hs_v in all_hs:
+                if p != pos and hs_v in wealth_stems:
+                    filler_positions.append(f"{p}(HS)")
+            for p, eb_v, prim in all_eb:
+                if p != pos and prim in wealth_stems:
+                    filler_positions.append(f"{p}(EB)")
+            is_filled = len(filler_positions) > 0
 
-        def check_opener(opener_branch, storage_pos):
-            """Check if opener branch exists elsewhere."""
-            return [pos for pos, eb_val, _ in all_eb_with_pos
-                    if pos != storage_pos and eb_val == opener_branch]
+            # Check OPENER: clash branch in OTHER positions
+            opener_positions = [p for p, eb_v, _ in all_eb
+                                if p != pos and eb_v == opener_branch]
+            is_opened = len(opener_positions) > 0
 
-        # ========== PART 1: PILLAR-BASED WEALTH STORAGE (Self-referential) ==========
-        # Check if any pillar is a "Large Wealth Storage" or "Small Wealth Storage" pillar
-        # This is independent of Day Master - the pillar itself is a wealth storage config
-        #
-        # Large (大财库): HS sits on the STORAGE (库) of its wealth element
-        #   - Wu-Chen, Ren-Xu, Ding-Chou, Xin-Wei
-        # Small (小财库): HS sits on branch containing its wealth element (not storage)
-        #   - Jia-Chen, Jia-Xu, Bing-Shen, Ding-You, Wu-Zi, Ji-Hai, Geng-Yin, Xin-Mao, Ren-Wu, Gui-Si
+            # Determine activation level
+            if is_filled and is_opened:
+                activation = "maximum"
+                badge_size = "xl"
+            elif is_filled or is_opened:
+                activation = "activated"
+                badge_size = "lg"
+            else:
+                activation = "latent"
+                badge_size = "md"
 
-        for pos, pillar_info in all_pillars.items():
-            pillar_key = f"{pillar_info['hs']}-{pillar_info['eb']}"
-
-            # Check both Large and Small wealth storage
-            is_large = pillar_key in LARGE_WEALTH_STORAGE
-            is_small = pillar_key in SMALL_WEALTH_STORAGE
-
-            if is_large or is_small:
-                storage_def = LARGE_WEALTH_STORAGE.get(pillar_key) or SMALL_WEALTH_STORAGE.get(pillar_key)
-                storage_size = "large" if is_large else "small"
-
-                eb_id = f"eb_{pos}"
-                eb_node = nodes.get(eb_id)
-                hs_node = nodes.get(f"hs_{pos}")
-
-                if not eb_node:
-                    continue
-
-                # Get opener info - for large storage use designated opener, for small use clash branch
-                if is_large:
-                    opener_branch = storage_def.get("opener")
-                else:
-                    # Small storage: use the branch's natural clash partner as opener
-                    eb_branch_data = EARTHLY_BRANCHES.get(pillar_info['eb'], {})
-                    opener_branch = eb_branch_data.get("clashes")
-
-                opener_positions = check_opener(opener_branch, pos) if opener_branch else []
-                is_opened = len(opener_positions) > 0
-
-                # For pillar-based storage, check if the stored element stems exist elsewhere
-                pillar_wealth_element = storage_def["wealth_element"]
-                pillar_wealth_stems = WEALTH_ELEMENT_STEMS.get(pillar_wealth_element, [])
-                filler_positions = check_filler(pillar_wealth_stems, pos)
-                is_filled = len(filler_positions) > 0
-
-                # Determine activation level (same logic for both large and small)
-                if is_filled and is_opened:
-                    activation_level = "maximum"
-                    badge_size = "xl" if is_large else "lg"
-                elif is_filled or is_opened:
-                    activation_level = "activated"
-                    badge_size = "lg" if is_large else "md"
-                else:
-                    activation_level = "latent"
-                    badge_size = "md" if is_large else "sm"
-
-                interaction_id = f"STORAGE~pillar~{pillar_key}~{eb_id}"
-
-                # Add badge to the branch node
-                badge_data = {
-                    "interaction_id": interaction_id,
-                    "type": "wealth_storage",
-                    "storage_type": "pillar",
-                    "badge": "STORAGE",
-                    "size": badge_size,
-                    "storage_size": storage_size,
-                    "chinese": "财库" if is_large else "小财",
-                    "label": f"{storage_def['hs_element']}{'财库' if is_large else '小财'}",
-                    "perspective": "pillar",
-                    "position": "top-right" if (is_filled or is_opened) else "bottom",
-                    "opacity": 1.0 if (is_filled or is_opened) else 0.6,
-                    "is_activated": is_filled or is_opened,
-                    "description": storage_def["description"]
-                }
-                eb_node.badges.append(badge_data)
-
-                hs_chinese = HEAVENLY_STEMS.get(pillar_info['hs'], {}).get("chinese", pillar_info['hs'])
-                eb_chinese = EARTHLY_BRANCHES.get(pillar_info['eb'], {}).get("chinese", pillar_info['eb'])
-
-                pillar_storages.append({
-                    "position": pos,
-                    "pillar_key": pillar_key,
-                    "pillar_chinese": f"{hs_chinese}{eb_chinese}",
-                    "perspective": "pillar",
-                    "storage_size": storage_size,
-                    "hs_element": storage_def["hs_element"],
-                    "wealth_element": pillar_wealth_element,
-                    "stored_stem": storage_def.get("stored_stem") or storage_def.get("wealth_stem"),
-                    "opener_branch": opener_branch,
-                    "is_opened": is_opened,
-                    "opener_positions": opener_positions,
-                    "is_filled": is_filled,
-                    "filler_positions": filler_positions,
-                    "activation_level": activation_level,
-                    "description": storage_def["description"],
-                    "interaction_id": interaction_id
-                })
-
-        # ========== PART 2: DM-BASED WEALTH/INFLUENCE STORAGE ==========
-        # Storage configs based on Day Master's wealth/influence storage branches
-        # These are BRANCH-based (doesn't need to be HS-EB pair in same pillar)
-        storage_configs = []
-
-        # Add wealth storage config (single branch per DM)
-        if wealth_storage_branch:
-            storage_configs.append({
-                "type": "wealth",
-                "branch": wealth_storage_branch,
-                "element": wealth_element,
-                "stems": wealth_stems,
-                "chinese": "财库",
-                "label": "DW/IW",
-                "perspective": "dm"
+            # Add badge to the branch node
+            interaction_id = f"STORAGE~wealth~{storage_branch}~{eb_id}"
+            eb_node.badges.append({
+                "interaction_id": interaction_id,
+                "type": "wealth_storage",
+                "badge": "STORAGE",
+                "size": badge_size,
+                "storage_size": "large" if is_large else "standard",
+                "chinese": "大财库" if is_large else "财库",
+                "label": f"{'大' if is_large else ''}财库",
+                "perspective": "dm",
+                "position": "top-right" if activation != "latent" else "bottom",
+                "opacity": 1.0 if activation != "latent" else 0.5,
+                "is_activated": activation != "latent",
             })
 
-        # Add influence storage config (single branch per DM)
-        if influence_storage_branch:
-            storage_configs.append({
-                "type": "influence",
-                "branch": influence_storage_branch,
-                "element": influence_element,
-                "stems": influence_stems,
-                "chinese": "官库",
-                "label": "DO/7K",
-                "perspective": "dm"
+            # Build storage record
+            hs_node = nodes.get(f"hs_{pos}")
+            hs_val = hs_node.value if hs_node else "?"
+            hs_chinese = HEAVENLY_STEMS.get(hs_val, {}).get("chinese", hs_val)
+            eb_chinese = EARTHLY_BRANCHES.get(eb_val, {}).get("chinese", eb_val)
+
+            storages.append({
+                "position": pos,
+                "branch": storage_branch,
+                "branch_chinese": eb_chinese,
+                "pillar": f"{hs_val}-{eb_val}",
+                "pillar_chinese": f"{hs_chinese}{eb_chinese}",
+                "is_large": is_large,
+                "storage_type": "wealth",
+                "stored_element": wealth_element,
+                "wealth_element": wealth_element,
+                "filler_stems": wealth_stems,
+                "is_filled": is_filled,
+                "filler_positions": filler_positions,
+                "opener_branch": opener_branch,
+                "is_opened": is_opened,
+                "opener_positions": opener_positions,
+                "activation_level": activation,
+                "interaction_id": interaction_id,
             })
-
-        # Find all storage branch instances for DM-based storage
-        for config in storage_configs:
-            for pos, eb_val, primary_stem in all_eb_with_pos:
-                if eb_val != config["branch"]:
-                    continue
-
-                eb_id = f"eb_{pos}"
-                eb_node = nodes.get(eb_id)
-                if not eb_node:
-                    continue
-
-                branch_info = EARTH_STORAGE_BRANCHES.get(config["branch"], {})
-                opener_branch = branch_info.get("opener")
-
-                filler_positions = check_filler(config["stems"], pos)
-                is_filled = len(filler_positions) > 0
-                opener_positions = check_opener(opener_branch, pos) if opener_branch else []
-                is_opened = len(opener_positions) > 0
-
-                if is_filled and is_opened:
-                    activation_level = "maximum"
-                    badge_size = "xl"
-                elif is_filled or is_opened:
-                    activation_level = "activated"
-                    badge_size = "lg"
-                else:
-                    activation_level = "latent"
-                    badge_size = "md"
-
-                interaction_id = f"STORAGE~{config['type']}~{config['branch']}~{eb_id}"
-
-                # Check if this branch already has a pillar-based storage badge
-                # If pillar-based WEALTH storage exists, skip DM-based WEALTH storage (redundant)
-                # But still add DM-based INFLUENCE storage even if pillar wealth exists
-                has_pillar_wealth_badge = any(
-                    b.get("storage_type") == "pillar" and b.get("type") == "wealth_storage"
-                    for b in eb_node.badges
-                )
-
-                # Skip DM-based wealth badge if pillar-based wealth badge already exists
-                # (The pillar badge already indicates this is a wealth storage)
-                if config["type"] == "wealth" and has_pillar_wealth_badge:
-                    # Still record in storages for data, but don't add duplicate badge
-                    hs_node = nodes.get(f"hs_{pos}")
-                    hs_value = hs_node.value if hs_node else "?"
-                    hs_chinese = HEAVENLY_STEMS.get(hs_value, {}).get("chinese", hs_value)
-                    storages.append({
-                        "position": pos,
-                        "branch": config["branch"],
-                        "branch_chinese": branch_info.get("chinese", config["branch"]),
-                        "pillar": f"{hs_value}-{config['branch']}",
-                        "pillar_chinese": f"{hs_chinese}{branch_info.get('chinese', config['branch'])}",
-                        "storage_type": config["type"],
-                        "perspective": "dm",
-                        "size": "large",
-                        "stored_element": config["element"],
-                        "filler_stems": config["stems"],
-                        "is_filled": is_filled,
-                        "filler_positions": filler_positions,
-                        "opener_branch": opener_branch,
-                        "is_opened": is_opened,
-                        "opener_positions": opener_positions,
-                        "activation_level": activation_level,
-                        "description": f"{config['chinese']} (covered by pillar badge)",
-                        "interaction_id": interaction_id,
-                        "badge_skipped": True  # Flag that badge was not added (redundant)
-                    })
-                    continue  # Skip adding the badge
-
-                badge_data = {
-                    "interaction_id": interaction_id,
-                    "type": "wealth_storage",
-                    "storage_type": config["type"],
-                    "badge": "STORAGE",
-                    "size": badge_size,
-                    "storage_size": "large",
-                    "chinese": config["chinese"],
-                    "label": f"{dm_element}DM {config['label']}",
-                    "perspective": "dm",
-                    "position": "top-right" if (is_filled or is_opened) else "bottom",
-                    "opacity": 1.0 if (is_filled or is_opened) else 0.5,
-                    "is_activated": is_filled or is_opened
-                }
-                eb_node.badges.append(badge_data)
-
-                hs_node = nodes.get(f"hs_{pos}")
-                hs_value = hs_node.value if hs_node else "?"
-                hs_chinese = HEAVENLY_STEMS.get(hs_value, {}).get("chinese", hs_value)
-
-                storages.append({
-                    "position": pos,
-                    "branch": config["branch"],
-                    "branch_chinese": branch_info.get("chinese", config["branch"]),
-                    "pillar": f"{hs_value}-{config['branch']}",
-                    "pillar_chinese": f"{hs_chinese}{branch_info.get('chinese', config['branch'])}",
-                    "storage_type": config["type"],
-                    "perspective": "dm",
-                    "size": "large",
-                    "stored_element": config["element"],
-                    "filler_stems": config["stems"],
-                    "is_filled": is_filled,
-                    "filler_positions": filler_positions,
-                    "opener_branch": opener_branch,
-                    "is_opened": is_opened,
-                    "opener_positions": opener_positions,
-                    "activation_level": activation_level,
-                    "description": f"{config['chinese']} storing {config['element']} for {dm_element} DM",
-                    "interaction_id": interaction_id
-                })
 
         # Build summary
-        summary_parts = []
+        total = len(storages)
+        activated = sum(1 for s in storages if s["activation_level"] != "latent")
+        maximum = sum(1 for s in storages if s["activation_level"] == "maximum")
+        large_count = sum(1 for s in storages if s["is_large"])
 
-        if pillar_storages:
-            summary_parts.append(f"{len(pillar_storages)} pillar-based 财库")
+        storage_branch_chinese = EARTHLY_BRANCHES.get(storage_branch, {}).get("chinese", storage_branch)
 
-        if storages:
-            wealth_count = sum(1 for s in storages if s["storage_type"] == "wealth")
-            influence_count = sum(1 for s in storages if s["storage_type"] == "influence")
-            dm_activated = sum(1 for s in storages if s["activation_level"] != "latent")
-
-            if wealth_count:
-                summary_parts.append(f"{wealth_count} DM wealth (财库)")
-            if influence_count:
-                summary_parts.append(f"{influence_count} DM influence (官库)")
-
-        total_storages = len(pillar_storages) + len(storages)
-        total_activated = (
-            sum(1 for s in pillar_storages if s["activation_level"] != "latent") +
-            sum(1 for s in storages if s["activation_level"] != "latent")
-        )
-
-        if summary_parts:
-            summary = f"Found {', '.join(summary_parts)} for {dm_element} DM. "
-            summary += f"{total_activated}/{total_storages} activated." if total_storages else ""
+        if total == 0:
+            summary = (f"No wealth storage (财库) found for {dm_element} DM. "
+                       f"Storage branch {storage_branch} ({storage_branch_chinese}) "
+                       f"not present in chart.")
         else:
-            summary = f"No storage branches found for {dm_element} Day Master."
+            parts = []
+            if large_count:
+                parts.append(f"{large_count} Large (大财库)")
+            standard = total - large_count
+            if standard:
+                parts.append(f"{standard} Standard (财库)")
+            summary = f"Found {', '.join(parts)} for {dm_element} DM. "
+            if maximum:
+                summary += f"{maximum} at MAXIMUM activation (filled + opened). "
+            elif activated:
+                summary += f"{activated}/{total} activated. "
+            else:
+                summary += f"All {total} latent (locked). "
 
         return {
             "daymaster_element": dm_element,
             "daymaster_stem": dm_stem,
             "wealth_element": wealth_element,
             "wealth_stems": wealth_stems,
-            "wealth_storage_branch": wealth_storage_branch,
-            "influence_element": influence_element,
-            "influence_stems": influence_stems,
-            "influence_storage_branch": influence_storage_branch,
-            "pillar_storages": pillar_storages,  # Pillar-based storages (Large + Small)
-            "storages": storages,  # DM-based storages
-            "all_storages": pillar_storages + storages,  # Combined for convenience
-            "summary": summary
+            "wealth_storage_branch": storage_branch,
+            "opener_branch": opener_branch,
+            "storages": storages,
+            "all_storages": storages,  # Backwards compat alias
+            "summary": summary,
         }
     
     # Perform wealth/influence storage detection

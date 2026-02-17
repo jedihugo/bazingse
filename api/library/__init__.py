@@ -103,9 +103,10 @@ from .seasonal import (
 
 # Wealth Storage
 from .wealth_storage import (
-    EARTH_STORAGE_BRANCHES,
+    ELEMENT_STORAGE,
+    DM_WEALTH_STORAGE,
+    STORAGE_OPENER,
     LARGE_WEALTH_STORAGE,
-    SMALL_WEALTH_STORAGE,
     DM_WEALTH_ELEMENT,
     WEALTH_ELEMENT_STEMS,
 )
@@ -319,9 +320,10 @@ __all__ = [
     "SEASONAL_ADJUSTMENT",
     "ELEMENT_SEASONAL_STATES",
     # Wealth Storage
-    "EARTH_STORAGE_BRANCHES",
+    "ELEMENT_STORAGE",
+    "DM_WEALTH_STORAGE",
+    "STORAGE_OPENER",
     "LARGE_WEALTH_STORAGE",
-    "SMALL_WEALTH_STORAGE",
     "DM_WEALTH_ELEMENT",
     "WEALTH_ELEMENT_STEMS",
     # Wu Xing Combat Engine

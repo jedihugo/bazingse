@@ -407,6 +407,10 @@ SHEN_SHA_IMPACTS = {
     "童子": {
         "present": ["Child Star — soul of a celestial servant. Marriage difficulty, health issues, karmic debt."],
     },
+    "財星": {
+        "present": ["Wealth Star — small fortune energy. Wealth element naturally present, money comes with less friction."],
+        "absent": ["No Wealth Star — wealth element not prominent in chart. Must work harder for financial gains."],
+    },
 }
 
 
