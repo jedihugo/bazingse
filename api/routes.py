@@ -28,11 +28,6 @@ from library import (
     get_dong_gong_rating,
     get_dong_gong_day_info,
     check_consult_promotion,
-    # Life Aspects Analysis
-    generate_health_analysis,
-    generate_wealth_analysis,
-    generate_learning_analysis,
-    generate_ten_gods_detail,
 )
 
 # Import DONG_GONG data dict for calendar endpoint
@@ -45,14 +40,9 @@ from chart_constructor import (
     generate_xiao_yun_pillars
 )
 
-# Import from bazingse
-from bazingse import analyze_8_node_interactions
-
-# Import Pattern Engine integration
-from library.pattern_engine.integration import analyze_with_pattern_engine
-
-# Import Narrative Interpretation System
-from library.narrative import generate_narrative
+# Import Comprehensive BaZi Engine
+from library.comprehensive.engine import build_chart, analyze_for_api
+from library.comprehensive.adapter import adapt_to_frontend
 
 # sxtwl solar term indices for Four Extinction (四絕) and Four Separation (四離)
 # Four Extinction: day before start-of-season terms (Li Chun, Li Xia, Li Qiu, Li Dong)
@@ -383,30 +373,59 @@ async def analyze_bazi(
         if analysis_time:
             chart_dict["hourly_luck"] = time_pillars["hour_pillar"]
     
-    # 4. Get month branch for interaction analysis
+    # 4. Extract stems and branches from natal chart pillars
     day_pillar_str = natal_chart["day_pillar"]
     day_master_hs = day_pillar_str.split(" ")[0]
-    
-    month_pillar_str = natal_chart.get("month_pillar", "")
-    month_branch = month_pillar_str.split(" ")[1] if " " in month_pillar_str else None
-    
-    # 5. Calculate ALL interactions across ALL nodes (including optional talismans)
-    interaction_results = analyze_8_node_interactions(
-        chart_dict,
-        month_branch=month_branch,
-        talisman_year_hs=talisman_year_hs,
-        talisman_year_eb=talisman_year_eb,
-        talisman_month_hs=talisman_month_hs,
-        talisman_month_eb=talisman_month_eb,
-        talisman_day_hs=talisman_day_hs,
-        talisman_day_eb=talisman_day_eb,
-        talisman_hour_hs=talisman_hour_hs,
-        talisman_hour_eb=talisman_hour_eb,
-        location=location,
-        school=school
+
+    # Extract all pillar components for comprehensive engine
+    year_stem, year_branch = natal_chart["year_pillar"].split(" ")
+    month_stem, month_branch = natal_chart["month_pillar"].split(" ")
+    day_stem, day_branch = natal_chart["day_pillar"].split(" ")
+
+    # Hour pillar (may not exist if birth time unknown)
+    if "hour_pillar" in natal_chart:
+        hour_stem, hour_branch = natal_chart["hour_pillar"].split(" ")
+    else:
+        hour_stem, hour_branch = day_stem, day_branch  # Fallback to day pillar
+
+    # Luck pillar stems/branches for comprehensive engine
+    lp_stem, lp_branch = "", ""
+    if "luck_10_year" in chart_dict:
+        lp_stem, lp_branch = chart_dict["luck_10_year"].split(" ")
+
+    # Build luck pillars list for comprehensive engine
+    luck_pillars_list = []
+    if luck_pillars:
+        for lp_data in luck_pillars:
+            lp_pillar = lp_data["pillar"]
+            lp_s, lp_b = lp_pillar.split(" ")
+            start_age = lp_data.get("start_age", 0)
+            luck_pillars_list.append({
+                "stem": lp_s,
+                "branch": lp_b,
+                "start_age": start_age,
+                "end_age": start_age + 10,
+                "start_year": birth_date.year + start_age,
+                "end_year": birth_date.year + start_age + 10,
+            })
+
+    # 5. Build comprehensive chart and run analysis
+    comprehensive_chart = build_chart(
+        gender=gender,
+        birth_year=birth_date.year,
+        year_stem=year_stem, year_branch=year_branch,
+        month_stem=month_stem, month_branch=month_branch,
+        day_stem=day_stem, day_branch=day_branch,
+        hour_stem=hour_stem, hour_branch=hour_branch,
+        luck_pillar_stem=lp_stem,
+        luck_pillar_branch=lp_branch,
+        luck_pillars=luck_pillars_list,
+        current_year=analysis_year or datetime.now().year,
     )
-    
-    # 6. Build response
+
+    results = analyze_for_api(comprehensive_chart)
+
+    # 6. Build response with adapter
     response = {
         "birth_info": {
             "date": birth_date.isoformat(),
@@ -423,209 +442,64 @@ async def analyze_bazi(
             "has_monthly": "monthly_luck" in chart_dict,
             "has_daily": "daily_luck" in chart_dict,
             "has_hourly": "hourly_luck" in chart_dict,
-            "annual_disabled": analysis_year is not None and not include_annual_luck,  # NEW: Flag for greyed-out display
-            "is_xiao_yun": luck_10y_info.get("is_xiao_yun", False) if luck_10y_info else False,  # True if in Xiao Yun (小運) period
-            "da_yun_start_age": da_yun_start_age,  # Age when Da Yun (大運) begins
+            "annual_disabled": analysis_year is not None and not include_annual_luck,
+            "is_xiao_yun": luck_10y_info.get("is_xiao_yun", False) if luck_10y_info else False,
+            "da_yun_start_age": da_yun_start_age,
         }
     }
-    
-    # Add all nodes from interaction results
-    nodes_with_ten_gods = interaction_results.get("nodes", {})
-    response.update(nodes_with_ten_gods)
-    
+
+    # Apply adapter to get all frontend-expected fields
+    adapted = adapt_to_frontend(comprehensive_chart, results)
+    response.update(adapted)
+
+    # Build time-period pillar nodes (annual, monthly, daily, hourly luck)
+    # These are display-only nodes not part of the comprehensive engine's natal analysis
+    time_period_map = {
+        "yearly_luck": ("hs_yl", "eb_yl"),
+        "monthly_luck": ("hs_ml", "eb_ml"),
+        "daily_luck": ("hs_dl", "eb_dl"),
+        "hourly_luck": ("hs_hl", "eb_hl"),
+    }
+    for chart_key, (hs_key, eb_key) in time_period_map.items():
+        if chart_key in chart_dict:
+            tp_stem, tp_branch = chart_dict[chart_key].split(" ")
+            response[hs_key] = {
+                "base": {"id": tp_stem, "qi": {tp_stem: 100.0}},
+                "post": {"id": tp_stem, "qi": {tp_stem: 100.0}},
+                "badges": [],
+                "interaction_ids": [],
+            }
+            tp_eb_qi = {qi[0]: float(qi[1]) for qi in EARTHLY_BRANCHES[tp_branch]["qi"]}
+            response[eb_key] = {
+                "base": {"id": tp_branch, "qi": tp_eb_qi},
+                "post": {"id": tp_branch, "qi": tp_eb_qi},
+                "badges": [],
+                "interaction_ids": [],
+            }
+
     # If annual luck was disabled but year was provided, add display-only nodes
-    # These nodes won't be in chart_dict (so not in interactions) but needed for UI
     if analysis_year and not include_annual_luck:
-        # Generate temporary display nodes for annual pillar
         annual_hs, annual_eb = annual_pillar_for_display.split(" ")
-        
-        # Create minimal node structure for display (no interactions)
         response["hs_yl"] = {
             "base": {"id": annual_hs, "qi": {annual_hs: 100.0}},
             "interaction_ids": [],
             "post": {"id": annual_hs, "qi": {annual_hs: 100.0}},
             "badges": [],
-            "disabled": True  # Mark as disabled for frontend
+            "disabled": True
         }
-        # Get qi scores from EARTHLY_BRANCHES (qi is list of (stem, score) tuples)
         eb_qi = {qi_tuple[0]: float(qi_tuple[1]) for qi_tuple in EARTHLY_BRANCHES[annual_eb]["qi"]}
-        
         response["eb_yl"] = {
             "base": {"id": annual_eb, "qi": eb_qi},
             "interaction_ids": [],
             "post": {"id": annual_eb, "qi": eb_qi},
             "badges": [],
-            "disabled": True  # Mark as disabled for frontend
+            "disabled": True
         }
-    
+
     # Add misc field to 10-year luck nodes if they exist
     if luck_10y_info and "hs_10yl" in response and "eb_10yl" in response:
         response["hs_10yl"]["misc"] = luck_10y_info
         response["eb_10yl"]["misc"] = luck_10y_info
-    
-    # Add scores and interactions (3-tier: base → natal → post)
-    response["base_element_score"] = interaction_results.get("base_element_score", {})
-    response["natal_element_score"] = interaction_results.get("natal_element_score", {})
-    response["post_element_score"] = interaction_results.get("post_element_score", {})
-    response["interactions"] = interaction_results.get("interactions", {})
-    response["daymaster_analysis"] = interaction_results["daymaster_analysis"]
-    response["wealth_storage_analysis"] = interaction_results.get("wealth_storage_analysis", {})
-    response["unit_tracker"] = interaction_results.get("unit_tracker")  # Unit Story tracking
-
-    # Generate Life Aspects Analysis (Health, Wealth, Learning)
-    daymaster_element = HEAVENLY_STEMS.get(day_master_hs, {}).get("element", "")
-    daymaster_strength = interaction_results.get("daymaster_analysis", {}).get("strength", "Balanced")
-    daymaster_support_pct = interaction_results.get("daymaster_analysis", {}).get("support_percentage", 50.0)
-
-    # Get seasonal states for month
-    seasonal_states = {}
-    if month_branch and month_branch in EARTHLY_BRANCHES:
-        seasonal_states = EARTHLY_BRANCHES[month_branch].get("element_states", {})
-
-    # Health Analysis (TCM organ-element correlations + control cycle imbalances)
-    health_analysis = generate_health_analysis(
-        interactions=interaction_results.get("interactions", {}),
-        post_element_score=interaction_results.get("post_element_score", {}),
-        natal_element_score=interaction_results.get("natal_element_score", {}),
-        month_branch=month_branch,
-        daymaster_element=daymaster_element
-    )
-    response["health_analysis"] = health_analysis
-
-    # Wealth Analysis (Financial opportunities and risks)
-    wealth_analysis = generate_wealth_analysis(
-        interactions=interaction_results.get("interactions", {}),
-        post_element_score=interaction_results.get("post_element_score", {}),
-        natal_element_score=interaction_results.get("natal_element_score", {}),
-        seasonal_states=seasonal_states,
-        daymaster_element=daymaster_element,
-        daymaster_strength=daymaster_strength,
-        wealth_storage_analysis=interaction_results.get("wealth_storage_analysis")
-    )
-    response["wealth_analysis"] = wealth_analysis
-
-    # Learning Analysis (Education and skill development)
-    learning_analysis = generate_learning_analysis(
-        interactions=interaction_results.get("interactions", {}),
-        post_element_score=interaction_results.get("post_element_score", {}),
-        natal_element_score=interaction_results.get("natal_element_score", {}),
-        seasonal_states=seasonal_states,
-        daymaster_element=daymaster_element,
-        daymaster_strength=daymaster_strength,
-        support_percentage=daymaster_support_pct
-    )
-    response["learning_analysis"] = learning_analysis
-
-    # Ten Gods Detail Analysis (per-node breakdown)
-    ten_gods_detail = generate_ten_gods_detail(
-        nodes=nodes_with_ten_gods,
-        day_master_stem=day_master_hs,
-        interactions=interaction_results.get("interactions", {})
-    )
-    response["ten_gods_detail"] = ten_gods_detail
-
-    # Extract Year Branch for context-dependent Shen Sha (Gu Chen, Gua Su, etc.)
-    year_pillar = natal_chart.get("year_pillar", "")
-    year_branch = year_pillar.split(" ")[1] if " " in year_pillar else ""
-
-    # Pattern Engine Analysis (enhanced pattern detection + severity + predictions)
-    pattern_engine_analysis = analyze_with_pattern_engine(
-        interactions=interaction_results.get("interactions", {}),
-        seasonal_states=seasonal_states,
-        daymaster_stem=day_master_hs,
-        daymaster_element=daymaster_element,
-        post_element_score=interaction_results.get("post_element_score", {}),
-        year_branch=year_branch,
-    )
-    response["pattern_engine_analysis"] = pattern_engine_analysis
-
-    # Enhance existing analysis with Pattern Engine insights
-    domain_analysis = pattern_engine_analysis.get("domain_analysis", {})
-    enhanced_patterns = pattern_engine_analysis.get("enhanced_patterns", [])
-    recommendations = pattern_engine_analysis.get("recommendations", [])
-
-    # Enhance health_analysis with Pattern Engine data
-    if "health" in domain_analysis:
-        health_domain = domain_analysis["health"]
-        health_patterns = [p for p in enhanced_patterns if "health" in p.get("affected_domains", [])]
-        health_recs = [r for r in recommendations if r.get("domain") == "health"]
-
-        response["health_analysis"]["pattern_engine"] = {
-            "pattern_count": health_domain.get("pattern_count", 0),
-            "compound_severity": health_domain.get("compound_severity", 0),
-            "severity_level": health_domain.get("severity_level", "unknown"),
-            "top_patterns": [
-                {
-                    "chinese_name": p.get("chinese_name"),
-                    "severity": p.get("severity", {}).get("normalized_score", 0),
-                    "level": p.get("severity", {}).get("level", "unknown"),
-                }
-                for p in sorted(health_patterns, key=lambda x: x.get("severity", {}).get("normalized_score", 0), reverse=True)[:5]
-            ],
-            "recommendations": health_recs,
-        }
-
-    # Enhance wealth_analysis with Pattern Engine data
-    if "wealth" in domain_analysis:
-        wealth_domain = domain_analysis["wealth"]
-        wealth_patterns = [p for p in enhanced_patterns if "wealth" in p.get("affected_domains", [])]
-        wealth_recs = [r for r in recommendations if r.get("domain") == "wealth"]
-
-        response["wealth_analysis"]["pattern_engine"] = {
-            "pattern_count": wealth_domain.get("pattern_count", 0),
-            "compound_severity": wealth_domain.get("compound_severity", 0),
-            "severity_level": wealth_domain.get("severity_level", "unknown"),
-            "top_patterns": [
-                {
-                    "chinese_name": p.get("chinese_name"),
-                    "severity": p.get("severity", {}).get("normalized_score", 0),
-                    "level": p.get("severity", {}).get("level", "unknown"),
-                }
-                for p in sorted(wealth_patterns, key=lambda x: x.get("severity", {}).get("normalized_score", 0), reverse=True)[:5]
-            ],
-            "recommendations": wealth_recs,
-        }
-
-    # Enhance learning_analysis with Pattern Engine data (uses education domain)
-    if "education" in domain_analysis:
-        edu_domain = domain_analysis["education"]
-        edu_patterns = [p for p in enhanced_patterns if "education" in p.get("affected_domains", [])]
-
-        response["learning_analysis"]["pattern_engine"] = {
-            "pattern_count": edu_domain.get("pattern_count", 0),
-            "compound_severity": edu_domain.get("compound_severity", 0),
-            "severity_level": edu_domain.get("severity_level", "unknown"),
-            "top_patterns": [
-                {
-                    "chinese_name": p.get("chinese_name"),
-                    "severity": p.get("severity", {}).get("normalized_score", 0),
-                    "level": p.get("severity", {}).get("level", "unknown"),
-                }
-                for p in sorted(edu_patterns, key=lambda x: x.get("severity", {}).get("normalized_score", 0), reverse=True)[:5]
-            ],
-        }
-
-    # Add special stars to response (from Pattern Engine)
-    response["special_stars"] = pattern_engine_analysis.get("special_stars", [])
-
-    # Add unified recommendations (from Pattern Engine)
-    response["recommendations"] = recommendations
-
-    # Generate Narrative Interpretation
-    narrative_analysis = generate_narrative(
-        interactions=interaction_results.get("interactions", {}),
-        post_element_score=interaction_results.get("post_element_score", {}),
-        natal_element_score=interaction_results.get("natal_element_score", {}),
-        daymaster_analysis=interaction_results.get("daymaster_analysis", {}),
-        wealth_storage_analysis=interaction_results.get("wealth_storage_analysis"),
-        special_stars=pattern_engine_analysis.get("special_stars", []),
-        ten_gods_detail=response.get("ten_gods_detail", {}),  # Add Ten Gods for richer narratives
-        nodes=response,  # Pass full response for pillar analysis
-        interaction_log=interaction_results.get("interaction_log", []),  # Raw chronological order
-        locale="en",  # Default to English, can be parameterized later
-        max_narratives=15,  # Increase limit for more comprehensive analysis
-    )
-    response["narrative_analysis"] = narrative_analysis
 
     # Add Dong Gong Date Selection info when daily luck is present
     if analysis_year and analysis_month and analysis_day and "daily_luck" in chart_dict and "monthly_luck" in chart_dict:
@@ -713,78 +587,7 @@ async def analyze_bazi(
 
             response["dong_gong"] = dong_gong_data
 
-    # Add mappings (using new structure where key is the id)
-    response["mappings"] = {
-        "heavenly_stems": {
-            stem_id: {
-                "id": stem_id,
-                "pinyin": stem_id,  # pinyin is the key
-                "chinese": stem_data["chinese"],
-                "english": stem_id,  # use pinyin as english equivalent
-                "hex_color": stem_data["color"]
-            }
-            for stem_id, stem_data in HEAVENLY_STEMS.items()
-        },
-        "earthly_branches": {
-            branch_id: {
-                "id": branch_id,
-                "chinese": branch_data["chinese"],
-                "animal": branch_data["animal"],
-                "hex_color": branch_data["color"],
-                "qi": [
-                    {
-                        "stem": qi_tuple[0],
-                        "score": qi_tuple[1],
-                        "stem_chinese": HEAVENLY_STEMS.get(qi_tuple[0], {}).get("chinese", "?"),
-                        "element": HEAVENLY_STEMS.get(qi_tuple[0], {}).get("element", "?"),
-                        "polarity": HEAVENLY_STEMS.get(qi_tuple[0], {}).get("polarity", "?"),
-                        "hex_color": HEAVENLY_STEMS.get(qi_tuple[0], {}).get("color", "#ccc")
-                    }
-                    for qi_tuple in branch_data.get("qi", [])
-                ]
-            }
-            for branch_id, branch_data in EARTHLY_BRANCHES.items()
-        },
-        "ten_gods": TEN_GODS,
-        # Event type styling for frontend rendering
-        "event_types": {
-            "registration": {"hex_color": "#60a5fa", "icon": "📝", "label": "Registration"},
-            "seasonal": {"hex_color": "#fbbf24", "icon": "🍂", "label": "Seasonal"},
-            "controlling": {"hex_color": "#f87171", "icon": "⚔️", "label": "Controlling"},
-            "controlled": {"hex_color": "#f87171", "icon": "⚔️", "label": "Controlled"},
-            "control": {"hex_color": "#f87171", "icon": "⚔️", "label": "Control"},
-            "producing": {"hex_color": "#4ade80", "icon": "🌱", "label": "Producing"},
-            "produced": {"hex_color": "#4ade80", "icon": "🌱", "label": "Produced"},
-            "generation": {"hex_color": "#4ade80", "icon": "🌱", "label": "Generation"},
-            "combination": {"hex_color": "#c084fc", "icon": "🤝", "label": "Combination"},
-            "conflict": {"hex_color": "#fb923c", "icon": "💥", "label": "Conflict"},
-            "conflict_aggressor": {"hex_color": "#fb923c", "icon": "💥", "label": "Conflict"},
-            "conflict_victim": {"hex_color": "#fb923c", "icon": "💥", "label": "Conflict"},
-            "same_element": {"hex_color": "#2dd4bf", "icon": "🔗", "label": "Same Element"},
-        },
-        # Ten gods styling for frontend rendering
-        "ten_gods_styling": {
-            "DM": {"hex_color": "#9333ea", "bg_hex": "#f3e8ff", "label": "Day Master"},
-            "F": {"hex_color": "#2563eb", "bg_hex": "#dbeafe", "label": "Friend"},
-            "RW": {"hex_color": "#3b82f6", "bg_hex": "#eff6ff", "label": "Rob Wealth"},
-            "EG": {"hex_color": "#16a34a", "bg_hex": "#dcfce7", "label": "Eating God"},
-            "HO": {"hex_color": "#22c55e", "bg_hex": "#f0fdf4", "label": "Hurting Officer"},
-            "IW": {"hex_color": "#ca8a04", "bg_hex": "#fef9c3", "label": "Indirect Wealth"},
-            "DW": {"hex_color": "#eab308", "bg_hex": "#fefce8", "label": "Direct Wealth"},
-            "7K": {"hex_color": "#dc2626", "bg_hex": "#fee2e2", "label": "Seven Killings"},
-            "DO": {"hex_color": "#ef4444", "bg_hex": "#fef2f2", "label": "Direct Officer"},
-            "IR": {"hex_color": "#4b5563", "bg_hex": "#f3f4f6", "label": "Indirect Resource"},
-            "DR": {"hex_color": "#6b7280", "bg_hex": "#f9fafb", "label": "Direct Resource"},
-        },
-        # Element colors for frontend rendering
-        "elements": {
-            "Wood": {"hex_color": "#22c55e", "hex_color_yang": "#16a34a", "hex_color_yin": "#4ade80"},
-            "Fire": {"hex_color": "#ef4444", "hex_color_yang": "#dc2626", "hex_color_yin": "#f87171"},
-            "Earth": {"hex_color": "#ca8a04", "hex_color_yang": "#a16207", "hex_color_yin": "#eab308"},
-            "Metal": {"hex_color": "#6b7280", "hex_color_yang": "#4b5563", "hex_color_yin": "#9ca3af"},
-            "Water": {"hex_color": "#3b82f6", "hex_color_yang": "#2563eb", "hex_color_yin": "#60a5fa"},
-        }
-    }
+    # Mappings are already set by adapt_to_frontend()
 
     response["school"] = school
 
@@ -1150,4 +953,45 @@ async def delete_life_event(
     if not success:
         raise HTTPException(status_code=404, detail="Life event not found")
     return None
+
+
+# =============================================================================
+# COMPREHENSIVE BAZI ANALYSIS (New Engine)
+# =============================================================================
+
+@router.get("/comprehensive_analysis")
+async def comprehensive_analysis(
+    gender: str = Query(..., description="male or female"),
+    birth_year: int = Query(..., description="Gregorian birth year"),
+    year_stem: str = Query(..., description="Year stem (Pinyin, e.g. Yi)"),
+    year_branch: str = Query(..., description="Year branch (Pinyin, e.g. Chou)"),
+    month_stem: str = Query(..., description="Month stem"),
+    month_branch: str = Query(..., description="Month branch"),
+    day_stem: str = Query(..., description="Day stem"),
+    day_branch: str = Query(..., description="Day branch"),
+    hour_stem: str = Query(..., description="Hour stem"),
+    hour_branch: str = Query(..., description="Hour branch"),
+    luck_pillar_stem: str = Query("", description="Current luck pillar stem (optional)"),
+    luck_pillar_branch: str = Query("", description="Current luck pillar branch (optional)"),
+):
+    """
+    Comprehensive BaZi analysis — pure Python, zero LLM, fully deterministic.
+    Returns a complete markdown report covering all 11 sections.
+    """
+    from library.comprehensive import analyze
+
+    try:
+        report = analyze(
+            gender=gender,
+            birth_year=birth_year,
+            year_stem=year_stem, year_branch=year_branch,
+            month_stem=month_stem, month_branch=month_branch,
+            day_stem=day_stem, day_branch=day_branch,
+            hour_stem=hour_stem, hour_branch=hour_branch,
+            luck_pillar_stem=luck_pillar_stem,
+            luck_pillar_branch=luck_pillar_branch,
+        )
+        return {"status": "success", "report": report}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
