@@ -628,7 +628,7 @@ def build_recommendations(predictions: Dict[str, list],
                            env: EnvironmentAssessment) -> list:
     """Build unified recommendations list."""
     recs = []
-    priority = 1
+    order = 0
 
     # Element remedy
     if strength.useful_god:
@@ -636,8 +636,10 @@ def build_recommendations(predictions: Dict[str, list],
         remedies = ELEMENT_REMEDIES.get(strength.useful_god, {})
         colors = ", ".join(remedies.get("colors", [])[:3])
         direction = remedies.get("direction", "")
+        order += 1
         recs.append({
-            "priority": priority,
+            "priority": "high",
+            "order": order,
             "domain": "general",
             "title": f"Strengthen {strength.useful_god} Element",
             "description": (
@@ -646,29 +648,32 @@ def build_recommendations(predictions: Dict[str, list],
                 f"Wear colors: {colors}. Direction: {direction}."
             ),
         })
-        priority += 1
 
     # Environment recommendation
     if env.crosses_water_benefit:
+        order += 1
         recs.append({
-            "priority": priority,
+            "priority": "medium",
+            "order": order,
             "domain": "environment",
             "title": "Consider Relocation Near Water",
             "description": env.crosses_water_reason,
         })
-        priority += 1
 
     # From red flags
     for area, area_flags in flags.items():
         if area_flags:
             most_severe = max(area_flags, key=lambda f: {"mild": 0, "moderate": 1, "severe": 2, "critical": 3}.get(f.severity, 0))
+            sev = most_severe.severity
+            priority_str = "high" if sev in ("severe", "critical") else "medium" if sev == "moderate" else "low"
+            order += 1
             recs.append({
-                "priority": priority,
+                "priority": priority_str,
+                "order": order,
                 "domain": area,
                 "title": f"Address {area.capitalize()} Concerns",
                 "description": most_severe.description,
             })
-            priority += 1
 
     return recs
 
