@@ -64,12 +64,16 @@ export default function ClientSummaryDisplay({ chartData }: { chartData: any }) 
   if (!summary?.sections?.length) return null;
 
   // Sections that should be open by default
-  const defaultOpen = new Set(['red_flags', 'summary', 'chart_overview', 'strength']);
+  const defaultOpen = new Set(
+    summary.tier === 'full'
+      ? ['luck_pillar', 'element_shift', 'ten_gods_diff', 'interactions_diff', 'shen_sha_diff']
+      : ['red_flags', 'summary', 'chart_overview', 'strength']
+  );
 
   return (
     <div className="mt-3 space-y-1">
       <div className="text-xs tui-text-muted px-2 py-1">
-        {summary.tier === 'full' ? 'Full Analysis (Natal + Luck + Time)' : 'Natal Analysis (Birth Chart)'}
+        {summary.tier === 'full' ? 'What Changed (vs Natal)' : 'Natal Analysis (Birth Chart)'}
       </div>
       {summary.sections.map((section: Section) => (
         <details

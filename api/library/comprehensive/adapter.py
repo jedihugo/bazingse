@@ -1282,10 +1282,179 @@ def _summary_honest(chart: ChartData, strength: StrengthAssessment) -> dict:
     }
 
 
+def _diff_ten_gods_arriving(tg_entries: List[TenGodEntry],
+                             tg_classification: Dict[str, dict],
+                             chart: ChartData) -> Optional[dict]:
+    """Section: ten gods arriving via LP/time-period (diff from natal)."""
+    from .templates import TEN_GOD_INTERPRETATIONS, _pick
+    natal_positions = {"year", "month", "day", "hour"}
+    # Find ten gods in LP/time-period pillars
+    arriving = {}  # abbr -> list of (position, visible)
+    for entry in tg_entries:
+        if entry.position in natal_positions:
+            continue
+        if entry.abbreviation == "DM":
+            continue
+        arriving.setdefault(entry.abbreviation, []).append(
+            (entry.position, entry.visible))
+
+    if not arriving:
+        return None
+
+    items = []
+    for abbr, appearances in arriving.items():
+        natal_strength = tg_classification.get(abbr, {}).get("strength", "ABSENT")
+        info = TEN_GOD_INFO.get(abbr, {})
+        english = info.get("english", abbr)
+        chinese = info.get("chinese", "")
+        # Life meaning for this person's gender
+        life_meaning = TEN_GOD_LIFE_MEANING.get(chart.gender, {}).get(abbr, "")
+
+        # Visible arrivals are more significant
+        visible_arrivals = [pos for pos, vis in appearances if vis]
+        hidden_arrivals = [pos for pos, vis in appearances if not vis]
+        pos_labels = visible_arrivals + [f"({p} hidden)" for p in hidden_arrivals]
+        sources = ", ".join(pos_labels)
+
+        if natal_strength == "ABSENT":
+            label_prefix = "NEW"
+            severity = "warning"
+            templates = TEN_GOD_INTERPRETATIONS.get(abbr, {})
+            meaning = _pick(templates.get("PRESENT", [f"{english} arrives"]))
+        elif natal_strength in ("HIDDEN_ONLY", "WEAK"):
+            label_prefix = "BOOSTED"
+            severity = "info"
+            meaning = f"{english} was weak natally, now reinforced"
+        elif natal_strength == "PROMINENT":
+            label_prefix = "AMPLIFIED"
+            severity = "warning" if abbr in ("7K", "HO", "RW") else "info"
+            meaning = f"{english} already dominant — further amplified"
+        else:
+            label_prefix = "REINFORCED"
+            severity = "info"
+            meaning = f"{english} gains additional support"
+
+        if life_meaning:
+            meaning += f" ({life_meaning})"
+
+        items.append({
+            "label": f"{label_prefix}: {abbr} ({chinese})",
+            "value": f"via {sources} — {meaning}",
+            "severity": severity,
+        })
+
+    return {
+        "id": "ten_gods_diff",
+        "title": "Ten Gods Arriving",
+        "title_zh": "十神變化",
+        "text": f"{len(arriving)} ten god(s) enter from luck/time pillars",
+        "items": items,
+    }
+
+
+def _diff_interactions(interactions: List[BranchInteraction]) -> Optional[dict]:
+    """Section: NEW interactions activated by LP/time-period (not natal-only)."""
+    positive_types = {"harmony", "three_harmony", "half_three_harmony", "directional_combo"}
+    new_interactions = [i for i in interactions if i.activated_by_lp]
+    if not new_interactions:
+        return None
+
+    pos_count = sum(1 for i in new_interactions if i.interaction_type in positive_types)
+    neg_count = len(new_interactions) - pos_count
+
+    items = []
+    for inter in new_interactions[:8]:
+        polarity = "positive" if inter.interaction_type in positive_types else "negative"
+        severity = "positive" if polarity == "positive" else inter.severity
+        palaces_str = " vs ".join(inter.palaces) if inter.palaces else ""
+        items.append({
+            "label": f"{inter.chinese_name} {inter.interaction_type.replace('_', ' ').title()}",
+            "value": f"{palaces_str} — {inter.description}" if palaces_str else inter.description,
+            "severity": severity,
+        })
+    return {
+        "id": "interactions_diff",
+        "title": "New Interactions",
+        "title_zh": "新增地支關係",
+        "text": f"{pos_count} positive, {neg_count} negative NEW interactions from luck/time pillars",
+        "items": items,
+    }
+
+
+def _diff_shen_sha(shen_sha: List[ShenShaResult]) -> Optional[dict]:
+    """Section: shen sha activated by LP/time-period."""
+    from .templates import SHEN_SHA_IMPACTS, _pick
+    new_stars = [s for s in shen_sha if s.present and s.activated_by is not None]
+    if not new_stars:
+        return None
+
+    items = []
+    for s in new_stars:
+        templates = SHEN_SHA_IMPACTS.get(s.name_chinese, {})
+        text = _pick(templates.get("present", [f"{s.name_english} activated"]))
+        severity = "positive" if s.nature == "auspicious" else "negative" if s.nature == "inauspicious" else "info"
+        items.append({
+            "label": f"{s.name_chinese} {s.name_english}",
+            "value": f"via {s.activated_by} — {text}",
+            "severity": severity,
+        })
+    return {
+        "id": "shen_sha_diff",
+        "title": "Stars Activated",
+        "title_zh": "新增神煞",
+        "text": f"{len(new_stars)} star(s) activated by luck/time pillars",
+        "items": items,
+    }
+
+
+def _diff_element_shift(chart: ChartData) -> Optional[dict]:
+    """Section: how element balance shifted from natal to full."""
+    natal_counts = count_elements(chart)
+    full_counts = count_all_elements(chart)
+
+    # Check if there's any actual difference
+    if natal_counts == full_counts:
+        return None
+
+    natal_total = sum(natal_counts.values())
+    full_total = sum(full_counts.values())
+
+    ELEMENT_CHINESE = {"Wood": "木", "Fire": "火", "Earth": "土", "Metal": "金", "Water": "水"}
+    items = []
+    for elem in ["Wood", "Fire", "Earth", "Metal", "Water"]:
+        natal_pct = (natal_counts[elem] / natal_total * 100) if natal_total > 0 else 0
+        full_pct = (full_counts[elem] / full_total * 100) if full_total > 0 else 0
+        change = full_pct - natal_pct
+        if abs(change) < 1.0:
+            continue
+        arrow = "+" if change > 0 else ""
+        severity = "positive" if change > 3 else "negative" if change < -3 else "info"
+        items.append({
+            "label": f"{ELEMENT_CHINESE[elem]} {elem}",
+            "value": f"{natal_pct:.0f}% -> {full_pct:.0f}% ({arrow}{change:.0f}%)",
+            "severity": severity,
+        })
+
+    if not items:
+        return None
+
+    return {
+        "id": "element_shift",
+        "title": "Element Balance Shift",
+        "title_zh": "五行變化",
+        "text": "How luck/time pillars shift your element balance",
+        "items": items,
+    }
+
+
 def build_client_summary(chart: ChartData, results: dict,
                           flags: Dict[str, List[RedFlag]]) -> dict:
-    """Build structured client summary for non-technical frontend display."""
+    """Build structured client summary for non-technical frontend display.
+    Natal tier: static analysis of birth chart.
+    Full tier: diff-focused — what changed from natal due to LP/time pillars.
+    """
     strength = results["strength"]
+    tg_entries = results["ten_god_entries"]
     tg_classification = results["ten_god_classification"]
     interactions = results["interactions"]
     shen_sha = results["shen_sha"]
@@ -1296,32 +1465,62 @@ def build_client_summary(chart: ChartData, results: dict,
     is_full = has_luck or has_time_period
     tier = "full" if is_full else "natal"
 
-    sections = [
-        _summary_chart_overview(chart),
-        _summary_strength(strength),
-        _summary_ten_gods(chart, tg_classification),
-        _summary_interactions(interactions),
-        _summary_shen_sha(shen_sha),
-        _summary_red_flags(flags),
-    ]
+    if not is_full:
+        # NATAL tier: static analysis of birth chart
+        sections = [
+            _summary_chart_overview(chart),
+            _summary_strength(strength),
+            _summary_ten_gods(chart, tg_classification),
+            _summary_interactions(interactions),
+            _summary_shen_sha(shen_sha),
+            _summary_red_flags(flags),
+            _summary_health(chart),
+            _summary_remedies(strength),
+            _summary_honest(chart, strength),
+        ]
+    else:
+        # FULL tier: diff-focused — what changed from natal
+        sections = []
 
-    # Luck pillar section (full tier only)
-    if is_full:
+        # Luck pillar context
         lp_section = _summary_luck_pillar(chart, strength)
         if lp_section:
             sections.append(lp_section)
 
-    sections.append(_summary_health(chart))
-    sections.append(_summary_remedies(strength))
+        # Element balance shift
+        elem_diff = _diff_element_shift(chart)
+        if elem_diff:
+            sections.append(elem_diff)
 
-    # Predictions — only for year-level analysis (not month/day granularity)
-    is_year_only = is_full and "monthly" not in chart.time_period_pillars and "daily" not in chart.time_period_pillars
-    if is_year_only:
-        pred_section = _summary_predictions(predictions)
-        if pred_section:
-            sections.append(pred_section)
+        # Ten gods arriving
+        tg_diff = _diff_ten_gods_arriving(tg_entries, tg_classification, chart)
+        if tg_diff:
+            sections.append(tg_diff)
 
-    sections.append(_summary_honest(chart, strength))
+        # New interactions from LP/time pillars
+        inter_diff = _diff_interactions(interactions)
+        if inter_diff:
+            sections.append(inter_diff)
+
+        # Stars activated by LP/time pillars
+        sha_diff = _diff_shen_sha(shen_sha)
+        if sha_diff:
+            sections.append(sha_diff)
+
+        # Red flags still relevant
+        rf = _summary_red_flags(flags)
+        if rf.get("items"):
+            sections.append(rf)
+
+        # Predictions — only for year-level analysis
+        is_year_only = "monthly" not in chart.time_period_pillars and "daily" not in chart.time_period_pillars
+        if is_year_only:
+            pred_section = _summary_predictions(predictions)
+            if pred_section:
+                sections.append(pred_section)
+
+        # Remedies always useful
+        sections.append(_summary_remedies(strength))
 
     return {
         "tier": tier,
