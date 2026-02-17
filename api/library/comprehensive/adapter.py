@@ -11,6 +11,9 @@ from ..derived import (
     get_ten_god, get_all_branch_qi, TEN_GODS, TEN_GOD_NOTES,
     ELEMENT_CYCLES, STEM_ORDER, BRANCH_ORDER,
 )
+from ..wealth_storage import (
+    DM_WEALTH_STORAGE, STORAGE_OPENER, LARGE_WEALTH_STORAGE, WEALTH_ELEMENT_STEMS,
+)
 from ..qi_phase import get_qi_phase_for_pillar
 from .models import (
     ChartData, Pillar, StrengthAssessment, BranchInteraction,
@@ -23,6 +26,133 @@ from .ten_gods import (
     check_spouse_star, check_children_star,
 )
 from .strength import count_elements, count_all_elements
+
+
+# =============================================================================
+# WEALTH STORAGE COMPUTATION (財庫)
+# =============================================================================
+
+def _compute_wealth_storage(chart: ChartData) -> dict:
+    """
+    Compute wealth storage (財庫) from ChartData for frontend display.
+    Uses the same theory as bazingse.py's detect_wealth_storage() but
+    operates on ChartData instead of the nodes dict.
+    """
+    dm_stem = chart.day_master
+    dm_element = chart.dm_element
+    wealth_element = ELEMENT_CYCLES["controlling"].get(dm_element, "")
+    wealth_stems = WEALTH_ELEMENT_STEMS.get(wealth_element, [])
+    storage_branch = DM_WEALTH_STORAGE.get(dm_element)
+    opener_branch = STORAGE_OPENER.get(storage_branch) if storage_branch else None
+
+    if not storage_branch:
+        return {
+            "daymaster_element": dm_element, "daymaster_stem": dm_stem,
+            "wealth_element": wealth_element, "wealth_stems": wealth_stems,
+            "wealth_storage_branch": None, "opener_branch": None,
+            "storages": [], "all_storages": [], "summary": f"No storage mapping for {dm_element} DM",
+        }
+
+    # Collect all pillars (natal + luck + time period)
+    all_pillars: List[Tuple[str, Pillar]] = []
+    for pos in ["year", "month", "day", "hour"]:
+        if pos in chart.pillars:
+            all_pillars.append((pos, chart.pillars[pos]))
+    if chart.luck_pillar:
+        all_pillars.append(("luck_pillar", chart.luck_pillar))
+    for pos, p in chart.time_period_pillars.items():
+        all_pillars.append((pos, p))
+
+    storages = []
+
+    for pos, pillar in all_pillars:
+        if pillar.branch != storage_branch:
+            continue
+
+        # Check Large Wealth Storage (DM stem on own storage branch)
+        pillar_key = f"{pillar.stem}-{pillar.branch}"
+        is_large = pillar_key in LARGE_WEALTH_STORAGE
+
+        # Check FILLER: wealth stems in OTHER positions
+        filler_positions = []
+        for other_pos, other_p in all_pillars:
+            if other_pos == pos:
+                continue
+            if other_p.stem in wealth_stems:
+                filler_positions.append(f"{other_pos}(HS)")
+            # Check primary qi of branch
+            if other_p.hidden_stems:
+                primary_stem = other_p.hidden_stems[0][0]
+                if primary_stem in wealth_stems:
+                    filler_positions.append(f"{other_pos}(EB)")
+        is_filled = len(filler_positions) > 0
+
+        # Check OPENER: clash branch in OTHER positions
+        opener_positions = [other_pos for other_pos, other_p in all_pillars
+                           if other_pos != pos and other_p.branch == opener_branch]
+        is_opened = len(opener_positions) > 0
+
+        # Activation level
+        if is_filled and is_opened:
+            activation = "maximum"
+        elif is_filled or is_opened:
+            activation = "activated"
+        else:
+            activation = "latent"
+
+        branch_chinese = BRANCHES.get(storage_branch, {}).get("chinese", storage_branch)
+        stem_chinese = STEMS.get(pillar.stem, {}).get("chinese", pillar.stem)
+
+        storages.append({
+            "position": pos,
+            "branch": storage_branch,
+            "branch_chinese": branch_chinese,
+            "pillar": pillar_key,
+            "pillar_chinese": f"{stem_chinese}{branch_chinese}",
+            "is_large": is_large,
+            "storage_type": "wealth",
+            "stored_element": wealth_element,
+            "wealth_element": wealth_element,
+            "filler_stems": wealth_stems,
+            "is_filled": is_filled,
+            "filler_positions": filler_positions,
+            "opener_branch": opener_branch,
+            "is_opened": is_opened,
+            "opener_positions": opener_positions,
+            "activation_level": activation,
+        })
+
+    # Summary
+    total = len(storages)
+    maximum = sum(1 for s in storages if s["activation_level"] == "maximum")
+    activated = sum(1 for s in storages if s["activation_level"] != "latent")
+    large_count = sum(1 for s in storages if s["is_large"])
+    branch_chinese = BRANCHES.get(storage_branch, {}).get("chinese", storage_branch)
+
+    if total == 0:
+        summary = (f"No wealth storage (财库) found for {dm_element} DM. "
+                   f"Storage branch {storage_branch} ({branch_chinese}) not in chart.")
+    else:
+        parts = []
+        if large_count:
+            parts.append(f"{large_count} Large (大财库)")
+        if total - large_count:
+            parts.append(f"{total - large_count} Standard (财库)")
+        summary = f"Found {', '.join(parts)} for {dm_element} DM. "
+        if maximum:
+            summary += f"{maximum} at MAXIMUM activation (filled + opened). "
+        elif activated:
+            summary += f"{activated}/{total} activated. "
+        else:
+            summary += f"All {total} latent (locked). "
+
+    return {
+        "daymaster_element": dm_element, "daymaster_stem": dm_stem,
+        "wealth_element": wealth_element, "wealth_stems": wealth_stems,
+        "wealth_storage_branch": storage_branch, "opener_branch": opener_branch,
+        "storages": storages, "all_storages": storages,
+        "summary": summary,
+    }
 
 
 # =============================================================================
@@ -1987,8 +2117,8 @@ def adapt_to_frontend(chart: ChartData, results: dict) -> dict:
         "special_stars": response["special_stars"],
     }
 
-    # Wealth storage (stub)
-    response["wealth_storage_analysis"] = {}
+    # Wealth storage (財庫)
+    response["wealth_storage_analysis"] = _compute_wealth_storage(chart)
 
     # Unit tracker (stub)
     response["unit_tracker"] = None

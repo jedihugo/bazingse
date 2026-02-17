@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import BaZiChart from './BaZiChart';
 import ElementAnalysis from './ElementAnalysis';
+import WealthStorageDisplay from './WealthStorageDisplay';
 import NarrativeDisplay from './NarrativeDisplay';
 import ClientSummaryDisplay from './ClientSummaryDisplay';
 import { type LifeEvent, updateLifeEvent } from '@/lib/api';
@@ -252,6 +253,9 @@ export default function LifeEventBlock({
 
             {/* Element Analysis */}
             <ElementAnalysis chartData={chartData} />
+
+            {/* Wealth Storage Analysis */}
+            <WealthStorageDisplay chartData={chartData} />
 
             {/* Interaction-Based Narratives (collapsed) */}
             {isNatal && chartData?.narrative_analysis && (
