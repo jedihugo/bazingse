@@ -2,7 +2,7 @@
 
 Guidance for AI agents working on **BaZingSe** - a full-stack Chinese BaZi (Four Pillars/八字) astrology application.
 
-**Status**: Production-ready API with 8-26 node extensible architecture, Next.js 14 frontend with i18n, TUI-style Anti-WIMP input system, deployed on Vercel.
+**Status**: Production-ready API with comprehensive analysis engine, Next.js 14 frontend with i18n, TUI-style Anti-WIMP input system, deployed on Vercel + Railway.
 
 ---
 
@@ -10,14 +10,14 @@ Guidance for AI agents working on **BaZingSe** - a full-stack Chinese BaZi (Four
 
 - **Frontend**: Next.js 14 + React 18 at repo root (NOT in `app/` subfolder)
 - **Backend**: Python FastAPI + sxtwl calendar library
-- **Deployment**: Vercel (frontend) + separate API hosting
+- **Deployment**: Vercel (frontend) + Railway (backend + SQLite DB)
 - **i18n**: next-intl with locales: `en`, `id` (default), `zh`
 - **Testing**: Playwright E2E test suite
 - **UI Paradigm**: TUI-style Anti-WIMP (keyboard-first, no modals)
 
 ---
 
-## CRITICAL: Project Structure (Updated 2026-02)
+## CRITICAL: Project Structure (Updated 2026-02-17)
 
 **The Next.js app is at the REPO ROOT, not in a subfolder.**
 
@@ -28,32 +28,34 @@ bazingse/
 ├── package.json               # Frontend dependencies
 ├── tsconfig.json              # TypeScript config
 ├── src/                       # Next.js source code
-│   ├── app/                   # App Router
-│   │   ├── layout.tsx         # Root layout with PasswordGate
-│   │   ├── page.tsx           # Root redirect to /id
+│   ├── app/                   # App Router (3 pages)
+│   │   ├── layout.tsx         # Root layout with PasswordGate + Analytics
+│   │   ├── page.tsx           # Home page (profiles list)
 │   │   ├── globals.css        # Global styles (~53KB)
-│   │   └── [locale]/          # i18n routes
-│   │       ├── layout.tsx     # Locale provider
-│   │       ├── page.tsx       # Home page (profiles list)
-│   │       └── profile/[id]/  # Profile pages
+│   │   ├── profile/[id]/      # Profile detail page
+│   │   │   └── page.tsx
+│   │   └── calendar/          # Dong Gong calendar page
+│   │       └── page.tsx
 │   ├── components/            # React components
-│   │   ├── chat-form/         # TUI-style input components (NEW)
-│   │   ├── PasswordGate.tsx   # App access protection
-│   │   └── ...                # Other components
+│   │   ├── chat-form/         # TUI-style input components
+│   │   └── *.tsx              # Page-level and display components
 │   ├── i18n/                  # Internationalization config
-│   │   ├── config.ts          # Locales: en, id, zh
-│   │   ├── routing.ts         # next-intl routing
-│   │   └── request.ts         # Server-side i18n
-│   ├── lib/                   # Utilities
-│   └── locales/               # Translation files
-│       ├── en/
-│       ├── id/
-│       └── zh/
+│   ├── lib/                   # Utilities (api.ts)
+│   └── locales/               # Translation files (en/, id/, zh/)
 ├── public/                    # Static assets
 ├── api/                       # Backend - Python FastAPI
-│   ├── bazingse.py            # Core interaction engine
+│   ├── bazingse.py            # Core interaction engine (~5300 lines)
 │   ├── routes.py              # API endpoints
-│   └── ...
+│   ├── chart_constructor.py   # Chart generation
+│   ├── library/               # All BaZi logic modules
+│   │   ├── core.py            # STEMS + BRANCHES (single source of truth)
+│   │   ├── comprehensive/     # New comprehensive analysis engine
+│   │   ├── narrative/         # Narrative generation
+│   │   ├── life_aspects/      # Health, wealth, learning analysis
+│   │   ├── pattern_engine/    # Universal pattern detection
+│   │   └── *.py               # Scoring, physics, qi_phase, etc.
+│   ├── crud.py / models.py / schemas.py / database.py  # DB layer
+│   └── run_bazingse.py        # Local dev server
 ├── ios/                       # Capacitor iOS app
 └── tests/                     # Playwright tests
 ```
@@ -81,6 +83,103 @@ export default createMiddleware(routing);
 
 ---
 
+## Frontend Pages & Component Tree
+
+### 3 Pages (App Router)
+
+| Route | Page File | Key Components |
+|-------|-----------|----------------|
+| `/` | `src/app/page.tsx` | Header, InlineProfileForm, SearchableProfileList |
+| `/profile/[id]` | `src/app/profile/[id]/page.tsx` | Header, ProfilePage |
+| `/calendar` | `src/app/calendar/page.tsx` | Header, DongGongCalendar |
+
+### Core Components (`src/components/`)
+
+| Component | Purpose |
+|-----------|---------|
+| `PasswordGate.tsx` | App access protection |
+| `Header.tsx` | Logo + title + ThemeToggle |
+| `ProfilePage.tsx` | Profile view orchestrator (info, life events, chart) |
+| `ProfileInfoBlock.tsx` | Editable profile info display |
+| `LifeEventBlock.tsx` | Life event display with BaZi chart + analysis |
+| `BaZiChart.tsx` | Pillar cards renderer |
+| `PillarCard.tsx` | Individual pillar display |
+| `PillarTag.tsx` | Compact pillar label |
+| `ElementAnalysis.tsx` | Element score breakdown |
+| `NarrativeDisplay.tsx` | Narrative cards container |
+| `NarrativeCard.tsx` | Individual narrative card |
+| `ClientSummaryDisplay.tsx` | Client-facing summary with diffs |
+| `DongGongCalendar.tsx` | Dong Gong date selection calendar |
+| `InlineProfileForm.tsx` | Create profile (inline, no modal) |
+| `InlineLifeEventForm.tsx` | Add life event (inline, no modal) |
+| `SearchableProfileList.tsx` | Filterable profile list on home page |
+| `ThemeToggle.tsx` | Dark/light mode toggle |
+| `LocaleProvider.tsx` | i18n context wrapper |
+
+### Input Components (`src/components/chat-form/`)
+
+| Component | Purpose |
+|-----------|---------|
+| `ChatFormContext.tsx` | React context for focus management |
+| `ChatForm.tsx` | Container with title bar, keyboard shortcuts |
+| `ChatFormField.tsx` | Field wrapper with blinking cursor `>` |
+| `GuidedDateInput.tsx` | YYYY/MM/DD with auto-advance |
+| `GuidedTimeInput.tsx` | HH:MM with unknown toggle |
+| `InlineSelector.tsx` | Radio-style keyboard selection `(●)/(○)` |
+| `TypeaheadSelect.tsx` | Keyboard-navigable dropdown replacement |
+
+---
+
+## Backend Architecture
+
+### Core Engine
+
+- `api/bazingse.py` (~5300 lines) — Monolithic with inner functions (closures over `nodes` dict)
+- All BaZi logic lives in `api/library/` modules; `bazingse.py` uses `from library import *`
+
+### Library Modules (`api/library/`)
+
+| Module | Purpose |
+|--------|---------|
+| `core.py` | STEMS + BRANCHES — single source of truth |
+| `derived.py` | All computed data from core |
+| `combinations.py` | Positive: Three Meetings, Six Harmonies, etc. |
+| `conflicts.py` | Negative: Punishments, Harms, Clashes, etc. |
+| `scoring.py` / `dynamic_scoring.py` | Element scoring systems |
+| `seasonal.py` | Seasonal strength configs |
+| `qi_phase.py` | Twelve Life Stages (十二长生) |
+| `physics.py` | Physics school (Yin/Yang polarity modifier) |
+| `wealth_storage.py` | Wealth storage (財庫) analysis |
+| `dong_gong.py` | Dong Gong date selection system |
+| `distance.py` | Node distance calculations |
+| `unity.py` | Wu Xing combat engine |
+| `unit_tracker.py` | Unit story tracker |
+| `comprehensive/` | New comprehensive analysis engine (zero-LLM) |
+| `narrative/` | Narrative generation (templates, chains, localization) |
+| `life_aspects/` | Health, wealth, learning, ten gods detail |
+| `pattern_engine/` | Universal pattern detection + life events |
+
+### API Endpoints (`api/routes.py`)
+
+```
+GET  /health                              # Health check
+GET  /api/analyze_bazi?...                # BaZi chart analysis (main)
+GET  /api/comprehensive_analysis?...      # Comprehensive report (zero-LLM, markdown)
+GET  /api/dong_gong_calendar?...          # Dong Gong date selection
+POST /api/seed                            # Seed database (if empty)
+GET  /api/profiles                        # List all profiles
+POST /api/profiles                        # Create profile
+GET  /api/profiles/{id}                   # Get profile
+PUT  /api/profiles/{id}                   # Update profile
+DELETE /api/profiles/{id}                 # Delete profile
+POST /api/profiles/{id}/life_events       # Add life event
+GET  /api/profiles/{id}/life_events/{eid} # Get life event
+PUT  /api/profiles/{id}/life_events/{eid} # Update life event
+DELETE /api/profiles/{id}/life_events/{eid} # Delete life event
+```
+
+---
+
 ## Anti-WIMP Input System (TUI-Style)
 
 **Design Philosophy**: Replace traditional WIMP (Windows, Icons, Menus, Pointer) UI with terminal/chat-style keyboard-first interactions.
@@ -93,32 +192,6 @@ export default createMiddleware(routing);
 4. **Visual Cursor** - `>` indicator for active field
 5. **Inline Forms** - Forms appear in context, not overlays
 
-### Chat-Form Components (`src/components/chat-form/`)
-
-| Component | Purpose |
-|-----------|---------|
-| `ChatFormContext.tsx` | React context for focus management |
-| `ChatForm.tsx` | Container with title bar, keyboard shortcuts |
-| `ChatFormField.tsx` | Field wrapper with blinking cursor `>` |
-| `GuidedDateInput.tsx` | YYYY/MM/DD with auto-advance |
-| `GuidedTimeInput.tsx` | HH:MM with unknown toggle |
-| `InlineSelector.tsx` | Radio-style keyboard selection `(●)/(○)` |
-| `TypeaheadSelect.tsx` | Keyboard-navigable dropdown replacement |
-
-### Auto-Advance Logic
-
-```typescript
-// Year: 4 digits → move to month
-if (yearValue.length === 4 && isValidYear(yearValue)) {
-  monthRef.current?.focus();
-}
-
-// Month: 2 digits OR single digit > 1 → move to day
-if (monthValue.length === 2 || parseInt(monthValue) > 1) {
-  dayRef.current?.focus();
-}
-```
-
 ### Keyboard Shortcuts
 
 | Key | Action |
@@ -129,20 +202,6 @@ if (monthValue.length === 2 || parseInt(monthValue) > 1) {
 | Escape | Cancel/close form |
 | `m` / `f` | Jump to Male/Female in gender selector |
 | Arrow keys | Navigate options in selectors |
-
-### CSS Cursor Animation
-
-```css
-.chat-field-cursor-active {
-  color: var(--tui-water);
-  animation: cursor-blink 1s step-end infinite;
-}
-
-@keyframes cursor-blink {
-  0%, 50% { opacity: 1; }
-  51%, 100% { opacity: 0; }
-}
-```
 
 ---
 
@@ -165,6 +224,7 @@ The app is protected by a simple password gate.
 ### Frontend: Vercel
 - **URL**: https://bazingse.vercel.app
 - Auto-deploys from `main` branch
+- Vercel Web Analytics enabled
 - No `vercel.json` needed - Next.js at repo root is auto-detected
 
 ### Backend: Railway
@@ -174,49 +234,8 @@ The app is protected by a simple password gate.
 
 ### Database: Railway SQLite (SOURCE OF TRUTH)
 - **Location**: `/data/bazingse.db` on Railway persistent volume
-- **23 profiles** seeded (including test data + Ika Yayasan)
 - **NO local database** - Railway is the single source of truth
 - Seed endpoint: `POST /api/seed` (only works if DB is empty)
-
-### API Endpoints (Railway)
-```
-GET  /health                    # Health check
-GET  /api/profiles              # List all profiles
-POST /api/profiles              # Create profile
-GET  /api/profiles/{id}         # Get profile
-PUT  /api/profiles/{id}         # Update profile
-DELETE /api/profiles/{id}       # Delete profile
-POST /api/profiles/{id}/life_events  # Add life event
-GET  /api/analyze_bazi?...      # BaZi chart analysis
-POST /api/seed                  # Seed database (if empty)
-```
-
----
-
-## Vercel Deployment
-
-### Configuration
-
-No `vercel.json` needed - Next.js at repo root is auto-detected.
-
-### Common Issues & Solutions
-
-**404 on all routes:**
-- Middleware not at project root → Move `src/middleware.ts` to `middleware.ts`
-- Residual `app/` directory at root → Delete it
-
-**500 MIDDLEWARE_INVOCATION_FAILED:**
-- Import issues in middleware → Inline routing config instead of importing
-
-**Build fails "No Next.js version detected":**
-- Next.js not at repo root → Move all Next.js files from subfolder to root
-
-### Lessons Learned (2026-02 Deployment)
-
-1. **Never put Next.js in a subfolder for Vercel** - Always at repo root
-2. **Middleware must be at root** - Not in `src/` when app is at root
-3. **Inline middleware config** - Avoid imports in middleware for Edge compatibility
-4. **Clean up residual directories** - Old `app/` folders cause conflicts
 
 ---
 
@@ -224,22 +243,18 @@ No `vercel.json` needed - Next.js at repo root is auto-detected.
 
 Using `next-intl` for multi-language support.
 
-### Supported Locales
-
 | Code | Language | Default |
 |------|----------|---------|
-| `id` | Bahasa Indonesia | ✓ |
+| `id` | Bahasa Indonesia | yes |
 | `en` | English | |
 | `zh` | 中文 | |
 
 ### URL Structure
 
 ```
-/           → Redirects to /id/
-/id/        → Indonesian home
-/en/        → English home
-/zh/        → Chinese home
-/id/profile/123  → Profile page in Indonesian
+/               → Home (profiles list)
+/profile/123    → Profile page
+/calendar       → Dong Gong calendar
 ```
 
 ### Adding Translations
@@ -337,32 +352,6 @@ The user is **non-technical**. This means:
 
 ---
 
-## Component Architecture
-
-### Core Components (`src/components/`)
-
-| Component | Purpose |
-|-----------|---------|
-| `PasswordGate.tsx` | App access protection |
-| `Header.tsx` | Logo + title + locale switcher |
-| `BaZiApp.tsx` | Main debug page orchestrator |
-| `BaZiChart.tsx` | Pillar cards renderer |
-| `PillarCard.tsx` | Individual pillar display |
-| `ProfilePage.tsx` | Profile view with life events |
-| `InlineProfileForm.tsx` | Create profile (inline, no modal) |
-| `InlineLifeEventForm.tsx` | Add life event (inline, no modal) |
-
-### Input Components (`src/components/chat-form/`)
-
-| Component | Purpose |
-|-----------|---------|
-| `GuidedDateInput.tsx` | YYYY/MM/DD with auto-advance |
-| `GuidedTimeInput.tsx` | HH:MM with unknown toggle |
-| `InlineSelector.tsx` | Radio-style `(●)/(○)` selection |
-| `TypeaheadSelect.tsx` | Searchable keyboard dropdown |
-
----
-
 ## TL;DR for AI Agents
 
 1. **Next.js is at REPO ROOT** - Not in `app/` subfolder
@@ -376,7 +365,8 @@ The user is **non-technical**. This means:
 9. **Backend is Source of Truth** - No BaZi logic in frontend
 10. **Pattern-based thinking** - Apply fixes universally, not just to examples
 11. **Non-technical user** - Explain in plain language, no jargon
+12. **3 pages**: Home (profiles), Profile detail, Calendar
 
 ---
 
-**Last Updated:** 2026-02-03 (Anti-WIMP input system, Vercel deployment, project restructure)
+**Last Updated:** 2026-02-17 (Comprehensive engine, calendar, wealth storage, client summary, cleanup)
