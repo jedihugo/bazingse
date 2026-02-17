@@ -60,6 +60,7 @@ def build_stem_node(pillar: Pillar, chart: ChartData) -> dict:
         pass
 
     return {
+        "id": stem,
         "base": {"id": stem, "qi": dict(qi)},
         "post": {"id": stem, "qi": dict(qi)},
         "badges": [],
@@ -92,6 +93,7 @@ def build_branch_node(pillar: Pillar, chart: ChartData) -> dict:
     ten_god_abbr = tg[0] if tg else ""
 
     return {
+        "id": branch,
         "base": {"id": branch, "qi": dict(qi)},
         "post": {"id": branch, "qi": dict(qi)},
         "badges": [],

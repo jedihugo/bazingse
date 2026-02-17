@@ -464,6 +464,7 @@ async def analyze_bazi(
         if chart_key in chart_dict:
             tp_stem, tp_branch = chart_dict[chart_key].split(" ")
             response[hs_key] = {
+                "id": tp_stem,
                 "base": {"id": tp_stem, "qi": {tp_stem: 100.0}},
                 "post": {"id": tp_stem, "qi": {tp_stem: 100.0}},
                 "badges": [],
@@ -471,6 +472,7 @@ async def analyze_bazi(
             }
             tp_eb_qi = {qi[0]: float(qi[1]) for qi in EARTHLY_BRANCHES[tp_branch]["qi"]}
             response[eb_key] = {
+                "id": tp_branch,
                 "base": {"id": tp_branch, "qi": tp_eb_qi},
                 "post": {"id": tp_branch, "qi": tp_eb_qi},
                 "badges": [],
@@ -481,6 +483,7 @@ async def analyze_bazi(
     if analysis_year and not include_annual_luck:
         annual_hs, annual_eb = annual_pillar_for_display.split(" ")
         response["hs_yl"] = {
+            "id": annual_hs,
             "base": {"id": annual_hs, "qi": {annual_hs: 100.0}},
             "interaction_ids": [],
             "post": {"id": annual_hs, "qi": {annual_hs: 100.0}},
@@ -489,6 +492,7 @@ async def analyze_bazi(
         }
         eb_qi = {qi_tuple[0]: float(qi_tuple[1]) for qi_tuple in EARTHLY_BRANCHES[annual_eb]["qi"]}
         response["eb_yl"] = {
+            "id": annual_eb,
             "base": {"id": annual_eb, "qi": eb_qi},
             "interaction_ids": [],
             "post": {"id": annual_eb, "qi": eb_qi},
