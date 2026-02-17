@@ -106,10 +106,10 @@ WEALTH_INDICATORS = {
         "negative_chinese": "事業財務不穩、工作損失",
     },
     "day": {
-        "positive": "Spouse's wealth, joint assets, partnership income",
-        "positive_chinese": "配偶財富、共同資產",
-        "negative": "Spouse financial issues, partnership losses",
-        "negative_chinese": "配偶財務問題、合作損失",
+        "positive": "Personal wealth, savings, material assets",
+        "positive_chinese": "個人財富、儲蓄、物質資產",
+        "negative": "Personal financial drain, asset losses",
+        "negative_chinese": "個人財務消耗、資產損失",
     },
     "hour": {
         "positive": "Late-life wealth, children's support, retirement security",
