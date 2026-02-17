@@ -23,6 +23,10 @@ PALACE_NAMES = {
     "day": "Day (Self/Spouse)",
     "hour": "Hour (Children/Legacy)",
     "luck_pillar": "Current Luck Pillar",
+    "annual": "Annual Luck",
+    "monthly": "Monthly Luck",
+    "daily": "Daily Luck",
+    "hourly": "Hourly Luck",
 }
 
 
@@ -33,6 +37,8 @@ def _get_all_branches(chart: ChartData, include_lp: bool = True) -> List[Tuple[s
         pairs.append((pos, chart.pillars[pos].branch))
     if include_lp and chart.luck_pillar:
         pairs.append(("luck_pillar", chart.luck_pillar.branch))
+    for pos, pillar in chart.time_period_pillars.items():
+        pairs.append((pos, pillar.branch))
     return pairs
 
 

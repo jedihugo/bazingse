@@ -121,6 +121,26 @@ def map_all_ten_gods(chart: ChartData) -> List[TenGodEntry]:
                     visible=False,
                 ))
 
+    # Time-period pillars
+    for tp_pos, tp_pillar in chart.time_period_pillars.items():
+        tg = get_ten_god(dm, tp_pillar.stem)
+        if tg:
+            entries.append(TenGodEntry(
+                stem=tp_pillar.stem,
+                abbreviation=tg[0], english=tg[1], chinese=tg[2],
+                location=f"{tp_pos}_stem",
+                position=tp_pos, visible=True,
+            ))
+        for idx, (hs, score) in enumerate(get_all_branch_qi(tp_pillar.branch)):
+            tg = get_ten_god(dm, hs)
+            if tg:
+                label = "primary_qi" if idx == 0 else f"hidden_{idx}"
+                entries.append(TenGodEntry(
+                    stem=hs, abbreviation=tg[0], english=tg[1], chinese=tg[2],
+                    location=f"{tp_pos}_branch_{label}",
+                    position=tp_pos, visible=False,
+                ))
+
     return entries
 
 
@@ -135,7 +155,8 @@ def classify_ten_god_strength(entries: List[TenGodEntry]) -> Dict[str, dict]:
       - total_count: visible + hidden
       - locations: list of location strings
     """
-    # Only count natal chart entries (not luck pillar)
+    # Only count natal chart entries (not luck pillar or time-period)
+    natal_positions = {"year", "month", "day", "hour"}
     tg_counts: Dict[str, dict] = {}
     for abbr in TEN_GOD_INFO:
         tg_counts[abbr] = {
@@ -151,7 +172,7 @@ def classify_ten_god_strength(entries: List[TenGodEntry]) -> Dict[str, dict]:
         }
 
     for entry in entries:
-        if entry.position == "luck_pillar":
+        if entry.position not in natal_positions:
             continue
         info = tg_counts.get(entry.abbreviation)
         if not info:
@@ -257,11 +278,12 @@ def get_ten_god_element_counts(entries: List[TenGodEntry]) -> Dict[str, float]:
     Only counts natal chart entries.
     """
     HIDDEN_WEIGHT = 0.5
+    natal_positions = {"year", "month", "day", "hour"}
     counts = {"companion": 0.0, "output": 0.0, "wealth": 0.0,
               "officer": 0.0, "resource": 0.0}
 
     for entry in entries:
-        if entry.position == "luck_pillar":
+        if entry.position not in natal_positions:
             continue
         cat = TEN_GOD_INFO.get(entry.abbreviation, {}).get("category")
         if cat:

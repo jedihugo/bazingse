@@ -35,6 +35,10 @@ POSITION_TO_NODE = {
     "day":         ("hs_d",    "eb_d"),
     "hour":        ("hs_h",    "eb_h"),
     "luck_pillar": ("hs_10yl", "eb_10yl"),
+    "annual":      ("hs_yl",   "eb_yl"),
+    "monthly":     ("hs_ml",   "eb_ml"),
+    "daily":       ("hs_dl",   "eb_dl"),
+    "hourly":      ("hs_hl",   "eb_hl"),
 }
 
 
@@ -124,6 +128,13 @@ def build_all_nodes(chart: ChartData) -> dict:
         nodes[hs_key] = build_stem_node(chart.luck_pillar, chart)
         nodes[eb_key] = build_branch_node(chart.luck_pillar, chart)
 
+    # Time-period pillars
+    for tp_pos, tp_pillar in chart.time_period_pillars.items():
+        if tp_pos in POSITION_TO_NODE:
+            hs_key, eb_key = POSITION_TO_NODE[tp_pos]
+            nodes[hs_key] = build_stem_node(tp_pillar, chart)
+            nodes[eb_key] = build_branch_node(tp_pillar, chart)
+
     return nodes
 
 
@@ -151,6 +162,9 @@ def _branch_to_node_key(branch: str, chart: ChartData) -> Optional[str]:
             return POSITION_TO_NODE[pos][1]
     if chart.luck_pillar and chart.luck_pillar.branch == branch:
         return POSITION_TO_NODE["luck_pillar"][1]
+    for pos, pillar in chart.time_period_pillars.items():
+        if pillar.branch == branch and pos in POSITION_TO_NODE:
+            return POSITION_TO_NODE[pos][1]
     return None
 
 
@@ -565,10 +579,126 @@ def build_learning_analysis(flags: Dict[str, List[RedFlag]],
 # TEN GODS DETAIL
 # =============================================================================
 
+def _build_ten_gods_warnings(tg_entries: List[TenGodEntry],
+                              tg_classification: Dict[str, dict],
+                              chart: ChartData) -> list:
+    """Build per-pillar ten gods warnings in the exact shape the frontend expects."""
+    warnings = []
+    # Risk ten gods that warrant a warning when visible
+    RISK_TEN_GODS = {
+        "7K": {
+            "en": "Seven Killings prominent — aggressive energy, risk of conflicts",
+            "zh": "七殺旺 — 攻擊性強，易有衝突",
+            "id": "Tujuh Pembunuh menonjol — energi agresif, risiko konflik",
+        },
+        "HO": {
+            "en": "Hurting Officer prominent — rebellious, challenges authority",
+            "zh": "傷官旺 — 叛逆，挑戰權威",
+            "id": "Hurting Officer menonjol — pemberontak, menantang otoritas",
+        },
+        "RW": {
+            "en": "Rob Wealth present — wealth drained through others, competition",
+            "zh": "劫財現 — 財被他人所奪，競爭激烈",
+            "id": "Rob Wealth hadir — kekayaan terkuras oleh orang lain, persaingan",
+        },
+    }
+
+    seen = set()  # Avoid duplicate warnings per (ten_god, position)
+    for entry in tg_entries:
+        if not entry.visible:
+            continue
+        if entry.abbreviation not in RISK_TEN_GODS:
+            continue
+        key = (entry.abbreviation, entry.position)
+        if key in seen:
+            continue
+        seen.add(key)
+        msgs = RISK_TEN_GODS[entry.abbreviation]
+        info = TEN_GOD_INFO.get(entry.abbreviation, {})
+        warnings.append({
+            "ten_god": entry.abbreviation,
+            "ten_god_chinese": info.get("chinese", entry.chinese),
+            "ten_god_english": info.get("english", entry.english),
+            "pillar": entry.position,
+            "message": msgs["en"],
+            "message_chinese": msgs["zh"],
+            "message_id": msgs["id"],
+        })
+
+    # Absent spouse star warning on day pillar
+    spouse = check_spouse_star(chart, tg_classification)
+    if spouse["is_critical_absent"]:
+        star_abbr = spouse["star"]
+        info = TEN_GOD_INFO.get(star_abbr, {})
+        warnings.append({
+            "ten_god": star_abbr,
+            "ten_god_chinese": info.get("chinese", ""),
+            "ten_god_english": info.get("english", ""),
+            "pillar": "day",
+            "message": f"{info.get('english', star_abbr)} (spouse star) absent from chart",
+            "message_chinese": f"{info.get('chinese', '')}（配偶星）不見於命盤",
+            "message_id": f"{info.get('english', star_abbr)} (bintang pasangan) tidak ada dalam bagan",
+        })
+
+    # Absent children star warning on hour pillar
+    children = check_children_star(chart, tg_classification)
+    if not children["any_present"]:
+        star_abbr = children["primary_star"]
+        info = TEN_GOD_INFO.get(star_abbr, {})
+        warnings.append({
+            "ten_god": star_abbr,
+            "ten_god_chinese": info.get("chinese", ""),
+            "ten_god_english": info.get("english", ""),
+            "pillar": "hour",
+            "message": "Children stars absent from chart",
+            "message_chinese": "子女星不見於命盤",
+            "message_id": "Bintang anak tidak ada dalam bagan",
+        })
+
+    # Chart-level pattern warnings mapped to representative pillar/ten god
+    patterns = analyze_ten_god_patterns(chart, tg_classification)
+    PATTERN_TO_TG = {
+        "companion_heavy": "RW",
+        "output_heavy": "HO",
+        "ho_prominent": "HO",
+        "7k_prominent": "7K",
+        "rw_present": "RW",
+        "no_wealth": "DW",
+        "no_officer": "DO",
+        "no_resource": "DR",
+    }
+    PATTERN_TO_PILLAR = {
+        "no_wealth": "day",
+        "no_officer": "month",
+        "no_resource": "month",
+    }
+    for p in patterns:
+        tg_abbr = PATTERN_TO_TG.get(p["pattern"])
+        if not tg_abbr:
+            continue
+        # Skip if we already have a per-entry warning for this ten god
+        pillar = PATTERN_TO_PILLAR.get(p["pattern"], "day")
+        if (tg_abbr, pillar) in seen:
+            continue
+        seen.add((tg_abbr, pillar))
+        info = TEN_GOD_INFO.get(tg_abbr, {})
+        warnings.append({
+            "ten_god": tg_abbr,
+            "ten_god_chinese": info.get("chinese", ""),
+            "ten_god_english": info.get("english", ""),
+            "pillar": pillar,
+            "message": p["description"],
+            "message_chinese": p["description"],
+            "message_id": p["description"],
+        })
+
+    return warnings
+
+
 def build_ten_gods_detail(tg_entries: List[TenGodEntry],
                            tg_classification: Dict[str, dict],
                            chart: ChartData) -> dict:
-    """Build ten_gods_detail matching old shape."""
+    """Build ten_gods_detail matching frontend shape."""
     dm = chart.day_master
     dm_element = STEMS[dm]["element"]
 
@@ -585,16 +715,8 @@ def build_ten_gods_detail(tg_entries: List[TenGodEntry],
             "position": entry.position,
         }
 
-    # Warnings from patterns
-    patterns = analyze_ten_god_patterns(chart, tg_classification)
-    warnings = []
-    for p in patterns:
-        warnings.append({
-            "pattern": p["pattern"],
-            "description": p["description"],
-            "severity": p["severity"],
-            "life_areas": p["life_areas"],
-        })
+    # Warnings in frontend-expected shape
+    warnings = _build_ten_gods_warnings(tg_entries, tg_classification, chart)
 
     # Summary by category
     summary = {
@@ -705,6 +827,10 @@ def _palace_to_pillar_ref(palace: str) -> dict:
         "day": ("HS-D", "hs", "day"),
         "hour": ("HS-H", "hs", "hour"),
         "luck": ("LP", "hs", "luck"),
+        "annual": ("YL", "hs", "annual"),
+        "monthly": ("ML", "hs", "monthly"),
+        "daily": ("DL", "hs", "daily"),
+        "hourly": ("HL", "hs", "hourly"),
     }
     p_lower = palace.lower()
     for key, (abbrev, node_type, position) in pos_map.items():

@@ -23,6 +23,10 @@ def build_chart(
     luck_pillar_branch: str = "",
     luck_pillars: Optional[List[dict]] = None,
     current_year: int = 0,
+    annual_stem: str = "", annual_branch: str = "",
+    monthly_stem: str = "", monthly_branch: str = "",
+    daily_stem: str = "", daily_branch: str = "",
+    hourly_stem: str = "", hourly_branch: str = "",
 ) -> ChartData:
     """
     Build a ChartData object from raw pillar inputs.
@@ -105,6 +109,29 @@ def build_chart(
             )
             lp_list.append(lp_info)
 
+    # Build time-period pillars
+    tp_pillars = {}
+    for tp_pos, tp_stem, tp_branch in [
+        ("annual", annual_stem, annual_branch),
+        ("monthly", monthly_stem, monthly_branch),
+        ("daily", daily_stem, daily_branch),
+        ("hourly", hourly_stem, hourly_branch),
+    ]:
+        if tp_stem and tp_branch:
+            tp_qi = get_all_branch_qi(tp_branch)
+            tp_pillars[tp_pos] = Pillar(
+                position=tp_pos,
+                stem=tp_stem,
+                branch=tp_branch,
+                stem_chinese=STEMS[tp_stem]["chinese"],
+                branch_chinese=BRANCHES[tp_branch]["chinese"],
+                stem_element=STEMS[tp_stem]["element"],
+                stem_polarity=STEMS[tp_stem]["polarity"],
+                branch_element=BRANCHES[tp_branch]["element"],
+                branch_polarity=BRANCHES[tp_branch]["polarity"],
+                hidden_stems=tp_qi,
+            )
+
     # Day Master info
     dm = day_stem
     dm_info = STEMS[dm]
@@ -124,6 +151,7 @@ def build_chart(
         dm_chinese=dm_info["chinese"],
         luck_pillar=lp,
         luck_pillars=lp_list,
+        time_period_pillars=tp_pillars,
         current_year_stem=STEM_ORDER[cy_stem_idx],
         current_year_branch=BRANCH_ORDER[cy_branch_idx],
     )

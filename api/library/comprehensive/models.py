@@ -30,6 +30,11 @@ class Pillar:
             "month": "Career/Social",
             "day": "Self/Spouse",
             "hour": "Children/Legacy",
+            "luck_pillar": "Current Luck Pillar",
+            "annual": "Annual Luck",
+            "monthly": "Monthly Luck",
+            "daily": "Daily Luck",
+            "hourly": "Hourly Luck",
         }.get(self.position, self.position)
 
     @property
@@ -39,6 +44,11 @@ class Pillar:
             "month": "月柱 (事业宫)",
             "day": "日柱 (夫妻宫)",
             "hour": "时柱 (子女宫)",
+            "luck_pillar": "大运",
+            "annual": "流年",
+            "monthly": "流月",
+            "daily": "流日",
+            "hourly": "流时",
         }.get(self.position, self.position)
 
 
@@ -164,5 +174,6 @@ class ChartData:
     dm_chinese: str
     luck_pillar: Optional[Pillar] = None
     luck_pillars: List[LuckPillarInfo] = field(default_factory=list)
+    time_period_pillars: Dict[str, Pillar] = field(default_factory=dict)
     current_year_stem: str = ""
     current_year_branch: str = ""

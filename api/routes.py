@@ -409,7 +409,22 @@ async def analyze_bazi(
                 "end_year": birth_date.year + start_age + 10,
             })
 
-    # 5. Build comprehensive chart and run analysis
+    # 5. Extract time-period stems/branches for comprehensive engine
+    tp_annual_stem, tp_annual_branch = "", ""
+    tp_monthly_stem, tp_monthly_branch = "", ""
+    tp_daily_stem, tp_daily_branch = "", ""
+    tp_hourly_stem, tp_hourly_branch = "", ""
+
+    if "yearly_luck" in chart_dict:
+        tp_annual_stem, tp_annual_branch = chart_dict["yearly_luck"].split(" ")
+    if "monthly_luck" in chart_dict:
+        tp_monthly_stem, tp_monthly_branch = chart_dict["monthly_luck"].split(" ")
+    if "daily_luck" in chart_dict:
+        tp_daily_stem, tp_daily_branch = chart_dict["daily_luck"].split(" ")
+    if "hourly_luck" in chart_dict:
+        tp_hourly_stem, tp_hourly_branch = chart_dict["hourly_luck"].split(" ")
+
+    # Build comprehensive chart and run analysis
     comprehensive_chart = build_chart(
         gender=gender,
         birth_year=birth_date.year,
@@ -421,6 +436,10 @@ async def analyze_bazi(
         luck_pillar_branch=lp_branch,
         luck_pillars=luck_pillars_list,
         current_year=analysis_year or datetime.now().year,
+        annual_stem=tp_annual_stem, annual_branch=tp_annual_branch,
+        monthly_stem=tp_monthly_stem, monthly_branch=tp_monthly_branch,
+        daily_stem=tp_daily_stem, daily_branch=tp_daily_branch,
+        hourly_stem=tp_hourly_stem, hourly_branch=tp_hourly_branch,
     )
 
     results = analyze_for_api(comprehensive_chart)
@@ -451,33 +470,6 @@ async def analyze_bazi(
     # Apply adapter to get all frontend-expected fields
     adapted = adapt_to_frontend(comprehensive_chart, results)
     response.update(adapted)
-
-    # Build time-period pillar nodes (annual, monthly, daily, hourly luck)
-    # These are display-only nodes not part of the comprehensive engine's natal analysis
-    time_period_map = {
-        "yearly_luck": ("hs_yl", "eb_yl"),
-        "monthly_luck": ("hs_ml", "eb_ml"),
-        "daily_luck": ("hs_dl", "eb_dl"),
-        "hourly_luck": ("hs_hl", "eb_hl"),
-    }
-    for chart_key, (hs_key, eb_key) in time_period_map.items():
-        if chart_key in chart_dict:
-            tp_stem, tp_branch = chart_dict[chart_key].split(" ")
-            response[hs_key] = {
-                "id": tp_stem,
-                "base": {"id": tp_stem, "qi": {tp_stem: 100.0}},
-                "post": {"id": tp_stem, "qi": {tp_stem: 100.0}},
-                "badges": [],
-                "interaction_ids": [],
-            }
-            tp_eb_qi = {qi[0]: float(qi[1]) for qi in EARTHLY_BRANCHES[tp_branch]["qi"]}
-            response[eb_key] = {
-                "id": tp_branch,
-                "base": {"id": tp_branch, "qi": tp_eb_qi},
-                "post": {"id": tp_branch, "qi": tp_eb_qi},
-                "badges": [],
-                "interaction_ids": [],
-            }
 
     # If annual luck was disabled but year was provided, add display-only nodes
     if analysis_year and not include_annual_luck:

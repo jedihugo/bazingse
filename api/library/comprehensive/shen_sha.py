@@ -63,6 +63,9 @@ def _find_branch(chart: ChartData, target_branch: str,
             results.append({"palace": pos, "activated_by": None})
     if include_lp and chart.luck_pillar and chart.luck_pillar.branch == target_branch:
         results.append({"palace": "luck_pillar", "activated_by": "luck_pillar"})
+    for pos, pillar in chart.time_period_pillars.items():
+        if pillar.branch == target_branch:
+            results.append({"palace": pos, "activated_by": pos})
     return results
 
 
