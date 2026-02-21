@@ -25,7 +25,7 @@ from .ten_gods import (
     classify_ten_god_strength, analyze_ten_god_patterns,
     check_spouse_star, check_children_star,
 )
-from .strength import count_elements, count_all_elements, adjust_elements_for_interactions
+from .strength import count_elements, count_all_elements, adjust_elements_for_interactions, apply_seasonal_scaling
 from .qi_phase_analysis import analyze_qi_phases
 from .spiritual_sensitivity import assess_spiritual_sensitivity
 
@@ -414,6 +414,11 @@ def build_element_scores(chart: ChartData,
     if interactions:
         natal_counts = adjust_elements_for_interactions(natal_counts, interactions, chart)
         full_counts = adjust_elements_for_interactions(full_counts, interactions, chart)
+
+    # Apply seasonal scaling (旺相休囚死) — the most important factor
+    month_branch = chart.pillars["month"].branch
+    natal_counts = apply_seasonal_scaling(natal_counts, month_branch)
+    full_counts = apply_seasonal_scaling(full_counts, month_branch)
 
     def _to_stem_scores(elem_counts):
         scores = {}
