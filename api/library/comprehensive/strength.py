@@ -181,10 +181,11 @@ def count_support_vs_drain(chart: ChartData) -> Tuple[float, float]:
 # Bonuses for combinations that generate elements.
 # Transformed = resulting element present as visible Heavenly Stem.
 INTERACTION_BONUSES = {
-    "directional_combo": {"transformed": 2.0, "combined": 0.8},
-    "three_harmony":     {"transformed": 1.5, "combined": 0.6},
+    "directional_combo":  {"transformed": 2.0, "combined": 0.8},
+    "three_harmony":      {"transformed": 1.5, "combined": 0.6},
     "half_three_harmony": {"transformed": 0.3, "combined": 0.2},
-    "harmony":           {"transformed": 0.5, "combined": 0.2},
+    "harmony":            {"transformed": 0.5, "combined": 0.2},
+    "stem_combination":   {"transformed": 1.0, "combined": 0.4},
 }
 
 CLASH_PENALTY = 0.3
@@ -209,6 +210,10 @@ def _get_resulting_element(interaction: BranchInteraction) -> Optional[str]:
         return None
     elif itype == "harmony":
         return HARMONY_PAIRS.get(branches_set)
+    elif itype == "stem_combination":
+        # Stems are stored in branches field; look up combination_element
+        stem1 = interaction.branches[0]
+        return STEMS[stem1].get("combination_element")
     return None
 
 

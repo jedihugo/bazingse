@@ -397,12 +397,99 @@ def detect_destructions(chart: ChartData) -> List[BranchInteraction]:
 
 
 # =============================================================================
+# HEAVENLY STEM COMBINATIONS (天干合)
+# =============================================================================
+# 甲己合土, 乙庚合金, 丙辛合水, 丁壬合木, 戊癸合火
+# Transformation check: resulting element must appear as visible HS in chart.
+
+STEM_COMBO_CHINESE = {
+    "Jia": "甲己合土", "Ji": "甲己合土",
+    "Yi": "乙庚合金", "Geng": "乙庚合金",
+    "Bing": "丙辛合水", "Xin": "丙辛合水",
+    "Ding": "丁壬合木", "Ren": "丁壬合木",
+    "Wu": "戊癸合火", "Gui": "戊癸合火",
+}
+
+
+def detect_stem_combinations(chart: ChartData) -> List[BranchInteraction]:
+    """
+    Detect Heavenly Stem combinations (天干合) across all pillar pairs.
+    Any two visible stems that form a combination pair are detected,
+    regardless of adjacency (though adjacency strengthens the effect).
+    """
+    results = []
+
+    # Collect all (position, stem) pairs
+    stem_pairs = []
+    for pos in ["year", "month", "day", "hour"]:
+        stem_pairs.append((pos, chart.pillars[pos].stem))
+    if chart.luck_pillar:
+        stem_pairs.append(("luck_pillar", chart.luck_pillar.stem))
+    for pos, pillar in chart.time_period_pillars.items():
+        stem_pairs.append((pos, pillar.stem))
+
+    # Collect visible HS elements for transformation check
+    hs_elements = set()
+    for pos in ["year", "month", "day", "hour"]:
+        hs_elements.add(STEMS[chart.pillars[pos].stem]["element"])
+
+    # Check all pairs
+    seen = set()
+    for i, (pos1, stem1) in enumerate(stem_pairs):
+        combines_with = STEMS[stem1].get("combines_with", "")
+        if not combines_with:
+            continue
+        for j, (pos2, stem2) in enumerate(stem_pairs):
+            if j <= i:
+                continue
+            if stem2 != combines_with:
+                continue
+
+            pair_key = frozenset([pos1, pos2])
+            if pair_key in seen:
+                continue
+            seen.add(pair_key)
+
+            result_element = STEMS[stem1].get("combination_element", "")
+            transformed = result_element in hs_elements
+            chinese = STEM_COMBO_CHINESE.get(stem1, "天干合")
+
+            # Adjacency check (adjacent pillars = stronger)
+            pillar_order = ["year", "month", "day", "hour"]
+            adjacent = False
+            if pos1 in pillar_order and pos2 in pillar_order:
+                idx1 = pillar_order.index(pos1)
+                idx2 = pillar_order.index(pos2)
+                adjacent = abs(idx1 - idx2) == 1
+
+            desc_parts = [
+                f"{STEMS[stem1]['chinese']} ({pos1}) + {STEMS[stem2]['chinese']} ({pos2})",
+                f"→ {result_element}",
+                "(transformed)" if transformed else "(combined — no visible HS catalyst)",
+            ]
+            if not adjacent:
+                desc_parts.append("(distant — weaker bond)")
+
+            results.append(BranchInteraction(
+                interaction_type="stem_combination",
+                chinese_name=chinese,
+                branches=[stem1, stem2],  # stems stored in branches field
+                palaces=[PALACE_NAMES.get(pos1, pos1), PALACE_NAMES.get(pos2, pos2)],
+                description=" ".join(desc_parts),
+                activated_by_lp=(pos1 == "luck_pillar" or pos2 == "luck_pillar"),
+            ))
+
+    return results
+
+
+# =============================================================================
 # MASTER FUNCTION: Detect All Interactions
 # =============================================================================
 
 def detect_all_interactions(chart: ChartData) -> List[BranchInteraction]:
     """Run all interaction checks and return combined results."""
     results = []
+    # Branch interactions
     results.extend(detect_clashes(chart))
     results.extend(detect_harmonies(chart))
     results.extend(detect_three_harmony(chart))
@@ -410,6 +497,8 @@ def detect_all_interactions(chart: ChartData) -> List[BranchInteraction]:
     results.extend(detect_punishments(chart))
     results.extend(detect_harms(chart))
     results.extend(detect_destructions(chart))
+    # Stem interactions
+    results.extend(detect_stem_combinations(chart))
     return results
 
 
