@@ -1843,14 +1843,19 @@ def _summary_predictions_timeline(predictions: Dict[str, list]) -> Optional[dict
 def _summary_honest(chart: ChartData, strength: StrengthAssessment,
                      tg_classification: Dict[str, dict],
                      flags: Dict[str, List[RedFlag]]) -> dict:
-    """Section: comprehensive honest life summary."""
-    from .templates import LIFE_LESSON_TEMPLATES, DM_NATURE, _pick
+    """Section: comprehensive honest life summary with WHY-reasoning."""
+    from .templates import LIFE_LESSON_TEMPLATES, DM_NATURE, HEALTH_ELEMENT_MAP, _pick
     from .ten_gods import check_spouse_star
 
     dm_element = chart.dm_element
     dm_info = STEMS[chart.day_master]
     dm_key = (dm_info["element"], dm_info["polarity"].capitalize())
     nature = DM_NATURE.get(dm_key, {})
+
+    resource = ELEMENT_CYCLES["generated_by"].get(dm_element, "")
+    output = ELEMENT_CYCLES["generating"].get(dm_element, "")
+    wealth = ELEMENT_CYCLES["controlling"].get(dm_element, "")
+    officer = ELEMENT_CYCLES["controlled_by"].get(dm_element, "")
 
     # Life lesson
     if strength.is_following_chart:
@@ -1862,7 +1867,6 @@ def _summary_honest(chart: ChartData, strength: StrengthAssessment,
     templates = LIFE_LESSON_TEMPLATES.get(key, LIFE_LESSON_TEMPLATES.get("strong_general", [""]))
     life_lesson = _pick(templates)
 
-    # Build comprehensive text
     parts = []
 
     # Who you are
@@ -1890,27 +1894,53 @@ def _summary_honest(chart: ChartData, strength: StrengthAssessment,
         parts.append(f"Your Day Master is extremely strong ({score:.0f}/100). "
                      "You have overwhelming energy. The risk is stagnation and bulldozing over others.")
 
-    # Marriage reality
+    # Marriage reality — GENDER-AWARE
     spouse = check_spouse_star(chart, tg_classification)
     marriage_flags = flags.get("marriage", [])
-    if spouse["is_critical_absent"]:
-        parts.append(f"Marriage: Your {spouse['label']} is ABSENT. "
-                     "This is the single hardest indicator — marriage comes very late, "
-                     "with great difficulty, or through unconventional paths. This is not a death sentence, "
-                     "but it requires conscious effort and the right luck decade.")
-    elif marriage_flags:
-        severe_count = sum(1 for f in marriage_flags if f.severity in ("severe", "critical"))
-        if severe_count >= 2:
-            parts.append("Marriage: Multiple severe marriage indicators. "
-                         "Relationships are a major life challenge requiring active management.")
-        elif severe_count == 1:
-            parts.append("Marriage: One significant marriage challenge exists. "
-                         "Awareness and timing can mitigate it.")
-    else:
-        parts.append("Marriage: No major obstacles in the natal chart. "
-                     "Timing and luck pillar alignment will determine when.")
 
-    # Wealth reality
+    if chart.gender == "female":
+        # For females: DO (Direct Officer) = husband star
+        do_strength = tg_classification.get("DO", {}).get("strength", "ABSENT")
+        if do_strength == "ABSENT":
+            parts.append("Marriage: Your husband star (正官 Direct Officer) is ABSENT. "
+                         "This is the hardest marriage indicator for a woman — partnership comes very late, "
+                         "with great difficulty, or through unconventional paths. "
+                         "The right luck decade is critical.")
+        elif marriage_flags:
+            severe_count = sum(1 for f in marriage_flags if f.severity in ("severe", "critical"))
+            if severe_count >= 2:
+                parts.append("Marriage: Multiple severe marriage indicators. "
+                             "Relationships are a major life challenge requiring active management.")
+            elif severe_count == 1:
+                parts.append("Marriage: One significant marriage challenge exists. "
+                             "Awareness and timing can mitigate it.")
+            else:
+                parts.append("Marriage: Some marriage challenges flagged, but manageable with awareness.")
+        else:
+            parts.append("Marriage: No major obstacles in the natal chart. "
+                         "Timing and luck pillar alignment will determine when.")
+    else:
+        # Male path
+        if spouse["is_critical_absent"]:
+            parts.append(f"Marriage: Your {spouse['label']} is ABSENT. "
+                         "This is the single hardest indicator — marriage comes very late, "
+                         "with great difficulty, or through unconventional paths. This is not a death sentence, "
+                         "but it requires conscious effort and the right luck decade.")
+        elif marriage_flags:
+            severe_count = sum(1 for f in marriage_flags if f.severity in ("severe", "critical"))
+            if severe_count >= 2:
+                parts.append("Marriage: Multiple severe marriage indicators. "
+                             "Relationships are a major life challenge requiring active management.")
+            elif severe_count == 1:
+                parts.append("Marriage: One significant marriage challenge exists. "
+                             "Awareness and timing can mitigate it.")
+            else:
+                parts.append("Marriage: Some marriage challenges flagged, but manageable with awareness.")
+        else:
+            parts.append("Marriage: No major obstacles in the natal chart. "
+                         "Timing and luck pillar alignment will determine when.")
+
+    # Wealth reality (keep existing logic)
     dw = tg_classification.get("DW", {}).get("strength", "ABSENT")
     iw = tg_classification.get("IW", {}).get("strength", "ABSENT")
     rw = tg_classification.get("RW", {}).get("strength", "ABSENT")
@@ -1924,14 +1954,47 @@ def _summary_honest(chart: ChartData, strength: StrengthAssessment,
         parts.append("Wealth: Strong Indirect Wealth — windfall potential through speculation, business, or investments. "
                      "Risk tolerance is high, but so is the upside.")
 
+    # NEW: Health cross-reference
+    elem_counts = count_elements(chart)
+    total_count = sum(elem_counts.values())
+    avg_count = total_count / 5 if total_count > 0 else 1.0
+    deficient_elements = [e for e in ["Wood", "Fire", "Earth", "Metal", "Water"]
+                          if elem_counts.get(e, 0) < avg_count * 0.5]
+    if deficient_elements:
+        organs = []
+        for e in deficient_elements:
+            organ = HEALTH_ELEMENT_MAP.get(e, {}).get("yin_organ", e).split("(")[0].strip()
+            organs.append(f"{organ} ({e})")
+        parts.append(f"Health: Watch {', '.join(organs)} — these elements are deficient in your chart.")
+
     # The life lesson
     parts.append(f"Life lesson: {life_lesson}")
 
-    # Useful God reminder
-    parts.append(f"Your useful god is {strength.useful_god}. "
-                 f"Favorable: {', '.join(strength.favorable_elements)}. "
-                 f"Unfavorable: {', '.join(strength.unfavorable_elements)}. "
-                 f"Everything in your life improves when you increase {strength.useful_god} element exposure.")
+    # NEW: Useful God with WHY-reasoning
+    if strength.verdict in ("weak", "extremely_weak"):
+        parts.append(
+            f"Your useful god is {strength.useful_god}. "
+            f"{resource} generates your {dm_element} (resource — your nourishment), "
+            f"{dm_element} companions strengthen you. "
+            f"Unfavorable: {', '.join(strength.unfavorable_elements)} "
+            f"(they drain or attack your weak {dm_element}). "
+            f"Everything in your life improves when you increase {strength.useful_god} element exposure."
+        )
+    elif strength.verdict in ("strong", "extremely_strong"):
+        parts.append(
+            f"Your useful god is {strength.useful_god}. "
+            f"{output} channels your excess {dm_element} energy (output), "
+            f"{wealth} absorbs your strength (wealth). "
+            f"Unfavorable: {dm_element} and {resource} (they overload an already powerful chart). "
+            f"Everything in your life improves when you increase {strength.useful_god} element exposure."
+        )
+    else:
+        parts.append(
+            f"Your useful god is {strength.useful_god}. "
+            f"Favorable: {', '.join(strength.favorable_elements)}. "
+            f"Unfavorable: {', '.join(strength.unfavorable_elements)}. "
+            f"Your chart is balanced — maintain exposure to {strength.useful_god} for optimal flow."
+        )
 
     return {
         "id": "summary",
