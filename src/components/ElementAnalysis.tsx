@@ -159,7 +159,7 @@ export default function ElementAnalysis({ chartData }: ElementAnalysisProps) {
       {/* Header */}
       <div className="tui-frame-title flex items-center justify-between">
         <span>WU XING 五行</span>
-        <span className="tui-text-muted">balanced = 20%</span>
+        <span></span>
       </div>
 
       {/* Element Bars */}
