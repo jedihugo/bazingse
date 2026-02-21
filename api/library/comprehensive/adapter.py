@@ -1502,20 +1502,64 @@ def _summary_health(chart: ChartData, strength: StrengthAssessment) -> dict:
     }
 
 
-def _summary_remedies(strength: StrengthAssessment) -> dict:
-    """Section: remedies based on useful god."""
-    from .templates import ELEMENT_REMEDIES
-    remedies = ELEMENT_REMEDIES.get(strength.useful_god, {})
+def _summary_remedies(strength: StrengthAssessment, chart: ChartData) -> dict:
+    """Section: remedies with health cross-linking."""
+    from .templates import ELEMENT_REMEDIES, HEALTH_ELEMENT_MAP, HEALTH_BEHAVIORAL_REMEDIES
+
+    useful = strength.useful_god
+    remedies = ELEMENT_REMEDIES.get(useful, {})
     items = []
+
     if remedies:
         colors = ", ".join(remedies.get("colors", []))
-        items.append({"label": "Colors", "value": f"Wear {colors} ({strength.useful_god} element)"})
+        items.append({"label": "Colors", "value": f"Wear {colors} ({useful} element)"})
         items.append({"label": "Direction", "value": remedies.get("direction", "")})
         industries = ", ".join(remedies.get("industries", [])[:5])
         items.append({"label": "Industries", "value": industries})
         avoid = ", ".join(remedies.get("avoid_colors", []))
         if avoid:
             items.append({"label": "Avoid Colors", "value": avoid})
+
+    # Health-aware remedies: check for deficient elements
+    elem_counts = count_elements(chart)
+    total = sum(elem_counts.values())
+    avg = total / 5 if total > 0 else 1.0
+
+    for elem in ["Wood", "Fire", "Earth", "Metal", "Water"]:
+        count = elem_counts.get(elem, 0)
+        if count < avg * 0.5:
+            elem_remedies = ELEMENT_REMEDIES.get(elem, {})
+            organ = HEALTH_ELEMENT_MAP.get(elem, {}).get("yin_organ", elem).split("(")[0].strip()
+            behavioral = HEALTH_BEHAVIORAL_REMEDIES.get(elem, "")
+
+            if elem == useful:
+                # Synergy: useful god already covers this element
+                items.append({
+                    "label": f"Health + Useful God synergy ({elem})",
+                    "value": f"Your useful god ({useful}) also addresses your {organ.lower()} health. {behavioral}",
+                    "severity": "positive",
+                })
+            else:
+                # Secondary element remedy
+                elem_colors = ", ".join(elem_remedies.get("colors", [])[:2])
+                items.append({
+                    "label": f"Health: {organ} ({elem})",
+                    "value": f"Low {elem} weakens {organ.lower()}. Secondary remedy: add {elem_colors} accessories. {behavioral}",
+                    "severity": "info",
+                })
+
+    # Excess element warnings
+    for elem in ["Wood", "Fire", "Earth", "Metal", "Water"]:
+        count = elem_counts.get(elem, 0)
+        if count > avg * 1.8:
+            organ = HEALTH_ELEMENT_MAP.get(elem, {}).get("yin_organ", elem).split("(")[0].strip()
+            behavioral = HEALTH_BEHAVIORAL_REMEDIES.get(elem, "")
+            items.append({
+                "label": f"Health: {organ} excess ({elem})",
+                "value": f"High {elem} overloads {organ.lower()}. Reduce {elem} element exposure. {behavioral}",
+                "severity": "warning",
+            })
+
     return {
         "id": "remedies",
         "title": "Remedies",
@@ -2198,7 +2242,7 @@ def build_client_summary(chart: ChartData, results: dict,
             _summary_red_flags(flags),
             _summary_natal_predictions(chart, tg_classification, strength, predictions, flags),
             _summary_health(chart, strength),
-            _summary_remedies(strength),
+            _summary_remedies(strength, chart),
             _summary_honest(chart, strength, tg_classification, flags),
         ]
     else:
@@ -2243,7 +2287,7 @@ def build_client_summary(chart: ChartData, results: dict,
                 sections.append(pred_section)
 
         # Remedies always useful
-        sections.append(_summary_remedies(strength))
+        sections.append(_summary_remedies(strength, chart))
 
     return {
         "tier": tier,
