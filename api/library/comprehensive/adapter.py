@@ -1241,14 +1241,11 @@ def _summary_strength(strength: StrengthAssessment, chart: ChartData) -> dict:
         {"label": "Score", "value": f"{strength.score}% (20% = balanced)"},
     ]
 
-    # Useful God with role
-    if strength.verdict in ("weak", "extremely_weak"):
-        ug_reason = f"generates your {dm_element} (resource)"
-    elif strength.verdict in ("strong", "extremely_strong"):
-        ug_reason = f"channels your {dm_element} energy (output)"
-    else:
-        ug_reason = f"keeps the chart productive"
-    items.append({"label": "Useful God", "value": f"{strength.useful_god} — {ug_reason}"})
+    # Useful God with simulation-based reason
+    ug = strength.useful_god
+    ug_pct = strength.element_percentages.get(ug, 0)
+    ug_reason = f"most deficient at {ug_pct}% — adding it brings the chart closest to balance"
+    items.append({"label": "Useful God", "value": f"{ug} — {ug_reason}"})
 
     # Favorable with role explanation
     fav_explained = []
@@ -1264,11 +1261,20 @@ def _summary_strength(strength: StrengthAssessment, chart: ChartData) -> dict:
         unfav_explained.append(f"{elem} ({role})" if role else elem)
     items.append({"label": "Unfavorable", "value": ", ".join(unfav_explained)})
 
+    # Best element pairs (luck pillar combos)
+    if strength.best_element_pairs:
+        pair_parts = []
+        for p in strength.best_element_pairs[:3]:
+            elems = "+".join(p["elements"])
+            pair_parts.append(elems)
+        items.append({"label": "Best Luck Combos", "value": ", ".join(pair_parts)})
+
     # Explanation paragraph
     verdict_key = strength.verdict if strength.verdict in STRENGTH_EXPLANATION else "neutral"
     explanation = STRENGTH_EXPLANATION[verdict_key].format(
         dm_name=dm_name, dm_element=dm_element, score=strength.score,
         resource=resource, output=output, wealth=wealth, officer=officer,
+        useful_god=strength.useful_god,
         unfav_list=", ".join(strength.unfavorable_elements),
     )
     items.append({"label": "Why?", "value": explanation})
@@ -2021,31 +2027,16 @@ def _summary_honest(chart: ChartData, strength: StrengthAssessment,
     # The life lesson
     parts.append(f"Life lesson: {life_lesson}")
 
-    # NEW: Useful God with WHY-reasoning
-    if strength.verdict in ("weak", "extremely_weak"):
-        parts.append(
-            f"Your useful god is {strength.useful_god}. "
-            f"{resource} generates your {dm_element} (resource — your nourishment), "
-            f"{dm_element} companions strengthen you. "
-            f"Unfavorable: {', '.join(strength.unfavorable_elements)} "
-            f"(they drain or attack your weak {dm_element}). "
-            f"Everything in your life improves when you increase {strength.useful_god} element exposure."
-        )
-    elif strength.verdict in ("strong", "extremely_strong"):
-        parts.append(
-            f"Your useful god is {strength.useful_god}. "
-            f"{output} channels your excess {dm_element} energy (output), "
-            f"{wealth} absorbs your strength (wealth). "
-            f"Unfavorable: {dm_element} and {resource} (they overload an already powerful chart). "
-            f"Everything in your life improves when you increase {strength.useful_god} element exposure."
-        )
-    else:
-        parts.append(
-            f"Your useful god is {strength.useful_god}. "
-            f"Favorable: {', '.join(strength.favorable_elements)}. "
-            f"Unfavorable: {', '.join(strength.unfavorable_elements)}. "
-            f"Your chart is balanced — maintain exposure to {strength.useful_god} for optimal flow."
-        )
+    # Useful God with simulation-based reasoning
+    ug = strength.useful_god
+    ug_pct = strength.element_percentages.get(ug, 0)
+    parts.append(
+        f"Your useful god is {ug} (currently at {ug_pct}% — most deficient). "
+        f"Adding {ug} brings the chart closest to 20% equilibrium across all five elements. "
+        f"Favorable: {', '.join(strength.favorable_elements)}. "
+        f"Unfavorable: {', '.join(strength.unfavorable_elements)} (already excessive). "
+        f"Everything in your life improves when you increase {ug} element exposure."
+    )
 
     return {
         "id": "summary",

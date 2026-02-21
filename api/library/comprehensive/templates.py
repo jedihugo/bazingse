@@ -614,31 +614,32 @@ LIFE_LESSON_TEMPLATES = {
 
 STRENGTH_EXPLANATION = {
     "weak": (
-        "Your {dm_name} is weak at {score}% (20% = balanced). A weak Day Master needs nourishment "
-        "({resource} generates {dm_element}) and companions ({dm_element}). "
-        "{unfav_list} all drain or attack your weak {dm_element}. "
-        "Low amounts of unfavorable elements are actually a blessing — less pressure on your weak {dm_element}."
+        "Your {dm_name} is weak at {score}% (20% = balanced). "
+        "The chart needs elements that bring it closer to equilibrium. "
+        "Adding {useful_god} (currently most deficient) improves balance the most. "
+        "Avoid {unfav_list} — they are already excessive and would worsen the imbalance."
     ),
     "extremely_weak": (
         "Your {dm_name} is extremely weak at {score}% (20% = balanced) — severely depleted. "
-        "{resource} (resource) and {dm_element} (companions) are absolutely critical. "
-        "Everything else — {unfav_list} — drains or attacks you. "
-        "Environment, career, and relationships MUST supply {resource} energy."
+        "The chart is highly imbalanced. Adding {useful_god} brings the biggest improvement. "
+        "Avoid {unfav_list} — already dominant, adding more creates worse distortion."
     ),
     "strong": (
-        "Your {dm_name} is strong at {score}% (20% = balanced). Abundant energy needs outlets. "
-        "{output} (output) and {wealth} (wealth) channel your excess energy productively. "
-        "{officer} disciplines your strength. More {dm_element} or {resource} would overload the chart."
+        "Your {dm_name} is strong at {score}% (20% = balanced). "
+        "The chart has excess {dm_element} energy. "
+        "Adding {useful_god} (currently deficient) rebalances the distribution. "
+        "Avoid {unfav_list} — already abundant, adding more widens the gap."
     ),
     "extremely_strong": (
-        "Your {dm_name} is extremely strong at {score}% (20% = balanced). Overwhelming energy needs heavy draining. "
-        "{output}, {wealth}, and {officer} are all critical to prevent stagnation. "
-        "Avoid {dm_element} and {resource} — they fuel an already excessive chart."
+        "Your {dm_name} is extremely strong at {score}% (20% = balanced). Massive imbalance. "
+        "Adding {useful_god} brings the biggest correction. "
+        "Avoid {unfav_list} — they fuel the excess."
     ),
     "neutral": (
-        "Your {dm_name} is balanced at {score}% (20% = balanced). Small shifts in luck pillars have outsized effects. "
-        "{output} and {wealth} keep the chart productive. "
-        "Avoid excessive {officer} which could tip the balance toward weakness."
+        "Your {dm_name} is balanced at {score}% (20% = balanced). "
+        "Small shifts in luck pillars have outsized effects. "
+        "Adding {useful_god} (most deficient) fine-tunes the balance. "
+        "Avoid {unfav_list} — already slightly excessive."
     ),
 }
 

@@ -305,15 +305,106 @@ def detect_following_chart(chart: ChartData, support: float, drain: float,
 
 
 # =============================================================================
-# USEFUL GOD (用神) DETERMINATION
+# USEFUL GOD (用神) DETERMINATION — BALANCE SIMULATION
 # =============================================================================
+
+def _calc_imbalance(pcts: Dict[str, float]) -> float:
+    """Sum of squared deviations from 20% — lower = more balanced."""
+    return sum((p - 20.0) ** 2 for p in pcts.values())
+
+
+def _simulate_dose(element_counts: Dict[str, float], total: float,
+                   additions: Dict[str, float]) -> Tuple[float, Dict[str, float]]:
+    """Apply element additions and return (new_imbalance, new_percentages)."""
+    adjusted = dict(element_counts)
+    dose_total = 0.0
+    for elem, dose in additions.items():
+        adjusted[elem] += dose
+        dose_total += dose
+    new_total = total + dose_total
+    new_pcts = {e: (c / new_total) * 100 for e, c in adjusted.items()}
+    return _calc_imbalance(new_pcts), new_pcts
+
+
+def simulate_element_balance(element_counts: Dict[str, float]) -> dict:
+    """
+    Simulate adding each element to find which best balances the chart.
+    Imbalance = sum of squared deviations from 20% (ideal equal distribution).
+    The element whose addition produces the lowest imbalance = useful god.
+    """
+    total = sum(element_counts.values())
+    if total == 0:
+        return {"useful_god": None, "favorable": [], "unfavorable": []}
+
+    current_imbalance = _calc_imbalance(
+        {e: (c / total) * 100 for e, c in element_counts.items()})
+
+    # Standard dose = 1.0 (one Heavenly Stem equivalent, like a luck pillar)
+    dose = 1.0
+    improvements = {}
+
+    for test_elem in element_counts:
+        new_imb, _ = _simulate_dose(element_counts, total, {test_elem: dose})
+        improvements[test_elem] = round(current_imbalance - new_imb, 2)
+
+    # Rank by improvement (highest = most balancing)
+    ranked = sorted(improvements.keys(), key=lambda e: improvements[e], reverse=True)
+    favorable = [e for e in ranked if improvements[e] > 0]
+    unfavorable = [e for e in ranked if improvements[e] <= 0]
+
+    return {
+        "useful_god": ranked[0],
+        "favorable": favorable,
+        "unfavorable": unfavorable,
+    }
+
+
+def simulate_element_pairs(element_counts: Dict[str, float]) -> List[Dict]:
+    """
+    Simulate adding pairs of elements (like a luck pillar's stem + branch).
+    Tests all 15 unique pairs at equal dose (0.5 + 0.5 = 1.0 total).
+    Returns top 5 pairs ranked by balancing improvement.
+    """
+    total = sum(element_counts.values())
+    if total == 0:
+        return []
+
+    current_pcts = {e: (c / total) * 100 for e, c in element_counts.items()}
+    current_imbalance = _calc_imbalance(current_pcts)
+
+    elements = sorted(element_counts.keys())
+    results = []
+
+    for i, e1 in enumerate(elements):
+        for e2 in elements[i:]:
+            additions = {}
+            if e1 == e2:
+                additions[e1] = 1.0  # Same element: full dose
+            else:
+                additions[e1] = 0.5
+                additions[e2] = 0.5
+
+            new_imb, new_pcts = _simulate_dose(element_counts, total, additions)
+            improvement = round(current_imbalance - new_imb, 2)
+
+            results.append({
+                "elements": [e1, e2] if e1 != e2 else [e1],
+                "improvement": improvement,
+                "result_pcts": {k: round(v, 1) for k, v in new_pcts.items()},
+            })
+
+    results.sort(key=lambda r: r["improvement"], reverse=True)
+    return results[:5]  # Top 5 pairs
+
 
 def determine_useful_god(chart: ChartData, verdict: str,
                          is_following: bool, following_type: Optional[str],
-                         output_wealth_pressure: float = 0.0,
-                         officer_pressure: float = 0.0) -> dict:
+                         element_counts: Optional[Dict[str, float]] = None) -> dict:
     """
     Determine the Useful God (用神) and favorable/unfavorable elements.
+    Uses balance simulation: which element, when added, brings the chart
+    closest to 20% equilibrium across all five elements.
+    Following charts use categorical rules (go with the dominant force).
     """
     dm_element = chart.dm_element
     resource_element = ELEMENT_CYCLES["generated_by"].get(dm_element)
@@ -322,7 +413,7 @@ def determine_useful_god(chart: ChartData, verdict: str,
     officer_element = ELEMENT_CYCLES["controlled_by"].get(dm_element)
 
     if is_following:
-        # Following chart: go WITH the dominant force
+        # Following chart: go WITH the dominant force (no rebalancing)
         if following_type == "wealth":
             return {
                 "useful_god": wealth_element,
@@ -348,38 +439,16 @@ def determine_useful_god(chart: ChartData, verdict: str,
                 "unfavorable": [dm_element, resource_element],
             }
 
-    if verdict in ("extremely_weak", "weak"):
-        # Weak DM needs support: resource + companion
-        # When Output+Wealth dominate (not Officer), Officer becomes secondary favorable:
-        #   Output controls Officer (redirects output energy) +
-        #   Wealth generates Officer (drains wealth energy) −
-        #   Officer controls DM (one cost) = net positive
-        # But ONLY when Output+Wealth are the real threats, not Officer itself.
-        if output_wealth_pressure > 5.0 and output_wealth_pressure > officer_pressure:
-            return {
-                "useful_god": resource_element,
-                "favorable": [resource_element, dm_element, officer_element],
-                "unfavorable": [wealth_element, output_element],
-            }
-        return {
-            "useful_god": resource_element,
-            "favorable": [resource_element, dm_element],
-            "unfavorable": [wealth_element, officer_element, output_element],
-        }
-    elif verdict in ("extremely_strong", "strong"):
-        # Strong DM needs draining: output + wealth
-        return {
-            "useful_god": output_element,
-            "favorable": [output_element, wealth_element, officer_element],
-            "unfavorable": [dm_element, resource_element],
-        }
-    else:
-        # Neutral: balanced, slight preference for balance
-        return {
-            "useful_god": output_element,
-            "favorable": [output_element, wealth_element],
-            "unfavorable": [officer_element],
-        }
+    # Balance simulation: which element brings the chart closest to equilibrium?
+    if element_counts:
+        return simulate_element_balance(element_counts)
+
+    # Fallback (shouldn't reach here — element_counts always passed from assess)
+    return {
+        "useful_god": output_element,
+        "favorable": [output_element, wealth_element],
+        "unfavorable": [],
+    }
 
 
 # =============================================================================
@@ -439,20 +508,12 @@ def assess_day_master_strength(
     wealth_elem = ELEMENT_CYCLES["controlling"].get(dm_element, "")
     officer_elem = ELEMENT_CYCLES["controlled_by"].get(dm_element, "")
 
-    # Split pressure by source: output+wealth vs officer
-    # (needed to determine if officer is a secondary useful god)
-    output_wealth_pressure = 0.0
-    officer_pressure = 0.0
-    for drain_elem in [output_elem, wealth_elem]:
+    drain_pressure = 0.0
+    for drain_elem in [output_elem, wealth_elem, officer_elem]:
         if drain_elem:
             excess = percentages.get(drain_elem, 0) - score
             if excess > 0:
-                output_wealth_pressure += excess
-    if officer_elem:
-        excess = percentages.get(officer_elem, 0) - score
-        if excess > 0:
-            officer_pressure = excess
-    drain_pressure = output_wealth_pressure + officer_pressure
+                drain_pressure += excess
 
     # 6. Seasonal and root factors
     seasonal_state = get_seasonal_state(chart)
@@ -487,10 +548,12 @@ def assess_day_master_strength(
     is_following, following_type = detect_following_chart(
         chart, support, drain, seasonal_state, root_info)
 
-    # 11. Determine useful god and elements
+    # 11. Determine useful god via balance simulation
     god_info = determine_useful_god(chart, verdict, is_following, following_type,
-                                    output_wealth_pressure=output_wealth_pressure,
-                                    officer_pressure=officer_pressure)
+                                    element_counts=element_counts)
+
+    # 12. Simulate element pairs (best luck pillar combinations)
+    best_pairs = simulate_element_pairs(element_counts) if not is_following else []
 
     return StrengthAssessment(
         score=score,
@@ -504,4 +567,5 @@ def assess_day_master_strength(
         favorable_elements=god_info["favorable"],
         unfavorable_elements=god_info["unfavorable"],
         element_percentages={k: round(v, 1) for k, v in percentages.items()},
+        best_element_pairs=best_pairs,
     )

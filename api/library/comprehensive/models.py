@@ -107,6 +107,8 @@ class StrengthAssessment:
     favorable_elements: List[str] = field(default_factory=list)
     unfavorable_elements: List[str] = field(default_factory=list)
     element_percentages: Dict[str, float] = field(default_factory=dict)
+    # Balance simulation: ranked element pairs (best luck pillar combos)
+    best_element_pairs: List[Dict] = field(default_factory=list)
 
 
 @dataclass
