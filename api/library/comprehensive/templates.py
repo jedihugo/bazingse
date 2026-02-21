@@ -607,3 +607,53 @@ LIFE_LESSON_TEMPLATES = {
         "the universe's flow. Fighting your nature is the worst thing you can do.",
     ],
 }
+
+# =============================================================================
+# ELEMENT ROLE EXPLANATIONS (for strength WHY-reasoning)
+# =============================================================================
+
+STRENGTH_EXPLANATION = {
+    "weak": (
+        "Your {dm_name} is weak at {score}/100. A weak Day Master needs nourishment "
+        "({resource} generates {dm_element}) and companions ({dm_element}). "
+        "{unfav_list} all drain or attack your weak {dm_element}. "
+        "Low amounts of unfavorable elements are actually a blessing — less pressure on your weak {dm_element}."
+    ),
+    "extremely_weak": (
+        "Your {dm_name} is extremely weak at {score}/100 — severely depleted. "
+        "{resource} (resource) and {dm_element} (companions) are absolutely critical. "
+        "Everything else — {unfav_list} — drains or attacks you. "
+        "Environment, career, and relationships MUST supply {resource} energy."
+    ),
+    "strong": (
+        "Your {dm_name} is strong at {score}/100. Abundant energy needs outlets. "
+        "{output} (output) and {wealth} (wealth) channel your excess energy productively. "
+        "{officer} disciplines your strength. More {dm_element} or {resource} would overload the chart."
+    ),
+    "extremely_strong": (
+        "Your {dm_name} is extremely strong at {score}/100. Overwhelming energy needs heavy draining. "
+        "{output}, {wealth}, and {officer} are all critical to prevent stagnation. "
+        "Avoid {dm_element} and {resource} — they fuel an already excessive chart."
+    ),
+    "neutral": (
+        "Your {dm_name} is balanced at {score}/100. Small shifts in luck pillars have outsized effects. "
+        "{output} and {wealth} keep the chart productive. "
+        "Avoid excessive {officer} which could tip the balance toward weakness."
+    ),
+}
+
+HEALTH_BEHAVIORAL_REMEDIES = {
+    "Wood": "Practice eye care, stretch regularly, manage anger through movement/exercise",
+    "Fire": "Protect cardiovascular health, manage anxiety, avoid overstimulation and burnout",
+    "Earth": "Maintain regular eating schedule, avoid overthinking, strengthen digestive health",
+    "Metal": "Practice deep breathing exercises, protect lungs and skin, wear scarves in cold weather",
+    "Water": "Strengthen lower back and bones, protect hearing, manage fear and anxiety",
+}
+
+CONTROL_CYCLE_EXPLANATIONS = {
+    ("Wood", "Earth"): "Wood controls Earth. Weak Wood means digestive system (Spleen/Stomach) can become unregulated",
+    ("Fire", "Metal"): "Fire controls Metal. Weak Fire means respiratory system (Lungs) and immune response are unregulated",
+    ("Earth", "Water"): "Earth controls Water. Weak Earth means urinary/reproductive system (Kidneys) can become unregulated",
+    ("Metal", "Wood"): "Metal controls Wood. Weak Metal means liver system (Liver/Gallbladder) can become unregulated",
+    ("Water", "Fire"): "Water controls Fire. Weak Water means cardiovascular system (Heart) can become unregulated",
+}

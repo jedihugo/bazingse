@@ -1191,17 +1191,85 @@ def _summary_chart_overview(chart: ChartData) -> dict:
     }
 
 
-def _summary_strength(strength: StrengthAssessment) -> dict:
-    """Section: DM strength assessment."""
-    from .templates import STRENGTH_VERDICTS, _pick
+def _summary_strength(strength: StrengthAssessment, chart: ChartData) -> dict:
+    """Section: DM strength assessment with WHY-reasoning for favorable/unfavorable."""
+    from .templates import STRENGTH_VERDICTS, STRENGTH_EXPLANATION, _pick
+
     text = _pick(STRENGTH_VERDICTS.get(strength.verdict, ["No assessment available."]))
+
+    dm_element = chart.dm_element
+    dm_name = f"{chart.day_master} {dm_element}"
+    resource = ELEMENT_CYCLES["generated_by"].get(dm_element, "")
+    output = ELEMENT_CYCLES["generating"].get(dm_element, "")
+    wealth = ELEMENT_CYCLES["controlling"].get(dm_element, "")
+    officer = ELEMENT_CYCLES["controlled_by"].get(dm_element, "")
+
+    # Role labels for each element relative to DM
+    if strength.verdict in ("weak", "extremely_weak"):
+        role_map = {
+            dm_element: "companion — strengthens you",
+            resource: "resource — generates your " + dm_element,
+            output: "output — exhausts your weak " + dm_element,
+            wealth: "wealth — drains your weak " + dm_element,
+            officer: "officer — attacks/controls " + dm_element,
+        }
+    elif strength.verdict in ("strong", "extremely_strong"):
+        role_map = {
+            dm_element: "companion — overloads the chart",
+            resource: "resource — fuels already excessive " + dm_element,
+            output: "output — channels excess energy",
+            wealth: "wealth — absorbs your strength",
+            officer: "officer — disciplines your energy",
+        }
+    else:
+        role_map = {
+            dm_element: "companion",
+            resource: "resource — generates " + dm_element,
+            output: "output — channels energy",
+            wealth: "wealth — productive use of strength",
+            officer: "officer — can tip balance",
+        }
+
     items = [
         {"label": "Score", "value": f"{strength.score}/100"},
-        {"label": "Useful God", "value": f"{strength.useful_god}"},
-        {"label": "Favorable", "value": ", ".join(strength.favorable_elements)},
-        {"label": "Unfavorable", "value": ", ".join(strength.unfavorable_elements)},
     ]
-    severity = "strong" if strength.verdict in ("strong", "extremely_strong") else "weak" if strength.verdict in ("weak", "extremely_weak") else "neutral"
+
+    # Useful God with role
+    if strength.verdict in ("weak", "extremely_weak"):
+        ug_reason = f"generates your {dm_element} (resource)"
+    elif strength.verdict in ("strong", "extremely_strong"):
+        ug_reason = f"channels your {dm_element} energy (output)"
+    else:
+        ug_reason = f"keeps the chart productive"
+    items.append({"label": "Useful God", "value": f"{strength.useful_god} — {ug_reason}"})
+
+    # Favorable with role explanation
+    fav_explained = []
+    for elem in strength.favorable_elements:
+        role = role_map.get(elem, "")
+        fav_explained.append(f"{elem} ({role})" if role else elem)
+    items.append({"label": "Favorable", "value": ", ".join(fav_explained)})
+
+    # Unfavorable with role explanation
+    unfav_explained = []
+    for elem in strength.unfavorable_elements:
+        role = role_map.get(elem, "")
+        unfav_explained.append(f"{elem} ({role})" if role else elem)
+    items.append({"label": "Unfavorable", "value": ", ".join(unfav_explained)})
+
+    # Explanation paragraph
+    verdict_key = strength.verdict if strength.verdict in STRENGTH_EXPLANATION else "neutral"
+    explanation = STRENGTH_EXPLANATION[verdict_key].format(
+        dm_name=dm_name, dm_element=dm_element, score=strength.score,
+        resource=resource, output=output, wealth=wealth, officer=officer,
+        unfav_list=", ".join(strength.unfavorable_elements),
+    )
+    items.append({"label": "Why?", "value": explanation})
+
+    severity = ("strong" if strength.verdict in ("strong", "extremely_strong")
+                else "weak" if strength.verdict in ("weak", "extremely_weak")
+                else "neutral")
+
     return {
         "id": "strength",
         "title": "Strength Assessment",
@@ -1979,7 +2047,7 @@ def build_client_summary(chart: ChartData, results: dict,
         # NATAL tier: static analysis of birth chart
         sections = [
             _summary_chart_overview(chart),
-            _summary_strength(strength),
+            _summary_strength(strength, chart),
             _summary_ten_gods(chart, tg_classification),
             _summary_interactions(interactions),
             _summary_shen_sha(shen_sha),
