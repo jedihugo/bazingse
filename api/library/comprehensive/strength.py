@@ -309,7 +309,9 @@ def detect_following_chart(chart: ChartData, support: float, drain: float,
 # =============================================================================
 
 def determine_useful_god(chart: ChartData, verdict: str,
-                         is_following: bool, following_type: Optional[str]) -> dict:
+                         is_following: bool, following_type: Optional[str],
+                         output_wealth_pressure: float = 0.0,
+                         officer_pressure: float = 0.0) -> dict:
     """
     Determine the Useful God (用神) and favorable/unfavorable elements.
     """
@@ -348,6 +350,17 @@ def determine_useful_god(chart: ChartData, verdict: str,
 
     if verdict in ("extremely_weak", "weak"):
         # Weak DM needs support: resource + companion
+        # When Output+Wealth dominate (not Officer), Officer becomes secondary favorable:
+        #   Output controls Officer (redirects output energy) +
+        #   Wealth generates Officer (drains wealth energy) −
+        #   Officer controls DM (one cost) = net positive
+        # But ONLY when Output+Wealth are the real threats, not Officer itself.
+        if output_wealth_pressure > 5.0 and output_wealth_pressure > officer_pressure:
+            return {
+                "useful_god": resource_element,
+                "favorable": [resource_element, dm_element, officer_element],
+                "unfavorable": [wealth_element, output_element],
+            }
         return {
             "useful_god": resource_element,
             "favorable": [resource_element, dm_element],
@@ -426,12 +439,20 @@ def assess_day_master_strength(
     wealth_elem = ELEMENT_CYCLES["controlling"].get(dm_element, "")
     officer_elem = ELEMENT_CYCLES["controlled_by"].get(dm_element, "")
 
-    drain_pressure = 0.0
-    for drain_elem in [output_elem, wealth_elem, officer_elem]:
+    # Split pressure by source: output+wealth vs officer
+    # (needed to determine if officer is a secondary useful god)
+    output_wealth_pressure = 0.0
+    officer_pressure = 0.0
+    for drain_elem in [output_elem, wealth_elem]:
         if drain_elem:
             excess = percentages.get(drain_elem, 0) - score
             if excess > 0:
-                drain_pressure += excess
+                output_wealth_pressure += excess
+    if officer_elem:
+        excess = percentages.get(officer_elem, 0) - score
+        if excess > 0:
+            officer_pressure = excess
+    drain_pressure = output_wealth_pressure + officer_pressure
 
     # 6. Seasonal and root factors
     seasonal_state = get_seasonal_state(chart)
@@ -467,7 +488,9 @@ def assess_day_master_strength(
         chart, support, drain, seasonal_state, root_info)
 
     # 11. Determine useful god and elements
-    god_info = determine_useful_god(chart, verdict, is_following, following_type)
+    god_info = determine_useful_god(chart, verdict, is_following, following_type,
+                                    output_wealth_pressure=output_wealth_pressure,
+                                    officer_pressure=officer_pressure)
 
     return StrengthAssessment(
         score=score,
