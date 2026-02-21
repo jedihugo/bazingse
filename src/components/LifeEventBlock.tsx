@@ -257,6 +257,101 @@ export default function LifeEventBlock({
             {/* Wealth Storage Analysis */}
             <WealthStorageDisplay chartData={chartData} />
 
+            {/* Spiritual Sensitivity (natal only) */}
+            {isNatal && chartData?.spiritual_sensitivity && (() => {
+              const ss = chartData.spiritual_sensitivity;
+              const score: number = ss.score ?? 0;
+              const filled = Math.round(score / 10);
+              const empty = 10 - filled;
+              const bar = '\u2588'.repeat(filled) + '\u2591'.repeat(empty);
+
+              // Score color thresholds
+              const scoreColor =
+                score <= 20 ? 'var(--tui-wood)' :
+                score <= 40 ? 'var(--tui-warning)' :
+                score <= 60 ? 'var(--tui-accent-orange)' :
+                score <= 80 ? 'var(--tui-fire)' :
+                'var(--tui-accent-purple)';
+
+              const indicators: Array<{ name: string; name_zh: string; weight: number; reason: string }> = ss.indicators || [];
+
+              return (
+                <div className="tui-frame mt-2">
+                  <div className="tui-frame-title flex items-center justify-between">
+                    <span>SPIRITUAL SENSITIVITY \u7075\u6027\u654F\u611F\u5EA6</span>
+                    <span
+                      className="text-xs px-1.5 py-0.5"
+                      style={{ background: scoreColor, color: 'var(--tui-bg)' }}
+                    >
+                      {ss.label_zh || ss.level}
+                    </span>
+                  </div>
+
+                  <div className="p-2 font-mono space-y-2">
+                    {/* Score bar */}
+                    <div className="flex items-center gap-2 text-sm">
+                      <span className="tui-text-muted w-10 text-right">{score}</span>
+                      <span style={{ color: scoreColor, letterSpacing: '1px' }}>{bar}</span>
+                      <span className="tui-text-muted">100</span>
+                    </div>
+
+                    {/* Level label */}
+                    <div className="text-xs tui-text-dim">
+                      {ss.label_zh && ss.label_en
+                        ? `${ss.label_zh} / ${ss.label_en}`
+                        : ss.label_en || ss.label_zh || ss.level}
+                    </div>
+
+                    {/* Description */}
+                    {(ss.description_en || ss.description_zh) && (
+                      <div className="text-xs tui-text-dim" style={{ lineHeight: '1.5' }}>
+                        {ss.description_zh || ss.description_en}
+                      </div>
+                    )}
+
+                    {/* Indicators (collapsible) */}
+                    {indicators.length > 0 && (
+                      <details className="mt-1">
+                        <summary className="text-xs tui-text-muted cursor-pointer py-1">
+                          Indicators ({indicators.length})
+                        </summary>
+                        <div className="space-y-1 mt-1">
+                          {indicators.map((ind, i) => (
+                            <div key={i} className="text-xs flex gap-2 flex-wrap">
+                              <span
+                                className="px-1"
+                                style={{ color: scoreColor, border: `1px solid ${scoreColor}` }}
+                              >
+                                +{ind.weight}
+                              </span>
+                              <span className="tui-text-dim">
+                                {ind.name_zh} {ind.name}
+                              </span>
+                              {ind.reason && (
+                                <span className="tui-text-muted">{ind.reason}</span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </details>
+                    )}
+
+                    {/* Guidance (collapsible) */}
+                    {(ss.guidance_en || ss.guidance_zh) && (
+                      <details className="mt-1">
+                        <summary className="text-xs tui-text-muted cursor-pointer py-1">
+                          Guidance
+                        </summary>
+                        <div className="text-xs tui-text-dim mt-1" style={{ lineHeight: '1.5' }}>
+                          {ss.guidance_zh || ss.guidance_en}
+                        </div>
+                      </details>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
+
             {/* Interaction-Based Narratives (collapsed) */}
             {isNatal && chartData?.narrative_analysis && (
               <details className="mt-3">
