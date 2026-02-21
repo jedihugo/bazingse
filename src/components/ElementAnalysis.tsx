@@ -159,13 +159,7 @@ export default function ElementAnalysis({ chartData }: ElementAnalysisProps) {
       {/* Header */}
       <div className="tui-frame-title flex items-center justify-between">
         <span>WU XING 五行</span>
-        <span>
-          DM: <span className={daymasterColorClass}>{ELEMENT_CHINESE[daymasterElement]}</span>
-          {' '}
-          <span className={daymasterAnalysis.chart_type === 'Strong' ? 'tui-text-wood' : 'tui-text-fire'}>
-            {daymasterAnalysis.chart_type} {daymasterAnalysis.daymaster_percentage?.toFixed(0)}%
-          </span>
-        </span>
+        <span className="tui-text-muted">balanced = 20%</span>
       </div>
 
       {/* Element Bars */}
@@ -175,11 +169,12 @@ export default function ElementAnalysis({ chartData }: ElementAnalysisProps) {
           const hasChange = Math.abs(element.change) > 0.5;
           const displayPct = elementData.hasPost ? element.postPct : element.natalPct;
 
+          const isDM = element.name === daymasterElement;
           return (
-            <div key={element.name} className="flex items-center gap-2">
+            <div key={element.name} className={`flex items-center gap-2 ${isDM ? 'font-bold' : ''}`}>
               {/* Element Chinese + Name */}
               <span className={`w-12 ${colorClass}`}>
-                {ELEMENT_CHINESE[element.name]} {element.name.substring(0, 2)}
+                {ELEMENT_CHINESE[element.name]} {isDM ? 'DM' : element.name.substring(0, 2)}
               </span>
 
               {/* ASCII Bar with Yang/Yin colors */}
