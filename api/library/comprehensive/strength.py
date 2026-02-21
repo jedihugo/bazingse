@@ -50,6 +50,22 @@ def get_seasonal_multiplier(state: str) -> float:
     return SEASONAL_ADJUSTMENT.get(state.lower(), 1.0)
 
 
+def apply_seasonal_scaling(element_counts: Dict[str, float], month_branch: str) -> Dict[str, float]:
+    """
+    Scale element weights by seasonal multipliers based on month branch.
+    The month branch sets the seasonal context for the entire chart.
+    In Winter (Hai/Zi), Water is Prosperous (boosted) and Fire is Dead (weakened).
+    This is the most influential factor in element strength (旺相休囚死).
+    """
+    states = BRANCHES[month_branch]["element_states"]
+    scaled = {}
+    for elem, count in element_counts.items():
+        state = states.get(elem, "Resting")
+        multiplier = SEASONAL_ADJUSTMENT.get(state.lower(), 1.0)
+        scaled[elem] = count * multiplier
+    return scaled
+
+
 # =============================================================================
 # ROOTING ANALYSIS
 # =============================================================================
@@ -460,14 +476,6 @@ def determine_useful_god(chart: ChartData, verdict: str,
 # MAIN STRENGTH ASSESSMENT
 # =============================================================================
 
-# Seasonal nudge on DM element percentage (small adjustments)
-SEASONAL_NUDGE = {
-    "Prosperous": 2.0,
-    "Strengthening": 1.0,
-    "Resting": 0.0,
-    "Trapped": -1.0,
-    "Dead": -2.0,
-}
 
 # Verdict thresholds (20% = balanced center)
 VERDICT_THRESHOLDS = {
@@ -485,7 +493,7 @@ def assess_day_master_strength(
 ) -> StrengthAssessment:
     """
     DM strength = DM's element percentage of total chart elements.
-    ~20% = balanced. Branch interactions adjust element weights.
+    ~20% = balanced. Branch interactions and seasonal scaling adjust element weights.
     """
     # 1. Count raw elements
     element_counts = count_elements(chart)
@@ -495,20 +503,25 @@ def assess_day_master_strength(
         element_counts = adjust_elements_for_interactions(
             element_counts, interactions, chart)
 
-    # 3. Calculate percentages
+    # 3. Apply seasonal scaling (旺相休囚死) — most influential factor
+    #    The month branch determines each element's seasonal state.
+    #    e.g., Winter (Hai): Water Prosperous x1.382, Fire Dead x0.786
+    month_branch = chart.pillars["month"].branch
+    element_counts = apply_seasonal_scaling(element_counts, month_branch)
+
+    # 4. Calculate percentages from seasonally-scaled weights
     total = sum(element_counts.values())
     if total > 0:
         percentages = {elem: (count / total) * 100 for elem, count in element_counts.items()}
     else:
         percentages = {elem: 20.0 for elem in element_counts}
 
-    # 4. DM strength score = DM's element percentage (single source of truth)
+    # 5. DM strength score = DM's element percentage (single source of truth)
     dm_element = chart.dm_element
     score = max(1.0, min(50.0, round(percentages[dm_element], 1)))
 
-    # 5. Drain pressure: if drain elements individually exceed the DM,
+    # 6. Drain pressure: if drain elements individually exceed the DM,
     #    the DM is under pressure even at a "balanced" percentage.
-    #    e.g., Wood 22% looks balanced, but Fire 40% + Earth 24% = heavy drain.
     output_elem = ELEMENT_CYCLES["generating"].get(dm_element, "")
     wealth_elem = ELEMENT_CYCLES["controlling"].get(dm_element, "")
     officer_elem = ELEMENT_CYCLES["controlled_by"].get(dm_element, "")
@@ -520,21 +533,22 @@ def assess_day_master_strength(
             if excess > 0:
                 drain_pressure += excess
 
-    # 6. Seasonal and root factors
+    # 7. Seasonal state and root factors for verdict
     seasonal_state = get_seasonal_state(chart)
     root_info = check_rooting(chart)
 
-    effective_pct = score + SEASONAL_NUDGE.get(seasonal_state, 0)
+    # Seasonal effect is now in the percentages via scaling (step 3).
+    # Root adjustment is a small additional factor.
+    effective_pct = score
     if root_info["has_strong_root"]:
         effective_pct += 1.0
     elif not root_info["has_root"]:
         effective_pct -= 1.5
 
-    # 7. Apply drain pressure — each point of excess reduces effective strength
-    #    e.g., Fire 40% vs Wood 22% = 18 pts excess → heavy pressure on Wood
+    # 8. Apply drain pressure — each point of excess reduces effective strength
     effective_pct -= drain_pressure * 0.4
 
-    # 8. Determine verdict using effective_pct (20% = balanced)
+    # 9. Determine verdict using effective_pct (20% = balanced)
     if effective_pct >= 30.0:
         verdict = "extremely_strong"
     elif effective_pct >= 24.0:
@@ -546,18 +560,18 @@ def assess_day_master_strength(
     else:
         verdict = "extremely_weak"
 
-    # 9. Support/drain counts (kept for compatibility)
+    # 10. Support/drain counts (kept for compatibility)
     support, drain = count_support_vs_drain(chart)
 
-    # 10. Check for following chart
+    # 11. Check for following chart
     is_following, following_type = detect_following_chart(
         chart, support, drain, seasonal_state, root_info)
 
-    # 11. Determine useful god via balance simulation
+    # 12. Determine useful god via balance simulation (uses seasonally-scaled counts)
     god_info = determine_useful_god(chart, verdict, is_following, following_type,
                                     element_counts=element_counts)
 
-    # 12. Simulate element pairs (best luck pillar combinations)
+    # 13. Simulate element pairs (best luck pillar combinations)
     best_pairs = simulate_element_pairs(element_counts) if not is_following else []
 
     return StrengthAssessment(
