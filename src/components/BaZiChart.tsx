@@ -139,6 +139,7 @@ export default function BaZiChart({
       isDayMaster,
       isUnknown: !hsNode && !ebNode,
       qiPhase: hsNode?.qi_phase || ebNode?.qi_phase || null,
+      qiPhaseAnalysis: undefined as any,  // populated after build for natal pillars
       stemTransformations: stemBadges.filter((b: any) => b.type === 'transformation'),
       branchTransformations: branchBadges.filter((b: any) => b.type === 'transformation'),
       stemCombinations: stemBadges.filter((b: any) => b.type === 'combination'),
@@ -164,6 +165,7 @@ export default function BaZiChart({
       tenGod: null,
       isDayMaster: false,
       isUnknown: true,
+      qiPhaseAnalysis: undefined as any,
       stemTransformations: [],
       branchTransformations: [],
       stemCombinations: [],
@@ -176,7 +178,20 @@ export default function BaZiChart({
     const month = buildPillar('hs_m', 'eb_m', t('natal.pillar_labels.month'));
     const year = buildPillar('hs_y', 'eb_y', t('natal.pillar_labels.year'));
 
-    return [hour, day, month, year].filter(Boolean) as any[];
+    // Attach qi phase analysis to natal pillars
+    const qiPhaseData = chartData?.qi_phase_analysis?.pillars;
+    const pillarPositionMap: Record<number, string> = { 0: 'hour', 1: 'day', 2: 'month', 3: 'year' };
+    const result = [hour, day, month, year];
+    if (qiPhaseData) {
+      result.forEach((pillar, idx) => {
+        if (pillar) {
+          const posKey = pillarPositionMap[idx];
+          pillar.qiPhaseAnalysis = qiPhaseData[posKey] || undefined;
+        }
+      });
+    }
+
+    return result.filter(Boolean) as any[];
   }, [chartData, t]);
 
   // Empty placeholder pillar for alignment

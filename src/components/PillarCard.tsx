@@ -1,5 +1,16 @@
 'use client';
 
+import { useState } from 'react';
+
+interface QiPhaseAnalysis {
+  phase_id: string;
+  phase_chinese: string;
+  phase_english: string;
+  strength: string;
+  interpretation: string;
+  tandem_effects: Array<{ shen_sha: string; effect: string }>;
+}
+
 interface Pillar {
   label: string;
   stem: { chinese: string; element: string; color: string };
@@ -12,6 +23,7 @@ interface Pillar {
   isDayMaster?: boolean;
   isUnknown?: boolean;
   qiPhase?: string | null;
+  qiPhaseAnalysis?: QiPhaseAnalysis;
   stemTransformations: any[];
   branchTransformations: any[];
   stemCombinations: any[];
@@ -58,12 +70,25 @@ const STEM_TO_ELEMENT: Record<string, string> = {
   'Ren': 'Water', 'Gui': 'Water',
 };
 
+// Qi phase strength to TUI color style
+const STRENGTH_STYLE: Record<string, string> = {
+  'peak': 'var(--tui-fire)',
+  'strong': 'var(--tui-wood)',
+  'growing': 'var(--tui-wood-yin)',
+  'moderate': 'var(--tui-earth)',
+  'declining': 'var(--tui-metal)',
+  'weak': 'var(--tui-water)',
+  'dead': 'var(--tui-fg-muted)',
+};
+
 // Get element from stem/branch element string (removes Yang/Yin prefix)
 function getBaseElement(elementStr: string): string {
   return elementStr.replace('Yang ', '').replace('Yin ', '');
 }
 
 export default function PillarCard({ pillar, type, index, mappings, isLuck, isEmpty }: PillarCardProps) {
+  const [qiPhaseExpanded, setQiPhaseExpanded] = useState(false);
+
   // TUI style - simple uniform borders
   const getBorderStyle = (): React.CSSProperties => {
     const base: React.CSSProperties = {
@@ -116,6 +141,7 @@ export default function PillarCard({ pillar, type, index, mappings, isLuck, isEm
   const element = getBaseElement(pillar.branch?.element || 'Unknown');
   const colorClass = ELEMENT_TO_TUI_CLASS[element] || 'tui-text';
   const totalQi = Object.values(pillar.hiddenQi || {}).reduce((a: number, b: number) => a + b, 0);
+  const qpa = pillar.qiPhaseAnalysis;
 
   return (
     <div className="w-28 flex-shrink-0">
@@ -164,6 +190,54 @@ export default function PillarCard({ pillar, type, index, mappings, isLuck, isEm
           </div>
         )}
       </div>
+
+      {/* Qi Phase Analysis — compact collapsible below branch */}
+      {qpa && (
+        <div
+          className="cursor-pointer select-none"
+          style={{
+            borderLeft: '1px solid var(--tui-border)',
+            borderRight: '1px solid var(--tui-border)',
+            borderBottom: '1px solid var(--tui-border)',
+            fontSize: '0.65rem',
+            lineHeight: '1.1',
+            background: 'var(--tui-bg-alt)',
+          }}
+          onClick={() => setQiPhaseExpanded(!qiPhaseExpanded)}
+        >
+          {/* Header: phase name + strength */}
+          <div className="flex items-center justify-center gap-1 px-1 py-0.5">
+            <span style={{ color: STRENGTH_STYLE[qpa.strength] || 'var(--tui-fg-dim)' }}>
+              {qpa.phase_chinese}
+            </span>
+            <span className="tui-text-muted">
+              {qpa.phase_english}
+            </span>
+          </div>
+
+          {/* Expanded: interpretation + tandem effects */}
+          {qiPhaseExpanded && (
+            <div
+              className="px-1 pb-1"
+              style={{ borderTop: '1px dashed var(--tui-border-dim)' }}
+            >
+              <div className="tui-text-dim py-0.5" style={{ whiteSpace: 'normal' }}>
+                {qpa.interpretation}
+              </div>
+              {qpa.tandem_effects && qpa.tandem_effects.length > 0 && (
+                <div className="mt-0.5" style={{ borderTop: '1px dotted var(--tui-border-dim)' }}>
+                  {qpa.tandem_effects.map((te, idx) => (
+                    <div key={idx} className="py-0.5" style={{ whiteSpace: 'normal' }}>
+                      <span style={{ color: 'var(--tui-accent-purple)' }}>{te.shen_sha}</span>
+                      <span className="tui-text-dim"> {te.effect}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
