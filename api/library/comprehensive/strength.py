@@ -415,31 +415,27 @@ def assess_day_master_strength(
     else:
         percentages = {elem: 20.0 for elem in element_counts}
 
-    # 4. DM strength = DM's element percentage
-    dm_pct = percentages[chart.dm_element]
+    # 4. DM strength score = DM's element percentage (single source of truth)
+    score = max(1.0, min(50.0, round(percentages[chart.dm_element], 1)))
 
-    # 5. Seasonal nudge
+    # 5. Seasonal and root factors influence verdict, not the score
     seasonal_state = get_seasonal_state(chart)
-    dm_pct += SEASONAL_NUDGE.get(seasonal_state, 0)
-
-    # 6. Root adjustment
     root_info = check_rooting(chart)
+
+    effective_pct = score + SEASONAL_NUDGE.get(seasonal_state, 0)
     if root_info["has_strong_root"]:
-        dm_pct += 1.0
+        effective_pct += 1.0
     elif not root_info["has_root"]:
-        dm_pct -= 1.5
+        effective_pct -= 1.5
 
-    # 7. Clamp to reasonable range
-    score = max(1.0, min(50.0, round(dm_pct, 1)))
-
-    # 8. Determine verdict (20% = balanced)
-    if score >= 30.0:
+    # 6. Determine verdict using effective_pct (20% = balanced)
+    if effective_pct >= 30.0:
         verdict = "extremely_strong"
-    elif score >= 24.0:
+    elif effective_pct >= 24.0:
         verdict = "strong"
-    elif score >= 16.0:
+    elif effective_pct >= 16.0:
         verdict = "neutral"
-    elif score >= 10.0:
+    elif effective_pct >= 10.0:
         verdict = "weak"
     else:
         verdict = "extremely_weak"

@@ -25,7 +25,7 @@ from .ten_gods import (
     classify_ten_god_strength, analyze_ten_god_patterns,
     check_spouse_star, check_children_star,
 )
-from .strength import count_elements, count_all_elements
+from .strength import count_elements, count_all_elements, adjust_elements_for_interactions
 from .qi_phase_analysis import analyze_qi_phases
 from .spiritual_sensitivity import assess_spiritual_sensitivity
 
@@ -399,14 +399,21 @@ def build_daymaster_analysis(strength: StrengthAssessment,
 # ELEMENT SCORES (3-tier: base → natal → post)
 # =============================================================================
 
-def build_element_scores(chart: ChartData) -> Tuple[dict, dict, dict]:
+def build_element_scores(chart: ChartData,
+                         interactions: list = None) -> Tuple[dict, dict, dict]:
     """
     2-tier element scores: natal (4 pillars) vs full (natal + LP + time-period).
+    Interaction-adjusted so element bars match DM strength percentage.
     Returns (base_element_score, natal_element_score, post_element_score)
     as {stem_name: float} dicts.
     """
     natal_counts = count_elements(chart)      # Natal 4 pillars only
     full_counts = count_all_elements(chart)    # Everything
+
+    # Adjust for branch interactions (combinations/clashes)
+    if interactions:
+        natal_counts = adjust_elements_for_interactions(natal_counts, interactions, chart)
+        full_counts = adjust_elements_for_interactions(full_counts, interactions, chart)
 
     def _to_stem_scores(elem_counts):
         scores = {}
@@ -2329,8 +2336,8 @@ def adapt_to_frontend(chart: ChartData, results: dict) -> dict:
     # 3. Collect red flags
     flags = _collect_red_flags(chart, strength, tg_classification, interactions, shen_sha)
 
-    # 4. Build element scores
-    base_score, natal_score, post_score = build_element_scores(chart)
+    # 4. Build element scores (interaction-adjusted to match DM strength %)
+    base_score, natal_score, post_score = build_element_scores(chart, interactions)
 
     # 5. Assemble response
     response = {}
