@@ -416,9 +416,24 @@ def assess_day_master_strength(
         percentages = {elem: 20.0 for elem in element_counts}
 
     # 4. DM strength score = DM's element percentage (single source of truth)
-    score = max(1.0, min(50.0, round(percentages[chart.dm_element], 1)))
+    dm_element = chart.dm_element
+    score = max(1.0, min(50.0, round(percentages[dm_element], 1)))
 
-    # 5. Seasonal and root factors influence verdict, not the score
+    # 5. Drain pressure: if drain elements individually exceed the DM,
+    #    the DM is under pressure even at a "balanced" percentage.
+    #    e.g., Wood 22% looks balanced, but Fire 40% + Earth 24% = heavy drain.
+    output_elem = ELEMENT_CYCLES["generating"].get(dm_element, "")
+    wealth_elem = ELEMENT_CYCLES["controlling"].get(dm_element, "")
+    officer_elem = ELEMENT_CYCLES["controlled_by"].get(dm_element, "")
+
+    drain_pressure = 0.0
+    for drain_elem in [output_elem, wealth_elem, officer_elem]:
+        if drain_elem:
+            excess = percentages.get(drain_elem, 0) - score
+            if excess > 0:
+                drain_pressure += excess
+
+    # 6. Seasonal and root factors
     seasonal_state = get_seasonal_state(chart)
     root_info = check_rooting(chart)
 
@@ -428,7 +443,11 @@ def assess_day_master_strength(
     elif not root_info["has_root"]:
         effective_pct -= 1.5
 
-    # 6. Determine verdict using effective_pct (20% = balanced)
+    # 7. Apply drain pressure — each point of excess reduces effective strength
+    #    e.g., Fire 40% vs Wood 22% = 18 pts excess → heavy pressure on Wood
+    effective_pct -= drain_pressure * 0.4
+
+    # 8. Determine verdict using effective_pct (20% = balanced)
     if effective_pct >= 30.0:
         verdict = "extremely_strong"
     elif effective_pct >= 24.0:
