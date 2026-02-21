@@ -1,12 +1,9 @@
 # =============================================================================
 # DAY MASTER STRENGTH ASSESSMENT ENGINE
 # =============================================================================
-# Comprehensive DM strength calculation with:
-#   - Element counting (visible + hidden, weighted by qi score)
-#   - Seasonal qi factor
-#   - Rooting analysis
-#   - Following chart (从格) detection
-#   - Useful God (用神) determination
+# DM strength = DM's element percentage of total chart elements.
+# ~20% = balanced (100% / 5 elements).
+# Branch interactions adjust element weights before computing percentages.
 # =============================================================================
 
 from typing import List, Dict, Tuple, Optional
@@ -16,7 +13,7 @@ from ..derived import (
     STEM_ORDER, BRANCH_ORDER
 )
 from ..seasonal import SEASONAL_ADJUSTMENT
-from .models import StrengthAssessment, ChartData
+from .models import StrengthAssessment, BranchInteraction, ChartData
 
 
 # =============================================================================
@@ -178,6 +175,81 @@ def count_support_vs_drain(chart: ChartData) -> Tuple[float, float]:
 
 
 # =============================================================================
+# INTERACTION-ADJUSTED ELEMENT COUNTING
+# =============================================================================
+
+# Bonuses for combinations that generate elements.
+# Transformed = resulting element present as visible Heavenly Stem.
+INTERACTION_BONUSES = {
+    "directional_combo": {"transformed": 2.0, "combined": 0.8},
+    "three_harmony":     {"transformed": 1.5, "combined": 0.6},
+    "half_three_harmony": {"transformed": 0.3, "combined": 0.2},
+    "harmony":           {"transformed": 0.5, "combined": 0.2},
+}
+
+CLASH_PENALTY = 0.3
+
+
+def _get_resulting_element(interaction: BranchInteraction) -> Optional[str]:
+    """Look up the resulting element for a combination interaction."""
+    from .interactions import HARMONY_PAIRS, THREE_HARMONY_FRAMES, DIRECTIONAL_COMBOS
+
+    itype = interaction.interaction_type
+    branches_set = frozenset(interaction.branches)
+
+    if itype == "directional_combo":
+        info = DIRECTIONAL_COMBOS.get(branches_set)
+        return info[0] if info else None
+    elif itype == "three_harmony":
+        return THREE_HARMONY_FRAMES.get(branches_set)
+    elif itype == "half_three_harmony":
+        for frame_set, elem in THREE_HARMONY_FRAMES.items():
+            if branches_set.issubset(frame_set):
+                return elem
+        return None
+    elif itype == "harmony":
+        return HARMONY_PAIRS.get(branches_set)
+    return None
+
+
+def adjust_elements_for_interactions(
+    element_counts: Dict[str, float],
+    interactions: List[BranchInteraction],
+    chart: ChartData,
+) -> Dict[str, float]:
+    """
+    Adjust element counts based on branch interactions.
+    Positive combinations add weight to the resulting element.
+    Transformed (resulting element present as HS) = larger bonus.
+    Clashes reduce both elements slightly.
+    """
+    adjusted = dict(element_counts)
+
+    # Collect visible Heavenly Stem elements
+    hs_elements = set()
+    for pos in ["year", "month", "day", "hour"]:
+        hs_elements.add(chart.pillars[pos].stem_element)
+
+    for interaction in interactions:
+        itype = interaction.interaction_type
+
+        if itype in INTERACTION_BONUSES:
+            resulting_element = _get_resulting_element(interaction)
+            if resulting_element:
+                transformed = resulting_element in hs_elements
+                key = "transformed" if transformed else "combined"
+                bonus = INTERACTION_BONUSES[itype][key]
+                adjusted[resulting_element] = adjusted.get(resulting_element, 0) + bonus
+
+        elif itype == "clash":
+            for br in interaction.branches:
+                elem = BRANCHES[br]["element"]
+                adjusted[elem] = max(0, adjusted.get(elem, 0) - CLASH_PENALTY)
+
+    return adjusted
+
+
+# =============================================================================
 # FOLLOWING CHART (从格) DETECTION
 # =============================================================================
 
@@ -301,58 +373,85 @@ def determine_useful_god(chart: ChartData, verdict: str,
 # MAIN STRENGTH ASSESSMENT
 # =============================================================================
 
-def assess_day_master_strength(chart: ChartData) -> StrengthAssessment:
+# Seasonal nudge on DM element percentage (small adjustments)
+SEASONAL_NUDGE = {
+    "Prosperous": 2.0,
+    "Strengthening": 1.0,
+    "Resting": 0.0,
+    "Trapped": -1.0,
+    "Dead": -2.0,
+}
+
+# Verdict thresholds (20% = balanced center)
+VERDICT_THRESHOLDS = {
+    "extremely_strong": 30.0,
+    "strong": 24.0,
+    "neutral_upper": 24.0,
+    "neutral_lower": 16.0,
+    "weak": 10.0,
+}
+
+
+def assess_day_master_strength(
+    chart: ChartData,
+    interactions: Optional[List[BranchInteraction]] = None,
+) -> StrengthAssessment:
     """
-    Comprehensive Day Master strength assessment.
-    Returns a StrengthAssessment with score, verdict, and recommendations.
+    DM strength = DM's element percentage of total chart elements.
+    ~20% = balanced. Branch interactions adjust element weights.
     """
-    # 1. Count support vs drain
-    support, drain = count_support_vs_drain(chart)
-    total = support + drain
+    # 1. Count raw elements
+    element_counts = count_elements(chart)
 
-    # 2. Get seasonal state
-    seasonal_state = get_seasonal_state(chart)
-    seasonal_mult = get_seasonal_multiplier(seasonal_state)
+    # 2. Adjust for interactions (combinations add element weight, clashes reduce)
+    if interactions:
+        element_counts = adjust_elements_for_interactions(
+            element_counts, interactions, chart)
 
-    # 3. Get rooting info
-    root_info = check_rooting(chart)
-
-    # 4. Calculate raw score (0-100 scale, 50 = perfectly balanced)
+    # 3. Calculate percentages
+    total = sum(element_counts.values())
     if total > 0:
-        raw_ratio = support / total
+        percentages = {elem: (count / total) * 100 for elem, count in element_counts.items()}
     else:
-        raw_ratio = 0.5
+        percentages = {elem: 20.0 for elem in element_counts}
 
-    # Apply seasonal adjustment
-    adjusted_ratio = raw_ratio * seasonal_mult
+    # 4. DM strength = DM's element percentage
+    dm_pct = percentages[chart.dm_element]
 
-    # Apply root bonus/penalty
+    # 5. Seasonal nudge
+    seasonal_state = get_seasonal_state(chart)
+    dm_pct += SEASONAL_NUDGE.get(seasonal_state, 0)
+
+    # 6. Root adjustment
+    root_info = check_rooting(chart)
     if root_info["has_strong_root"]:
-        adjusted_ratio += 0.05
+        dm_pct += 1.0
     elif not root_info["has_root"]:
-        adjusted_ratio -= 0.10
+        dm_pct -= 1.5
 
-    # Clamp to [0, 1]
-    adjusted_ratio = max(0.0, min(1.0, adjusted_ratio))
-    score = round(adjusted_ratio * 100, 1)
+    # 7. Clamp to reasonable range
+    score = max(1.0, min(50.0, round(dm_pct, 1)))
 
-    # 5. Determine verdict
-    if score >= 75:
+    # 8. Determine verdict (20% = balanced)
+    if score >= 30.0:
         verdict = "extremely_strong"
-    elif score >= 58:
+    elif score >= 24.0:
         verdict = "strong"
-    elif score >= 42:
+    elif score >= 16.0:
         verdict = "neutral"
-    elif score >= 25:
+    elif score >= 10.0:
         verdict = "weak"
     else:
         verdict = "extremely_weak"
 
-    # 6. Check for following chart
+    # 9. Support/drain counts (kept for compatibility)
+    support, drain = count_support_vs_drain(chart)
+
+    # 10. Check for following chart
     is_following, following_type = detect_following_chart(
         chart, support, drain, seasonal_state, root_info)
 
-    # 7. Determine useful god and elements
+    # 11. Determine useful god and elements
     god_info = determine_useful_god(chart, verdict, is_following, following_type)
 
     return StrengthAssessment(
@@ -366,4 +465,5 @@ def assess_day_master_strength(chart: ChartData) -> StrengthAssessment:
         useful_god=god_info["useful_god"],
         favorable_elements=god_info["favorable"],
         unfavorable_elements=god_info["unfavorable"],
+        element_percentages={k: round(v, 1) for k, v in percentages.items()},
     )

@@ -614,29 +614,29 @@ LIFE_LESSON_TEMPLATES = {
 
 STRENGTH_EXPLANATION = {
     "weak": (
-        "Your {dm_name} is weak at {score}/100. A weak Day Master needs nourishment "
+        "Your {dm_name} is weak at {score}% (20% = balanced). A weak Day Master needs nourishment "
         "({resource} generates {dm_element}) and companions ({dm_element}). "
         "{unfav_list} all drain or attack your weak {dm_element}. "
         "Low amounts of unfavorable elements are actually a blessing — less pressure on your weak {dm_element}."
     ),
     "extremely_weak": (
-        "Your {dm_name} is extremely weak at {score}/100 — severely depleted. "
+        "Your {dm_name} is extremely weak at {score}% (20% = balanced) — severely depleted. "
         "{resource} (resource) and {dm_element} (companions) are absolutely critical. "
         "Everything else — {unfav_list} — drains or attacks you. "
         "Environment, career, and relationships MUST supply {resource} energy."
     ),
     "strong": (
-        "Your {dm_name} is strong at {score}/100. Abundant energy needs outlets. "
+        "Your {dm_name} is strong at {score}% (20% = balanced). Abundant energy needs outlets. "
         "{output} (output) and {wealth} (wealth) channel your excess energy productively. "
         "{officer} disciplines your strength. More {dm_element} or {resource} would overload the chart."
     ),
     "extremely_strong": (
-        "Your {dm_name} is extremely strong at {score}/100. Overwhelming energy needs heavy draining. "
+        "Your {dm_name} is extremely strong at {score}% (20% = balanced). Overwhelming energy needs heavy draining. "
         "{output}, {wealth}, and {officer} are all critical to prevent stagnation. "
         "Avoid {dm_element} and {resource} — they fuel an already excessive chart."
     ),
     "neutral": (
-        "Your {dm_name} is balanced at {score}/100. Small shifts in luck pillars have outsized effects. "
+        "Your {dm_name} is balanced at {score}% (20% = balanced). Small shifts in luck pillars have outsized effects. "
         "{output} and {wealth} keep the chart productive. "
         "Avoid excessive {officer} which could tip the balance toward weakness."
     ),

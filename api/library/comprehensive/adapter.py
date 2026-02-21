@@ -1231,7 +1231,7 @@ def _summary_strength(strength: StrengthAssessment, chart: ChartData) -> dict:
         }
 
     items = [
-        {"label": "Score", "value": f"{strength.score}/100"},
+        {"label": "Score", "value": f"{strength.score}% (20% = balanced)"},
     ]
 
     # Useful God with role
@@ -1917,25 +1917,25 @@ def _summary_honest(chart: ChartData, strength: StrengthAssessment,
     parts.append(f"You are {nature.get('name', chart.day_master)} ({nature.get('chinese', dm_info['chinese'])}). "
                  f"Personality: {nature.get('personality', 'unknown')}.")
 
-    # Strength reality
+    # Strength reality (score = element %, 20% = balanced)
     score = strength.score
-    if score < 25:
-        parts.append(f"Your Day Master is extremely weak ({score:.0f}/100). "
+    if score < 10:
+        parts.append(f"Your Day Master is extremely weak ({score:.0f}% element presence, 20% = balanced). "
                      "You are easily overwhelmed by life's demands. "
                      "Your biggest challenge is finding support systems and environments that sustain you.")
-    elif score < 42:
-        parts.append(f"Your Day Master is weak ({score:.0f}/100). "
+    elif score < 16:
+        parts.append(f"Your Day Master is weak ({score:.0f}% element presence, 20% = balanced). "
                      "You need more support than most people. "
                      "Resource and companion elements are your lifeline.")
-    elif score < 58:
-        parts.append(f"Your Day Master is balanced ({score:.0f}/100). "
+    elif score < 24:
+        parts.append(f"Your Day Master is balanced ({score:.0f}% element presence, 20% = balanced). "
                      "You have a flexible chart — small shifts in luck pillars have outsized effects on your life.")
-    elif score < 75:
-        parts.append(f"Your Day Master is strong ({score:.0f}/100). "
+    elif score < 30:
+        parts.append(f"Your Day Master is strong ({score:.0f}% element presence, 20% = balanced). "
                      "You have abundant energy but need productive outlets. "
                      "Without channels for your strength, you become restless and domineering.")
     else:
-        parts.append(f"Your Day Master is extremely strong ({score:.0f}/100). "
+        parts.append(f"Your Day Master is extremely strong ({score:.0f}% element presence, 20% = balanced). "
                      "You have overwhelming energy. The risk is stagnation and bulldozing over others.")
 
     # Marriage reality — GENDER-AWARE

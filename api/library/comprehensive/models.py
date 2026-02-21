@@ -96,7 +96,7 @@ class BranchInteraction:
 @dataclass
 class StrengthAssessment:
     """Day Master strength assessment result."""
-    score: float
+    score: float                    # DM's element percentage (20% = balanced)
     verdict: str                    # "extremely_strong", "strong", "neutral", "weak", "extremely_weak"
     support_count: float
     drain_count: float
@@ -106,6 +106,7 @@ class StrengthAssessment:
     useful_god: str = ""                    # Element name
     favorable_elements: List[str] = field(default_factory=list)
     unfavorable_elements: List[str] = field(default_factory=list)
+    element_percentages: Dict[str, float] = field(default_factory=dict)
 
 
 @dataclass

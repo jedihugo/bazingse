@@ -171,10 +171,10 @@ def analyze_for_api(chart: ChartData) -> dict:
     from .predictions import run_all_predictions
     from .environment import assess_environment
 
-    strength = assess_day_master_strength(chart)
+    interactions = detect_all_interactions(chart)
+    strength = assess_day_master_strength(chart, interactions=interactions)
     tg_entries = map_all_ten_gods(chart)
     tg_classification = classify_ten_god_strength(tg_entries)
-    interactions = detect_all_interactions(chart)
     shen_sha = run_all_shen_sha(chart)
     predictions = run_all_predictions(chart)
     env = assess_environment(chart, strength)
