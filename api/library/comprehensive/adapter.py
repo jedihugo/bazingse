@@ -26,6 +26,8 @@ from .ten_gods import (
     check_spouse_star, check_children_star,
 )
 from .strength import count_elements, count_all_elements
+from .qi_phase_analysis import analyze_qi_phases
+from .spiritual_sensitivity import assess_spiritual_sensitivity
 
 
 # =============================================================================
@@ -2128,6 +2130,19 @@ def adapt_to_frontend(chart: ChartData, results: dict) -> dict:
 
     # Comprehensive report (new field)
     response["comprehensive_report"] = comprehensive_report
+
+    # Qi Phase contextual analysis (十二长生深度分析) + Spiritual Sensitivity (灵性敏感度)
+    try:
+        qi_phase_result = analyze_qi_phases(chart, shen_sha)
+        response["qi_phase_analysis"] = qi_phase_result
+
+        spiritual_bonus = qi_phase_result.get("spiritual_bonus", 0)
+        response["spiritual_sensitivity"] = assess_spiritual_sensitivity(
+            chart, shen_sha, qi_phase_spiritual_bonus=spiritual_bonus
+        )
+    except Exception:
+        response["qi_phase_analysis"] = None
+        response["spiritual_sensitivity"] = None
 
     # Client summary (structured JSON for frontend)
     response["client_summary"] = build_client_summary(chart, results, flags)
