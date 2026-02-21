@@ -330,7 +330,10 @@ def build_interaction_dict(interactions: List[BranchInteraction]) -> dict:
     result = {}
     for idx, inter in enumerate(interactions):
         int_id = f"INT_{idx}_{inter.interaction_type}"
-        branch_chinese = "".join(BRANCHES[b]["chinese"] for b in inter.branches)
+        branch_chinese = "".join(
+            STEMS[b]["chinese"] if b in STEMS else BRANCHES[b]["chinese"]
+            for b in inter.branches
+        )
         result[int_id] = {
             "id": int_id,
             "type": inter.interaction_type.upper(),
