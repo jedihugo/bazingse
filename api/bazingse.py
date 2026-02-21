@@ -4052,344 +4052,157 @@ def analyze_8_node_interactions(
     # Apply location boost ONLY to post scores (current situation, not birth destiny)
     if location:
         apply_location_boost(post_ten_elements, location)
-    
-    # Enhanced Daymaster Analysis System
+
+    # ============= SEASONAL SCALING (旺相休囚死) =============
+    # The month branch sets the seasonal context for the entire chart.
+    # Each element's weight is multiplied by its seasonal state multiplier.
+    # This is the MOST INFLUENTIAL factor — more impactful than interactions.
+    # Source of truth: library.comprehensive.strength.apply_seasonal_scaling
+    def _apply_seasonal_to_scores(month_br):
+        """Apply seasonal multipliers to all element score dicts."""
+        if not month_br or month_br not in BRANCHES:
+            return
+        states = BRANCHES[month_br]["element_states"]
+        # Scale five-element dicts ({"Wood": {"score": N}, ...})
+        for five_dict in [base_five_elements, natal_five_elements, post_five_elements]:
+            for elem in five_dict:
+                state = states.get(elem, "Resting")
+                mult = SEASONAL_ADJUSTMENT.get(state.lower(), 1.0)
+                five_dict[elem]["score"] = int(five_dict[elem]["score"] * mult)
+        # Scale ten-element dicts ({"Jia": N, "Yi": N, ...})
+        for ten_dict in [base_ten_elements, natal_ten_elements, post_ten_elements]:
+            for stem in ten_dict:
+                elem = HEAVENLY_STEMS[stem]["element"]
+                state = states.get(elem, "Resting")
+                mult = SEASONAL_ADJUSTMENT.get(state.lower(), 1.0)
+                ten_dict[stem] = int(ten_dict[stem] * mult)
+
+    _apply_seasonal_to_scores(month_branch)
+
+    # ============= DAY MASTER STRENGTH ANALYSIS =============
+    # Single source of truth: library.comprehensive.strength
+    # Uses balance simulation (not categorical rules) for useful god.
+    from library.comprehensive.strength import simulate_element_balance, simulate_element_pairs
+
     def analyze_daymaster_strength(bazi_chart, five_elements):
         """
-        Advanced Daymaster strength analysis with multi-factor assessment.
-        Based on traditional BaZi principles: Resource, Companion, Output, Wealth, Officer.
+        DM strength via element percentage + balance simulation for useful god.
+        Delegates useful god determination to comprehensive engine's simulation.
         """
-        
-        # Get Day Master element
         day_hs = bazi_chart.get("day_pillar", "").split()[0] if "day_pillar" in bazi_chart else ""
         if day_hs not in HEAVENLY_STEMS:
             return {
-                "daymaster": "Unknown",
-                "strength_category": "Cannot determine",
-                "chart_type": "Unknown",
-                "favorable_elements": [],
-                "unfavorable_elements": [],
-                "useful_god": None,
+                "daymaster": "Unknown", "strength_category": "Cannot determine",
+                "chart_type": "Unknown", "favorable_elements": [],
+                "unfavorable_elements": [], "useful_god": None,
                 "explanation": "Day Master not found"
             }
-        
+
         dm_element = HEAVENLY_STEMS[day_hs]["element"]
         dm_polarity = HEAVENLY_STEMS[day_hs]["polarity"]
-        
-        # Define Wu Xing element relationships
-        element_relationships = {
-            "Wood": {
-                "resource": "Water",      # Water produces Wood
-                "companion": "Wood",       # Same element
-                "output": "Fire",          # Wood produces Fire
-                "wealth": "Earth",         # Wood controls Earth
-                "officer": "Metal"         # Metal controls Wood
-            },
-            "Fire": {
-                "resource": "Wood",
-                "companion": "Fire",
-                "output": "Earth",
-                "wealth": "Metal",
-                "officer": "Water"
-            },
-            "Earth": {
-                "resource": "Fire",
-                "companion": "Earth", 
-                "output": "Metal",
-                "wealth": "Water",
-                "officer": "Wood"
-            },
-            "Metal": {
-                "resource": "Earth",
-                "companion": "Metal",
-                "output": "Water",
-                "wealth": "Wood",
-                "officer": "Fire"
-            },
-            "Water": {
-                "resource": "Metal",
-                "companion": "Water",
-                "output": "Wood",
-                "wealth": "Fire",
-                "officer": "Earth"
-            }
-        }
-        
-        relationships = element_relationships[dm_element]
-        
-        # Calculate element scores
+
+        # Element relationship map
+        rels = {
+            "Wood": {"resource": "Water", "output": "Fire", "wealth": "Earth", "officer": "Metal"},
+            "Fire": {"resource": "Wood", "output": "Earth", "wealth": "Metal", "officer": "Water"},
+            "Earth": {"resource": "Fire", "output": "Metal", "wealth": "Water", "officer": "Wood"},
+            "Metal": {"resource": "Earth", "output": "Water", "wealth": "Wood", "officer": "Fire"},
+            "Water": {"resource": "Metal", "output": "Wood", "wealth": "Fire", "officer": "Earth"},
+        }[dm_element]
+
+        # Calculate percentages from seasonally-scaled scores
         dm_score = five_elements.get(dm_element, {}).get("score", 0)
         total_score = sum(e["score"] for e in five_elements.values())
-        
         if total_score == 0:
             return {
                 "daymaster": f"{dm_polarity} {dm_element}",
-                "strength_category": "Cannot determine",
-                "chart_type": "Invalid",
-                "favorable_elements": [],
-                "unfavorable_elements": [],
-                "useful_god": None,
-                "explanation": "No element scores found"
+                "strength_category": "Cannot determine", "chart_type": "Invalid",
+                "favorable_elements": [], "unfavorable_elements": [],
+                "useful_god": None, "explanation": "No element scores found"
             }
-        
-        # Calculate scores for each element relationship
-        resource_score = five_elements.get(relationships["resource"], {}).get("score", 0)
-        output_score = five_elements.get(relationships["output"], {}).get("score", 0)
-        wealth_score = five_elements.get(relationships["wealth"], {}).get("score", 0)
-        officer_score = five_elements.get(relationships["officer"], {}).get("score", 0)
-        
-        # Support vs Drain calculation
-        support_score = resource_score + dm_score  # Resource + Companion
+
+        resource_score = five_elements.get(rels["resource"], {}).get("score", 0)
+        output_score = five_elements.get(rels["output"], {}).get("score", 0)
+        wealth_score = five_elements.get(rels["wealth"], {}).get("score", 0)
+        officer_score = five_elements.get(rels["officer"], {}).get("score", 0)
+
+        support_score = resource_score + dm_score
         drain_score = output_score + wealth_score + officer_score
-        
-        support_percentage = (support_score / total_score * 100)
-        drain_percentage = (drain_score / total_score * 100)
-        dm_percentage = (dm_score / total_score * 100)
-        
-        # Check for special chart patterns
+        support_pct = support_score / total_score * 100
+        dm_pct = dm_score / total_score * 100
+
+        # Determine strength category
         chart_type = "Normal"
-        
-        # Follower Chart detection (从格) - Day Master < 10%, Support < 20%
-        if dm_percentage < 10 and support_percentage < 20:
+        if dm_pct < 10 and support_pct < 20:
             dominant_elem = max(five_elements.items(), key=lambda x: x[1]["score"])
             if dominant_elem[1]["score"] / total_score > 0.4:
                 chart_type = "Follower"
-        
-        # Vibrant Chart detection (旺格) - Support > 70%
-        elif support_percentage > 70:
+        elif support_pct > 70:
             chart_type = "Vibrant"
-        
-        # Determine favorable elements based on chart type
+
+        if support_pct >= 60:
+            strength_category = "Very Strong"
+        elif support_pct >= 45:
+            strength_category = "Strong"
+        elif support_pct >= 20:
+            if dm_pct >= 16:
+                strength_category = "Balanced"
+            else:
+                strength_category = "Weak"
+        else:
+            strength_category = "Very Weak"
+
         if chart_type == "Follower":
-            # Follower: Support the dominant element
-            dominant = max([(relationships["output"], output_score, "Output"),
-                          (relationships["wealth"], wealth_score, "Wealth"),
-                          (relationships["officer"], officer_score, "Officer")],
-                         key=lambda x: x[1])
-            
             strength_category = "Follower (从格)"
+        elif chart_type == "Vibrant":
+            strength_category = "Vibrant (旺格)"
+
+        # Use SIMULATION for useful god (single source of truth: comprehensive engine)
+        # Convert five_elements to simple {element: weight} for simulation
+        element_weights = {elem: data["score"] for elem, data in five_elements.items()}
+        sim_result = simulate_element_balance(element_weights)
+
+        useful_god = sim_result["useful_god"]
+        favorable = sim_result["favorable"]
+        unfavorable = sim_result["unfavorable"]
+
+        # Override for special chart types
+        if chart_type == "Follower":
+            dominant = max([(rels["output"], output_score), (rels["wealth"], wealth_score),
+                           (rels["officer"], officer_score)], key=lambda x: x[1])
             useful_god = dominant[0]
             favorable = [dominant[0]]
-            if dominant[0] in element_relationships:
-                favorable.append(element_relationships[dominant[0]]["resource"])
-            unfavorable = [dm_element, relationships["resource"]]
-            explanation = f"Follower Chart: Day Master surrenders to {dominant[0]} ({dominant[2]}). Support {dominant[0]}, avoid strengthening Day Master."
-            
-        elif chart_type == "Vibrant":
-            # Vibrant: Channel excess energy
-            strength_category = "Vibrant (旺格)"
-            useful_god = relationships["output"]
-            favorable = [relationships["output"], relationships["wealth"]]
-            unfavorable = [relationships["officer"]]
-            explanation = f"Vibrant Chart: Day Master self-sufficient at {support_percentage:.1f}%. Channel through Output ({relationships['output']}), avoid suppression."
-            
-        else:
-            # Normal chart analysis
-            if support_percentage >= 60:
-                strength_category = "Very Strong"
-                useful_god = relationships["output"]
-                favorable = [relationships["output"], relationships["wealth"]]
-                unfavorable = [relationships["resource"], dm_element]
-                explanation = f"Day Master very strong ({support_percentage:.1f}% support). Release excess through Output ({relationships['output']}) and Wealth ({relationships['wealth']})."
-                
-            elif support_percentage >= 45:
-                strength_category = "Strong"
-                useful_god = relationships["wealth"]
-                favorable = [relationships["wealth"], relationships["officer"], relationships["output"]]
-                unfavorable = [relationships["resource"]]
-                explanation = f"Day Master strong ({support_percentage:.1f}% support). Channel strength through Wealth ({relationships['wealth']}) and Officer ({relationships['officer']})."
-                
-            elif support_percentage >= 35:
-                strength_category = "Balanced"
-                
-                # Smart analysis: Consider generation chain effects
-                element_scores = {elem: data["score"] for elem, data in five_elements.items()}
-                
-                # Define WuXing generation relationships
-                generates = {
-                    "Wood": "Fire", "Fire": "Earth", "Earth": "Metal", 
-                    "Metal": "Water", "Water": "Wood"
-                }
-                controls = {
-                    "Wood": "Earth", "Earth": "Water", "Water": "Fire",
-                    "Fire": "Metal", "Metal": "Wood"
-                }
-                
-                # Find problematic elements (too strong and harmful to DM)
-                problematic_elements = []
-                for elem, score in element_scores.items():
-                    if score > total_score * 0.3:  # More than 30% of total
-                        # Check if this element harms the Day Master
-                        if (elem == relationships["officer"] and score > dm_score * 1.5) or \
-                           (elem == relationships["wealth"] and score > dm_score * 2.0) or \
-                           (score > total_score * 0.4):  # Or simply too dominant (>40%)
-                            problematic_elements.append(elem)
-                
-                # Smart favorable element selection
-                if problematic_elements:
-                    # Strategy: Control the problematic element or strengthen DM
-                    primary_problem = max(problematic_elements, key=lambda x: element_scores[x])
-                    
-                    # Option 1: Use element that controls the problematic element
-                    controller = None
-                    for elem, controlled in controls.items():
-                        if controlled == primary_problem and elem != primary_problem:
-                            controller = elem
-                            break
-                    
-                    # Option 2: Strengthen Day Master support (Resource)
-                    resource_elem = relationships["resource"]
-                    
-                    # Special case: When Day Master itself is too strong
-                    if primary_problem == dm_element:
-                        # Use Output to drain, Officer to control, or Wealth to consume
-                        useful_god = relationships["output"]  # Primary: drain excess energy
-                        favorable = [relationships["output"], relationships["wealth"]]
-                        unfavorable = [resource_elem]  # Avoid what feeds the Day Master
-                        
-                        # Also mark element that generates the Day Master as unfavorable
-                        for elem, generated in generates.items():
-                            if generated == dm_element and elem not in unfavorable:
-                                unfavorable.append(elem)
-                        
-                        explanation = f"Day Master excessively strong ({dm_percentage:.1f}%). Use Output ({relationships['output']}) to drain excess energy and Wealth ({relationships['wealth']}) to consume it."
-                        explanation += f" Avoid {resource_elem} which would strengthen it further."
-                    
-                    # Choose the better strategy for other problematic elements
-                    elif controller and element_scores.get(controller, 0) < element_scores[primary_problem] * 0.3:
-                        # Controller is weak enough to be effective
-                        useful_god = controller
-                        favorable = [controller]
-                        
-                        # Build comprehensive strategy based on element relationships
-                        
-                        # 1. Always strengthen daymaster when under attack (officer or wealth overwhelming)
-                        if primary_problem == relationships["officer"] or primary_problem == relationships["wealth"]:
-                            if dm_element not in favorable:
-                                favorable.append(dm_element)  # Strengthen daymaster to resist
-                        
-                        # 2. Check what element the problem generates (that element drains the problem!)
-                        drainer = generates.get(primary_problem)
-                        if drainer and drainer not in favorable:
-                            # Check if drainer is beneficial to daymaster
-                            if drainer == resource_elem or drainer == dm_element:
-                                favorable.append(drainer)
-                                drain_benefit = f" {drainer} drains {primary_problem} while supporting {dm_element}."
-                            elif drainer != relationships["officer"] and drainer != relationships["wealth"]:
-                                # Only add if it's not harmful to daymaster
-                                favorable.append(drainer)
-                                drain_benefit = f" {drainer} drains {primary_problem} energy."
-                            else:
-                                drain_benefit = ""
-                        else:
-                            drain_benefit = ""
-                        
-                        # 3. Check for generation chains and synergies
-                        synergies = []
-                        for i, elem1 in enumerate(favorable):
-                            for elem2 in favorable[i+1:]:
-                                if generates.get(elem1) == elem2:
-                                    synergies.append(f"{elem1}→{elem2}")
-                                elif generates.get(elem2) == elem1:
-                                    synergies.append(f"{elem2}→{elem1}")
-                        
-                        # Build explanation
-                        explanation = f"Day Master balanced ({support_percentage:.1f}% support). {primary_problem} ({element_scores[primary_problem]}pts) is overwhelming."
-                        explanation += f" Strategy: {controller} controls {primary_problem}"
-                        
-                        if dm_element in favorable:
-                            explanation += f", {dm_element} strengthens self"
-                        
-                        if drain_benefit:
-                            explanation += drain_benefit
-                        
-                        if synergies:
-                            explanation += f" Synergies: {', '.join(synergies)}."
-                        
-                        # Only add resource if Day Master itself is NOT the problem
-                        if primary_problem != dm_element and element_scores.get(resource_elem, 0) < dm_score * 0.5:
-                            favorable.append(resource_elem)  # Strengthen if resource is weak
-                            explanation += f" {resource_elem} can provide modest support."
-                    else:
-                        # Strengthen Day Master instead
-                        useful_god = resource_elem
-                        favorable = [resource_elem, dm_element]
-                        explanation = f"Day Master balanced ({support_percentage:.1f}% support). {primary_problem} ({element_scores[primary_problem]}pts) is too strong. Strengthen Day Master with {resource_elem}."
-                    
-                    unfavorable = [primary_problem]
-                    
-                    # Check if any element feeds the problematic element
-                    for elem, generated in generates.items():
-                        if generated == primary_problem and elem not in favorable:
-                            unfavorable.append(elem)
-                            if elem not in explanation:
-                                explanation += f" Avoid {elem} (feeds {primary_problem})."
-                else:
-                    # No major problems, traditional weakest element approach
-                    weakest = min(five_elements.items(), key=lambda x: x[1]["score"])
-                    useful_god = weakest[0]
-                    favorable = [weakest[0]]
-                    strongest = max(five_elements.items(), key=lambda x: x[1]["score"])
-                    unfavorable = [strongest[0]] if strongest[0] != dm_element else []
-                    explanation = f"Day Master balanced ({support_percentage:.1f}% support). Enhance {weakest[0]} (weakest element) for equilibrium."
-                
-            elif support_percentage >= 20:
-                strength_category = "Weak"
-                useful_god = relationships["resource"]
-                favorable = [relationships["resource"], dm_element]
-                unfavorable = [relationships["officer"], relationships["wealth"]]
-                explanation = f"Day Master weak ({support_percentage:.1f}% support). Strengthen with Resource ({relationships['resource']}) and Companion ({dm_element})."
-                
-            else:
-                strength_category = "Very Weak"
-                useful_god = relationships["resource"]
-                favorable = [relationships["resource"], dm_element]
-                unfavorable = [relationships["officer"], relationships["wealth"], relationships["output"]]
-                explanation = f"Day Master very weak ({support_percentage:.1f}% support). Urgently needs Resource ({relationships['resource']}) and Companion support."
-        
-        # Add seasonal context
-        month_eb = bazi_chart.get("month_pillar", "").split()[1] if " " in bazi_chart.get("month_pillar", "") else ""
-        
-        # Find element's seasonal state based on month branch
-        seasonal_state = None
-        seasonal_factor = 1.0
-        if month_eb and dm_element in SEASONAL_STRENGTH:
-            for state, branches in SEASONAL_STRENGTH[dm_element].items():
-                if month_eb in branches:
-                    seasonal_state = state.lower()
-                    seasonal_factor = SEASONAL_ADJUSTMENT.get(seasonal_state, 1.0)
-                    break
-        
-        if seasonal_state:
-            season = BRANCH_TO_SEASON.get(month_eb, "Unknown")
-            if seasonal_factor > 1.0:
-                explanation += f" Born in favorable {season} ({seasonal_state}, ×{seasonal_factor:.2f})."
-            elif seasonal_factor < 1.0:
-                explanation += f" Born in challenging {season} ({seasonal_state}, ×{seasonal_factor:.2f})."
-        
+            unfavorable = [dm_element, rels["resource"]]
+
+        # Build explanation from simulation
+        deficiency = 20.0 - (element_weights.get(useful_god, 0) / total_score * 100) if useful_god else 0
+        explanation = f"DM {dm_element} at {dm_pct:.1f}% ({strength_category}). "
+        if useful_god:
+            god_pct = element_weights.get(useful_god, 0) / total_score * 100
+            explanation += f"Useful God: {useful_god} — most deficient at {god_pct:.1f}%, adding it brings the chart closest to balance."
+
         return {
             "daymaster": f"{dm_polarity} {dm_element}",
             "daymaster_strength": strength_category,
-            "daymaster_percentage": round(dm_percentage, 1),
-            "support_percentage": round(support_percentage, 1),
-            "drain_percentage": round(drain_percentage, 1),
+            "daymaster_percentage": round(dm_pct, 1),
+            "support_percentage": round(support_pct, 1),
+            "drain_percentage": round(drain_score / total_score * 100, 1),
             "chart_type": chart_type,
             "element_relationships": {
-                "resource": f"{relationships['resource']} ({resource_score}pts)",
+                "resource": f"{rels['resource']} ({resource_score}pts)",
                 "companion": f"{dm_element} ({dm_score}pts)",
-                "output": f"{relationships['output']} ({output_score}pts)",
-                "wealth": f"{relationships['wealth']} ({wealth_score}pts)",
-                "officer": f"{relationships['officer']} ({officer_score}pts)"
+                "output": f"{rels['output']} ({output_score}pts)",
+                "wealth": f"{rels['wealth']} ({wealth_score}pts)",
+                "officer": f"{rels['officer']} ({officer_score}pts)"
             },
             "favorable_elements": favorable,
             "unfavorable_elements": unfavorable,
             "useful_god": useful_god,
-            "explanation": explanation
+            "explanation": explanation,
+            "best_element_pairs": simulate_element_pairs(element_weights),
         }
-    
+
     # Perform Daymaster analysis (use NATAL for inherent chart strength)
-    # CRITICAL: Use natal_five_elements (natal only, after interactions)
-    # NOT post_five_elements (which includes luck pillars and inflates strength)
     daymaster_analysis = analyze_daymaster_strength(bazi_chart, natal_five_elements)
     
     # ============= WEALTH STORAGE DETECTION (財庫分析) =============
