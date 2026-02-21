@@ -1392,27 +1392,108 @@ def _summary_luck_pillar(chart: ChartData, strength: StrengthAssessment) -> Opti
     }
 
 
-def _summary_health(chart: ChartData) -> dict:
-    """Section: health based on element balance."""
-    from .templates import HEALTH_ELEMENT_MAP
+def _summary_health(chart: ChartData, strength: StrengthAssessment) -> dict:
+    """Section: health based on element balance + seasonal states + control cycle.
+
+    Three layers of analysis:
+    1. Element balance: deficient/excess elements -> organ vulnerability
+    2. Seasonal state: elements in Dead/Trapped state -> heightened risk
+    3. Control cycle: weak controller -> uncontrolled target organ
+    """
+    from .templates import HEALTH_ELEMENT_MAP, CONTROL_CYCLE_EXPLANATIONS
+
     elem_counts = count_elements(chart)
+    total = sum(elem_counts.values())
+    avg = total / 5 if total > 0 else 1.0
+
+    # Get seasonal states for all elements from month branch
+    month_branch = chart.pillars["month"].branch
+    seasonal_states = BRANCHES[month_branch].get("element_states", {})
+
+    # Detect control cycle imbalances
+    ELEMENT_CONTROLS_MAP = {
+        "Wood": "Earth", "Fire": "Metal", "Earth": "Water",
+        "Metal": "Wood", "Water": "Fire",
+    }
+    control_imbalances = {}  # controlled_element -> controller info
+    for controller, controlled in ELEMENT_CONTROLS_MAP.items():
+        controller_state = seasonal_states.get(controller, "Resting")
+        controller_count = elem_counts.get(controller, 0)
+        # Weak controller: Dead/Trapped state OR very low count
+        if controller_state in ("Dead", "Trapped") or controller_count < avg * 0.3:
+            control_imbalances[controlled] = {
+                "controller": controller,
+                "controller_state": controller_state,
+                "controller_count": controller_count,
+            }
+
     items = []
+    SEASONAL_WEIGHT = {"Dead": 2.0, "Trapped": 1.5, "Resting": 1.0, "Strengthening": 0.7, "Prosperous": 0.5}
+
     for elem in ["Wood", "Fire", "Earth", "Metal", "Water"]:
         count = elem_counts.get(elem, 0)
+        pct = (count / total * 100) if total > 0 else 20
         organ_info = HEALTH_ELEMENT_MAP.get(elem, {})
         yin_organ = organ_info.get("yin_organ", elem)
-        if count < 1.0:
+        body_parts = organ_info.get("body_parts", "")
+        seasonal_state = seasonal_states.get(elem, "Resting")
+
+        reasons = []
+        severity = None
+
+        # Layer 1: Element balance
+        if count < avg * 0.5:
+            reasons.append(f"{elem} severely deficient ({pct:.0f}%). {organ_info.get('deficiency', 'vulnerability')}")
+            severity = "warning"
+        elif count < avg * 0.75:
+            reasons.append(f"{elem} below average ({pct:.0f}%). Mild {yin_organ.split('(')[0].strip().lower()} vulnerability")
+            severity = "mild"
+        elif count > avg * 1.8:
+            reasons.append(f"{elem} in excess ({pct:.0f}%). {organ_info.get('excess', 'overactive')}")
+            severity = "warning"
+        elif count > avg * 1.4:
+            reasons.append(f"{elem} above average ({pct:.0f}%). Watch for: {organ_info.get('excess', 'overactivity')}")
+            severity = "mild"
+
+        # Layer 2: Seasonal vulnerability
+        if seasonal_state in ("Dead", "Trapped"):
+            state_label = "Dead (死)" if seasonal_state == "Dead" else "Trapped (囚)"
+            reasons.append(f"{elem} in {state_label} seasonal state — heightened {yin_organ.split('(')[0].strip().lower()} vulnerability")
+            if severity is None:
+                severity = "mild"
+            elif severity == "mild":
+                severity = "warning"
+
+        # Layer 3: Control cycle imbalance
+        if elem in control_imbalances:
+            imb = control_imbalances[elem]
+            ctrl = imb["controller"]
+            explanation = CONTROL_CYCLE_EXPLANATIONS.get((ctrl, elem), "")
+            if explanation:
+                reasons.append(explanation)
+            else:
+                reasons.append(f"{ctrl} is too weak to control {elem} — {yin_organ.split('(')[0].strip().lower()} system unregulated")
+            if severity is None:
+                severity = "mild"
+            elif severity == "mild":
+                severity = "warning"
+
+        # Only include elements with issues
+        if reasons:
             items.append({
                 "label": f"{yin_organ} ({elem})",
-                "value": f"Low {elem} — {organ_info.get('deficiency', 'potential vulnerability')}",
-                "severity": "warning",
+                "value": ". ".join(reasons) + f". Body parts: {body_parts}.",
+                "severity": severity or "info",
             })
-        elif count > 3.0:
-            items.append({
-                "label": f"{yin_organ} ({elem})",
-                "value": f"Excess {elem} — {organ_info.get('excess', 'overactive')}",
-                "severity": "warning",
-            })
+
+    # If no issues found, show balanced message
+    if not items:
+        items.append({
+            "label": "Overall",
+            "value": "Element balance is healthy. No significant organ system vulnerabilities detected.",
+            "severity": "positive",
+        })
+
     return {
         "id": "health",
         "title": "Health",
@@ -2053,7 +2134,7 @@ def build_client_summary(chart: ChartData, results: dict,
             _summary_shen_sha(shen_sha),
             _summary_red_flags(flags),
             _summary_natal_predictions(chart, tg_classification, strength, predictions, flags),
-            _summary_health(chart),
+            _summary_health(chart, strength),
             _summary_remedies(strength),
             _summary_honest(chart, strength, tg_classification, flags),
         ]
