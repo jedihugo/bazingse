@@ -3,9 +3,13 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import ThemeToggle from './ThemeToggle';
-import { triCompact, CALENDAR } from '@/lib/t';
+import LanguagePicker from './LanguagePicker';
+import { useT } from './LanguageProvider';
+import { CALENDAR } from '@/lib/t';
 
 export default function Header() {
+  const { tCompact } = useT();
+
   return (
     <header className="tui-bg-panel border-b tui-border-color">
       <div className="max-w-7xl mx-auto px-1 py-1 sm:px-2 sm:py-2 md:px-3 flex items-center justify-between">
@@ -23,8 +27,9 @@ export default function Header() {
         </Link>
         <div className="flex items-center gap-2">
           <Link href="/calendar" className="tui-btn text-xs px-2 py-1 no-underline">
-            董公 Calendar
+            {tCompact(CALENDAR.title)}
           </Link>
+          <LanguagePicker />
           <ThemeToggle />
         </div>
       </div>

@@ -4,7 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import { type Profile, type ProfileUpdate, updateProfile } from '@/lib/api';
 import GuidedDateInput from './chat-form/GuidedDateInput';
 import GuidedTimeInput from './chat-form/GuidedTimeInput';
-import { tri, PROFILE_FORM, STATUS } from '@/lib/t';
+import { useT } from './LanguageProvider';
+import { PROFILE_FORM, STATUS } from '@/lib/t';
 
 interface ProfileInfoBlockProps {
   profile: Profile;
@@ -19,6 +20,7 @@ export default function ProfileInfoBlock({
   onBack,
   onBirthDataChange,
 }: ProfileInfoBlockProps) {
+  const { t } = useT();
   const [editingField, setEditingField] = useState<string | null>(null);
   const [editValue, setEditValue] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -157,7 +159,7 @@ export default function ProfileInfoBlock({
           <button
             onClick={onBack}
             className="tui-back-btn"
-            title={tri(PROFILE_FORM.click_to_edit)}
+            title={t(PROFILE_FORM.click_to_edit)}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -182,7 +184,7 @@ export default function ProfileInfoBlock({
           <h1
             onClick={() => handleEdit('name', profile.name)}
             className="text-2xl font-bold tui-text cursor-pointer px-1 -mx-1"
-            title={tri(PROFILE_FORM.click_to_edit)}
+            title={t(PROFILE_FORM.click_to_edit)}
           >
             {profile.name}
           </h1>
@@ -212,7 +214,7 @@ export default function ProfileInfoBlock({
           <span
             onClick={() => handleEdit('birth_date', '')}
             className="cursor-pointer px-1 -mx-1"
-            title={tri(PROFILE_FORM.click_to_edit)}
+            title={t(PROFILE_FORM.click_to_edit)}
           >
             {profile.birth_date}
           </span>
@@ -239,20 +241,20 @@ export default function ProfileInfoBlock({
           <span
             onClick={() => handleEdit('birth_time', '')}
             className={`cursor-pointer px-1 -mx-1 ${profile.birth_time ? '' : 'tui-text-muted italic'}`}
-            title={tri(PROFILE_FORM.click_to_edit)}
+            title={t(PROFILE_FORM.click_to_edit)}
           >
-            {profile.birth_time || tri(PROFILE_FORM.add_time)}
+            {profile.birth_time || t(PROFILE_FORM.add_time)}
           </span>
         )}
         <span className="tui-text-muted">|</span>
         <span style={{ color: profile.gender === 'female' ? 'var(--tui-accent-pink)' : 'var(--tui-water)' }}>
-          {profile.gender === 'female' ? `\u2640 ${tri(PROFILE_FORM.female)}` : `\u2642 ${tri(PROFILE_FORM.male)}`}
+          {profile.gender === 'female' ? `\u2640 ${t(PROFILE_FORM.female)}` : `\u2642 ${t(PROFILE_FORM.male)}`}
         </span>
       </div>
 
       {/* Place of birth (editable) */}
       <div className="flex items-center text-sm">
-        <span className="tui-text-muted mr-2">{tri(PROFILE_FORM.place_of_birth)}:</span>
+        <span className="tui-text-muted mr-2">{t(PROFILE_FORM.place_of_birth)}:</span>
         {editingField === 'place_of_birth' ? (
           <input
             ref={inputRef}
@@ -261,7 +263,7 @@ export default function ProfileInfoBlock({
             onChange={(e) => setEditValue(e.target.value)}
             onBlur={handleSave}
             onKeyDown={handleKeyDown}
-            placeholder={tri(PROFILE_FORM.click_to_add)}
+            placeholder={t(PROFILE_FORM.click_to_add)}
             className="tui-text-dim bg-transparent border-b outline-none flex-1"
             style={{ borderColor: 'var(--tui-water)' }}
             maxLength={200}
@@ -272,16 +274,16 @@ export default function ProfileInfoBlock({
             className={`cursor-pointer px-1 -mx-1 ${
               profile.place_of_birth ? 'tui-text-dim' : 'tui-text-muted italic'
             }`}
-            title={tri(PROFILE_FORM.click_to_edit)}
+            title={t(PROFILE_FORM.click_to_edit)}
           >
-            {profile.place_of_birth || tri(PROFILE_FORM.click_to_add)}
+            {profile.place_of_birth || t(PROFILE_FORM.click_to_add)}
           </span>
         )}
       </div>
 
       {/* Phone (editable) */}
       <div className="flex items-center text-sm mt-1">
-        <span className="tui-text-muted mr-2">{tri(PROFILE_FORM.phone)}:</span>
+        <span className="tui-text-muted mr-2">{t(PROFILE_FORM.phone)}:</span>
         {editingField === 'phone' ? (
           <input
             ref={inputRef}
@@ -290,7 +292,7 @@ export default function ProfileInfoBlock({
             onChange={(e) => setEditValue(e.target.value)}
             onBlur={handleSave}
             onKeyDown={handleKeyDown}
-            placeholder={tri(PROFILE_FORM.click_to_add)}
+            placeholder={t(PROFILE_FORM.click_to_add)}
             className="tui-text-dim bg-transparent border-b outline-none flex-1"
             style={{ borderColor: 'var(--tui-water)' }}
             maxLength={20}
@@ -301,9 +303,9 @@ export default function ProfileInfoBlock({
             className={`cursor-pointer px-1 -mx-1 ${
               profile.phone ? 'tui-text-dim' : 'tui-text-muted italic'
             }`}
-            title={tri(PROFILE_FORM.click_to_edit)}
+            title={t(PROFILE_FORM.click_to_edit)}
           >
-            {profile.phone || tri(PROFILE_FORM.click_to_add)}
+            {profile.phone || t(PROFILE_FORM.click_to_add)}
           </span>
         )}
       </div>
@@ -311,7 +313,7 @@ export default function ProfileInfoBlock({
       {/* Saving indicator */}
       {isSaving && (
         <div className="absolute top-2 right-2 text-xs tui-text-muted">
-          {tri(STATUS.saving)}
+          {t(STATUS.saving)}
         </div>
       )}
     </div>

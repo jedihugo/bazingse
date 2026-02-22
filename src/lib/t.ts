@@ -1,7 +1,6 @@
 /**
  * Trilingual dictionary for BaZingSe.
- * All user-facing strings in English / Bahasa Indonesia / 漢字 pīnyīn.
- * No language switching — all 3 displayed together.
+ * Supports 4 language modes: EN, ID, 中文, EN/中文 bilingual.
  */
 
 export interface TriEntry {
@@ -11,21 +10,48 @@ export interface TriEntry {
   py: string; // pinyin
 }
 
-/** Full trilingual format: "EN / ID / 漢字 pīnyīn" */
+export type LangMode = 'en' | 'id' | 'zh' | 'en-zh';
+
+// ── Mode-aware formatters (used by useT hook) ──
+
+/** Standard format */
+export function tFor(mode: LangMode, e: TriEntry): string {
+  switch (mode) {
+    case 'en': return e.en;
+    case 'id': return e.id;
+    case 'zh': return e.py ? `${e.zh} ${e.py}` : e.zh;
+    case 'en-zh': return e.py ? `${e.en} / ${e.zh} ${e.py}` : `${e.en} / ${e.zh}`;
+  }
+}
+
+/** Compact format for tight spaces */
+export function tCompactFor(mode: LangMode, e: TriEntry): string {
+  switch (mode) {
+    case 'en': return e.en;
+    case 'id': return e.id;
+    case 'zh': return e.zh;
+    case 'en-zh': return e.en === e.id ? `${e.zh} ${e.en}` : `${e.zh} ${e.en}`;
+  }
+}
+
+/** Pillar label format */
+export function tPillarFor(mode: LangMode, e: TriEntry): string {
+  switch (mode) {
+    case 'en': return e.en;
+    case 'id': return e.id;
+    case 'zh': return e.py ? `${e.zh} ${e.py}` : e.zh;
+    case 'en-zh': return e.py ? `${e.zh} ${e.py} · ${e.en}` : `${e.zh} · ${e.en}`;
+  }
+}
+
+// ── Static fallbacks (used by PasswordGate before context is available) ──
+
 export function tri(e: TriEntry): string {
-  return `${e.en} / ${e.id} / ${e.zh} ${e.py}`;
+  return tFor('en-zh', e);
 }
 
-/** Compact format for tight spaces: "漢字 EN/ID" */
 export function triCompact(e: TriEntry): string {
-  if (e.en === e.id) return `${e.zh} ${e.en}`;
-  return `${e.zh} ${e.en}/${e.id}`;
-}
-
-/** Pillar label format: "漢字 pīnyīn · EN/ID" */
-export function triPillar(e: TriEntry): string {
-  if (e.en === e.id) return `${e.zh} ${e.py} · ${e.en}`;
-  return `${e.zh} ${e.py} · ${e.en}/${e.id}`;
+  return tCompactFor('en-zh', e);
 }
 
 // ──────────────────────────────────────────────

@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from 'react';
 import PillarCard from './PillarCard';
-import { triPillar, PILLARS, COMPARISON, TALISMAN, LOCATION } from '@/lib/t';
+import { useT } from './LanguageProvider';
+import { PILLARS, COMPARISON, TALISMAN, LOCATION } from '@/lib/t';
 
 interface BaZiChartProps {
   chartData: any;
@@ -48,6 +49,7 @@ export default function BaZiChart({
   showTalisman = true,
   showLocation = true
 }: BaZiChartProps) {
+  const { tPillar } = useT();
   const mappings = chartData?.mappings || {};
   const dayMasterStem = chartData?.hs_d?.id || 'Yi';
   const [hoveredInteractionId, setHoveredInteractionId] = useState<string | null>(null);
@@ -153,8 +155,8 @@ export default function BaZiChart({
 
   // Build natal pillars
   const natalPillars = useMemo(() => {
-    const hour = buildPillar('hs_h', 'eb_h', triPillar(PILLARS.hour)) || {
-      label: triPillar(PILLARS.hour),
+    const hour = buildPillar('hs_h', 'eb_h', tPillar(PILLARS.hour)) || {
+      label: tPillar(PILLARS.hour),
       stem: { chinese: '?', element: 'Unknown', color: '' },
       stemName: '?',
       branch: { chinese: '?', animal: '?', element: 'Unknown', color: '' },
@@ -173,9 +175,9 @@ export default function BaZiChart({
       branchNegatives: [],
       branchWealthStorage: [],
     };
-    const day = buildPillar('hs_d', 'eb_d', triPillar(PILLARS.day), true);
-    const month = buildPillar('hs_m', 'eb_m', triPillar(PILLARS.month));
-    const year = buildPillar('hs_y', 'eb_y', triPillar(PILLARS.year));
+    const day = buildPillar('hs_d', 'eb_d', tPillar(PILLARS.day), true);
+    const month = buildPillar('hs_m', 'eb_m', tPillar(PILLARS.month));
+    const year = buildPillar('hs_y', 'eb_y', tPillar(PILLARS.year));
 
     // Attach qi phase analysis to natal pillars
     const qiPhaseData = chartData?.qi_phase_analysis?.pillars;
@@ -191,7 +193,7 @@ export default function BaZiChart({
     }
 
     return result.filter(Boolean) as any[];
-  }, [chartData]);
+  }, [chartData, tPillar]);
 
   // Empty placeholder pillar for alignment
   const createEmptyPillar = (label: string) => ({
@@ -219,9 +221,9 @@ export default function BaZiChart({
   // Order matches natal: Hour | Day | Month | Year | (extra column)
   const alignedLuckPillars = useMemo(() => {
     // Hourly luck (aligns with Hour)
-    let hourlyPillar = createEmptyPillar(triPillar(COMPARISON.hourly));
+    let hourlyPillar = createEmptyPillar(tPillar(COMPARISON.hourly));
     if (chartData?.analysis_info?.has_hourly && chartData?.hs_hl && chartData?.eb_hl) {
-      const pillar = buildPillar('hs_hl', 'eb_hl', triPillar(COMPARISON.hourly)) as any;
+      const pillar = buildPillar('hs_hl', 'eb_hl', tPillar(COMPARISON.hourly)) as any;
       if (pillar) {
         pillar.isHourlyLuck = true;
         hourlyPillar = pillar;
@@ -229,9 +231,9 @@ export default function BaZiChart({
     }
 
     // Daily luck (aligns with Day)
-    let dailyPillar = createEmptyPillar(triPillar(COMPARISON.daily));
+    let dailyPillar = createEmptyPillar(tPillar(COMPARISON.daily));
     if (chartData?.analysis_info?.has_daily && chartData?.hs_dl && chartData?.eb_dl) {
-      const pillar = buildPillar('hs_dl', 'eb_dl', triPillar(COMPARISON.daily)) as any;
+      const pillar = buildPillar('hs_dl', 'eb_dl', tPillar(COMPARISON.daily)) as any;
       if (pillar) {
         pillar.isDailyLuck = true;
         dailyPillar = pillar;
@@ -239,9 +241,9 @@ export default function BaZiChart({
     }
 
     // Monthly luck (aligns with Month)
-    let monthlyPillar = createEmptyPillar(triPillar(COMPARISON.monthly));
+    let monthlyPillar = createEmptyPillar(tPillar(COMPARISON.monthly));
     if (chartData?.analysis_info?.has_monthly && chartData?.hs_ml && chartData?.eb_ml) {
-      const pillar = buildPillar('hs_ml', 'eb_ml', triPillar(COMPARISON.monthly)) as any;
+      const pillar = buildPillar('hs_ml', 'eb_ml', tPillar(COMPARISON.monthly)) as any;
       if (pillar) {
         pillar.isMonthlyLuck = true;
         monthlyPillar = pillar;
@@ -249,9 +251,9 @@ export default function BaZiChart({
     }
 
     // Annual luck (aligns with Year)
-    let annualPillar = createEmptyPillar(triPillar(COMPARISON.annual));
+    let annualPillar = createEmptyPillar(tPillar(COMPARISON.annual));
     if (chartData?.analysis_info?.year && chartData?.hs_yl && chartData?.eb_yl) {
-      const pillar = buildPillar('hs_yl', 'eb_yl', triPillar(COMPARISON.annual)) as any;
+      const pillar = buildPillar('hs_yl', 'eb_yl', tPillar(COMPARISON.annual)) as any;
       if (pillar) {
         pillar.isAnnualLuck = true;
         pillar.year = chartData.analysis_info.year;
@@ -260,9 +262,9 @@ export default function BaZiChart({
     }
 
     // 10-Yr luck (rightmost column)
-    let tenYrPillar = createEmptyPillar(triPillar(COMPARISON.ten_year));
+    let tenYrPillar = createEmptyPillar(tPillar(COMPARISON.ten_year));
     if (chartData?.analysis_info?.has_luck_pillar && chartData?.hs_10yl && chartData?.eb_10yl) {
-      const pillar = buildPillar('hs_10yl', 'eb_10yl', triPillar(COMPARISON.ten_year)) as any;
+      const pillar = buildPillar('hs_10yl', 'eb_10yl', tPillar(COMPARISON.ten_year)) as any;
       if (pillar) {
         pillar.isLuckPillar = true;
         pillar.is10YrLuck = true;
@@ -280,7 +282,7 @@ export default function BaZiChart({
     }
 
     return [hourlyPillar, dailyPillar, monthlyPillar, annualPillar, tenYrPillar];
-  }, [chartData]);
+  }, [chartData, tPillar]);
 
   // Build comparison date luck pillars (legacy - keep for backward compatibility)
   const luckPillars = useMemo(() => {
@@ -324,7 +326,7 @@ export default function BaZiChart({
     }
 
     return pillars;
-  }, [chartData]);
+  }, [chartData, tPillar]);
 
   // Build talisman pillars
   const talismanPillars = useMemo(() => {
@@ -332,7 +334,7 @@ export default function BaZiChart({
 
     // Talisman Year
     if (chartData?.hs_ty || chartData?.eb_ty) {
-      const pillar = buildPillar('hs_ty', 'eb_ty', triPillar(TALISMAN.year)) as any;
+      const pillar = buildPillar('hs_ty', 'eb_ty', tPillar(TALISMAN.year)) as any;
       if (pillar) {
         pillar.isTalisman = true;
         pillar.isTalismanYear = true;
@@ -342,7 +344,7 @@ export default function BaZiChart({
 
     // Talisman Month
     if (chartData?.hs_tm || chartData?.eb_tm) {
-      const pillar = buildPillar('hs_tm', 'eb_tm', triPillar(TALISMAN.month)) as any;
+      const pillar = buildPillar('hs_tm', 'eb_tm', tPillar(TALISMAN.month)) as any;
       if (pillar) {
         pillar.isTalisman = true;
         pillar.isTalismanMonth = true;
@@ -352,7 +354,7 @@ export default function BaZiChart({
 
     // Talisman Day
     if (chartData?.hs_td || chartData?.eb_td) {
-      const pillar = buildPillar('hs_td', 'eb_td', triPillar(TALISMAN.day)) as any;
+      const pillar = buildPillar('hs_td', 'eb_td', tPillar(TALISMAN.day)) as any;
       if (pillar) {
         pillar.isTalisman = true;
         pillar.isTalismanDay = true;
@@ -362,7 +364,7 @@ export default function BaZiChart({
 
     // Talisman Hour
     if (chartData?.hs_th || chartData?.eb_th) {
-      const pillar = buildPillar('hs_th', 'eb_th', triPillar(TALISMAN.hour)) as any;
+      const pillar = buildPillar('hs_th', 'eb_th', tPillar(TALISMAN.hour)) as any;
       if (pillar) {
         pillar.isTalisman = true;
         pillar.isTalismanHour = true;
@@ -371,7 +373,7 @@ export default function BaZiChart({
     }
 
     return pillars;
-  }, [chartData]);
+  }, [chartData, tPillar]);
 
   // Build location pillars (overseas or birthplace)
   const locationPillars = useMemo(() => {
@@ -379,7 +381,7 @@ export default function BaZiChart({
 
     // Overseas pillars (o1, o2) - blue border
     if (chartData?.hs_o1 || chartData?.eb_o1) {
-      const pillar = buildPillar('hs_o1', 'eb_o1', triPillar(LOCATION.overseas_1)) as any;
+      const pillar = buildPillar('hs_o1', 'eb_o1', tPillar(LOCATION.overseas_1)) as any;
       if (pillar) {
         pillar.isLocation = true;
         pillar.isOverseas = true;
@@ -387,7 +389,7 @@ export default function BaZiChart({
       }
     }
     if (chartData?.hs_o2 || chartData?.eb_o2) {
-      const pillar = buildPillar('hs_o2', 'eb_o2', triPillar(LOCATION.overseas_2)) as any;
+      const pillar = buildPillar('hs_o2', 'eb_o2', tPillar(LOCATION.overseas_2)) as any;
       if (pillar) {
         pillar.isLocation = true;
         pillar.isOverseas = true;
@@ -397,7 +399,7 @@ export default function BaZiChart({
 
     // Birthplace pillars (b1-b4) - amber border
     if (chartData?.hs_b1 || chartData?.eb_b1) {
-      const pillar = buildPillar('hs_b1', 'eb_b1', triPillar(LOCATION.birthplace_1)) as any;
+      const pillar = buildPillar('hs_b1', 'eb_b1', tPillar(LOCATION.birthplace_1)) as any;
       if (pillar) {
         pillar.isLocation = true;
         pillar.isBirthplace = true;
@@ -405,7 +407,7 @@ export default function BaZiChart({
       }
     }
     if (chartData?.hs_b2 || chartData?.eb_b2) {
-      const pillar = buildPillar('hs_b2', 'eb_b2', triPillar(LOCATION.birthplace_2)) as any;
+      const pillar = buildPillar('hs_b2', 'eb_b2', tPillar(LOCATION.birthplace_2)) as any;
       if (pillar) {
         pillar.isLocation = true;
         pillar.isBirthplace = true;
@@ -413,7 +415,7 @@ export default function BaZiChart({
       }
     }
     if (chartData?.hs_b3 || chartData?.eb_b3) {
-      const pillar = buildPillar('hs_b3', 'eb_b3', triPillar(LOCATION.birthplace_3)) as any;
+      const pillar = buildPillar('hs_b3', 'eb_b3', tPillar(LOCATION.birthplace_3)) as any;
       if (pillar) {
         pillar.isLocation = true;
         pillar.isBirthplace = true;
@@ -421,7 +423,7 @@ export default function BaZiChart({
       }
     }
     if (chartData?.hs_b4 || chartData?.eb_b4) {
-      const pillar = buildPillar('hs_b4', 'eb_b4', triPillar(LOCATION.birthplace_4)) as any;
+      const pillar = buildPillar('hs_b4', 'eb_b4', tPillar(LOCATION.birthplace_4)) as any;
       if (pillar) {
         pillar.isLocation = true;
         pillar.isBirthplace = true;
@@ -430,7 +432,7 @@ export default function BaZiChart({
     }
 
     return pillars;
-  }, [chartData]);
+  }, [chartData, tPillar]);
 
   // Filter pillars based on props
   const displayNatalPillars = showNatal ? natalPillars : [];

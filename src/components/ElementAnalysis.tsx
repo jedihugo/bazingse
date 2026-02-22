@@ -1,7 +1,8 @@
 'use client';
 
 import { useMemo } from 'react';
-import { tri, CHART, WUXING } from '@/lib/t';
+import { useT } from './LanguageProvider';
+import { CHART, WUXING } from '@/lib/t';
 
 interface ElementAnalysisProps {
   chartData: any;
@@ -96,6 +97,7 @@ function generateAsciiBarParts(percentage: number, yangRatio: number, width: num
 }
 
 export default function ElementAnalysis({ chartData }: ElementAnalysisProps) {
+  const { t } = useT();
 
   // Get daymaster element
   const daymasterAnalysis = chartData?.daymaster_analysis;
@@ -157,7 +159,7 @@ export default function ElementAnalysis({ chartData }: ElementAnalysisProps) {
     <div className="tui-frame mt-2">
       {/* Header */}
       <div className="tui-frame-title flex items-center justify-between">
-        <span>{tri(WUXING.title)}</span>
+        <span>{t(WUXING.title)}</span>
         <span></span>
       </div>
 
@@ -214,7 +216,7 @@ export default function ElementAnalysis({ chartData }: ElementAnalysisProps) {
 
       {/* Footer note */}
       <div className="border-t tui-border-color px-2 py-1 tui-text-muted text-center">
-        {elementData.hasPost ? tri(CHART.post_interaction) : tri(CHART.natal)}
+        {elementData.hasPost ? t(CHART.post_interaction) : t(CHART.natal)}
       </div>
     </div>
   );

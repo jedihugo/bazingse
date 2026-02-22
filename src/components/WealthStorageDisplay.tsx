@@ -1,6 +1,7 @@
 'use client';
 
-import { tri, WEALTH } from '@/lib/t';
+import { useT } from './LanguageProvider';
+import { WEALTH } from '@/lib/t';
 
 interface WealthStorageDisplayProps {
   chartData: any;
@@ -21,6 +22,7 @@ const ACTIVATION_STYLE: Record<string, { label: string; color: string }> = {
 };
 
 export default function WealthStorageDisplay({ chartData }: WealthStorageDisplayProps) {
+  const { t } = useT();
   const ws = chartData?.wealth_storage_analysis;
   if (!ws || !ws.wealth_storage_branch) return null;
 
@@ -31,7 +33,7 @@ export default function WealthStorageDisplay({ chartData }: WealthStorageDisplay
   return (
     <div className="tui-frame mt-2">
       <div className="tui-frame-title flex items-center justify-between">
-        <span>{tri(WEALTH.title)}</span>
+        <span>{t(WEALTH.title)}</span>
         <span>
           <span className={dmColor}>{ws.daymaster_stem}</span>
           {' → '}

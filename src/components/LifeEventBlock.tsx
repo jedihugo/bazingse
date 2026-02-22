@@ -7,7 +7,8 @@ import WealthStorageDisplay from './WealthStorageDisplay';
 import NarrativeDisplay from './NarrativeDisplay';
 import ClientSummaryDisplay from './ClientSummaryDisplay';
 import { type LifeEvent, updateLifeEvent } from '@/lib/api';
-import { tri, triCompact, ACTIONS, STATUS, LOCATION, CHART, SPIRITUAL } from '@/lib/t';
+import { useT } from './LanguageProvider';
+import { ACTIONS, STATUS, LOCATION, CHART, SPIRITUAL } from '@/lib/t';
 
 
 interface LifeEventBlockProps {
@@ -43,6 +44,7 @@ export default function LifeEventBlock({
   onDelete,
   onEventUpdate,
 }: LifeEventBlockProps) {
+  const { t, tCompact } = useT();
   const [isEditingNotes, setIsEditingNotes] = useState(false);
   const [notes, setNotes] = useState(event.notes || '');
   const [isSaving, setIsSaving] = useState(false);
@@ -136,13 +138,13 @@ export default function LifeEventBlock({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-semibold" style={isNatal ? { color: 'var(--tui-accent-purple)' } : { color: 'var(--tui-fg-dim)' }}>
-              {isNatal ? tri(CHART.birth_chart) : formatDateLabel(event)}
+              {isNatal ? t(CHART.birth_chart) : formatDateLabel(event)}
             </span>
             {isNatal && (
               <span
                 className="text-xs px-2 py-0.5"
                 style={{ background: 'var(--tui-accent-purple)', color: 'var(--tui-bg)' }}
-              >{triCompact(CHART.birth)}</span>
+              >{tCompact(CHART.birth)}</span>
             )}
             {chartData?.school && chartData.school !== 'classic' && (
               <span
@@ -162,26 +164,26 @@ export default function LifeEventBlock({
             <div className="relative">
               {showDeleteConfirm ? (
                 <div className="flex items-center gap-2">
-                  <span className="text-xs tui-text-muted">{triCompact(ACTIONS.delete)}?</span>
+                  <span className="text-xs tui-text-muted">{tCompact(ACTIONS.delete)}?</span>
                   <button
                     onClick={handleDelete}
                     className="text-xs px-2 py-1"
                     style={{ background: 'var(--tui-error)', color: 'var(--tui-bg)' }}
                   >
-                    {triCompact(ACTIONS.yes)}
+                    {tCompact(ACTIONS.yes)}
                   </button>
                   <button
                     onClick={() => setShowDeleteConfirm(false)}
                     className="tui-btn text-xs px-2 py-1"
                   >
-                    {triCompact(ACTIONS.no)}
+                    {tCompact(ACTIONS.no)}
                   </button>
                 </div>
               ) : (
                 <button
                   onClick={() => setShowDeleteConfirm(true)}
                   className="tui-text-muted p-1"
-                  title={tri(ACTIONS.delete)}
+                  title={t(ACTIONS.delete)}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -205,10 +207,10 @@ export default function LifeEventBlock({
                 border: `1px solid ${event.is_abroad ? 'var(--tui-water)' : 'var(--tui-border)'}`,
                 opacity: isTogglingAbroad ? 0.5 : 1,
               }}
-              title={tri(LOCATION.abroad_hint)}
+              title={t(LOCATION.abroad_hint)}
             >
               <span style={{ fontFamily: 'monospace' }}>{event.is_abroad ? '[x]' : '[_]'}</span>
-              <span>{triCompact(LOCATION.abroad)}</span>
+              <span>{tCompact(LOCATION.abroad)}</span>
             </button>
           </div>
         )}
@@ -219,7 +221,7 @@ export default function LifeEventBlock({
         {isLoading ? (
           <div className="py-8 text-center tui-text-muted">
             <div className="inline-block animate-spin h-5 w-5 border-2 tui-border mr-2" style={{ borderTopColor: 'var(--tui-water)' }}></div>
-            {tri(STATUS.loading_chart)}
+            {t(STATUS.loading_chart)}
           </div>
         ) : error ? (
           <div className="py-4 px-3 text-sm" style={{ background: 'color-mix(in srgb, var(--tui-error) 10%, var(--tui-bg))', color: 'var(--tui-error)' }}>{error}</div>
@@ -274,7 +276,7 @@ export default function LifeEventBlock({
               return (
                 <div className="tui-frame mt-2">
                   <div className="tui-frame-title flex items-center justify-between">
-                    <span>{tri(SPIRITUAL.title)}</span>
+                    <span>{t(SPIRITUAL.title)}</span>
                     <span
                       className="text-xs px-1.5 py-0.5"
                       style={{ background: scoreColor, color: 'var(--tui-bg)' }}
@@ -309,7 +311,7 @@ export default function LifeEventBlock({
                     {indicators.length > 0 && (
                       <details className="mt-1">
                         <summary className="text-xs tui-text-muted cursor-pointer py-1">
-                          {tri(CHART.indicators)} ({indicators.length})
+                          {t(CHART.indicators)} ({indicators.length})
                         </summary>
                         <div className="space-y-1 mt-1">
                           {indicators.map((ind, i) => (
@@ -336,7 +338,7 @@ export default function LifeEventBlock({
                     {(ss.guidance_en || ss.guidance_zh) && (
                       <details className="mt-1">
                         <summary className="text-xs tui-text-muted cursor-pointer py-1">
-                          {tri(CHART.guidance)}
+                          {t(CHART.guidance)}
                         </summary>
                         <div className="text-xs tui-text-dim mt-1" style={{ lineHeight: '1.5' }}>
                           {ss.guidance_zh || ss.guidance_en}
@@ -352,7 +354,7 @@ export default function LifeEventBlock({
             {isNatal && chartData?.narrative_analysis && (
               <details className="mt-3">
                 <summary className="text-xs font-semibold tui-text-dim cursor-pointer p-2 tui-bg-alt tui-border">
-                  {tri(CHART.interaction_analysis)}
+                  {t(CHART.interaction_analysis)}
                 </summary>
                 <NarrativeDisplay chartData={chartData} />
               </details>
@@ -364,7 +366,7 @@ export default function LifeEventBlock({
             )}
           </>
         ) : (
-          <div className="py-8 text-center tui-text-muted">{tri(STATUS.no_data)}</div>
+          <div className="py-8 text-center tui-text-muted">{t(STATUS.no_data)}</div>
         )}
       </div>
 
@@ -379,13 +381,13 @@ export default function LifeEventBlock({
                 onChange={(e) => setNotes(e.target.value)}
                 onBlur={handleSaveNotes}
                 onKeyDown={handleKeyDown}
-                placeholder={tri(CHART.add_notes)}
+                placeholder={t(CHART.add_notes)}
                 className="tui-input w-full text-sm px-3 py-2 resize-none min-h-[60px]"
                 maxLength={10000}
               />
               <div className="flex justify-between items-center mt-1 text-xs tui-text-muted">
-                <span>{tri(CHART.esc_cancel)}</span>
-                {isSaving && <span>{tri(STATUS.saving)}</span>}
+                <span>{t(CHART.esc_cancel)}</span>
+                {isSaving && <span>{t(STATUS.saving)}</span>}
               </div>
             </div>
           ) : (
@@ -394,9 +396,9 @@ export default function LifeEventBlock({
               className={`text-sm cursor-pointer px-2 py-1 -mx-2 ${
                 notes ? 'tui-text-dim' : 'tui-text-muted italic'
               }`}
-              title={tri(CHART.click_add_notes)}
+              title={t(CHART.click_add_notes)}
             >
-              {notes || tri(CHART.click_add_notes)}
+              {notes || t(CHART.click_add_notes)}
             </div>
           )}
         </div>

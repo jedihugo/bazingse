@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
+import { LanguageProvider } from '@/components/LanguageProvider';
 import PasswordGate from '@/components/PasswordGate';
 import { Analytics } from '@vercel/analytics/next';
 
@@ -41,9 +42,11 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
       <body>
-        <PasswordGate>
-          {children}
-        </PasswordGate>
+        <LanguageProvider>
+          <PasswordGate>
+            {children}
+          </PasswordGate>
+        </LanguageProvider>
         <Analytics />
       </body>
     </html>

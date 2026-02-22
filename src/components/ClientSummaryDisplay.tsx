@@ -1,6 +1,7 @@
 'use client';
 
-import { tri, CHART } from '@/lib/t';
+import { useT } from './LanguageProvider';
+import { CHART } from '@/lib/t';
 
 interface SectionItem {
   label: string;
@@ -62,6 +63,7 @@ function severityColor(severity?: string): string {
 }
 
 export default function ClientSummaryDisplay({ chartData }: { chartData: any }) {
+  const { t } = useT();
   const summary: ClientSummary | undefined = chartData?.client_summary;
   if (!summary?.sections?.length) return null;
 
@@ -75,7 +77,7 @@ export default function ClientSummaryDisplay({ chartData }: { chartData: any }) 
   return (
     <div className="mt-3 space-y-1">
       <div className="text-xs tui-text-muted px-2 py-1">
-        {summary.tier === 'full' ? tri(CHART.what_changed) : tri(CHART.natal_analysis)}
+        {summary.tier === 'full' ? t(CHART.what_changed) : t(CHART.natal_analysis)}
       </div>
       {summary.sections.map((section: Section) => (
         <details
@@ -115,7 +117,7 @@ export default function ClientSummaryDisplay({ chartData }: { chartData: any }) 
               </div>
             ))}
             {!section.text && (!section.items || section.items.length === 0) && (
-              <p className="tui-text-muted text-xs">{tri(CHART.no_section_data)}</p>
+              <p className="tui-text-muted text-xs">{t(CHART.no_section_data)}</p>
             )}
           </div>
         </details>

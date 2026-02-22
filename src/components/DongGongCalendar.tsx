@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { getDongGongCalendar, type DongGongDay, type DongGongCalendarResponse, type DongGongForbidden } from '@/lib/api';
-import { tri, triCompact, CALENDAR, WEEKDAYS_TRI, MONTHS_TRI, STATUS } from '@/lib/t';
+import { useT } from './LanguageProvider';
+import { CALENDAR, WEEKDAYS_TRI, MONTHS_TRI, STATUS } from '@/lib/t';
 
 /** Format a decimal hour (e.g. 14.5) as "14:30" */
 function formatHour(h: number): string {
@@ -16,8 +17,7 @@ function forbiddenRange(f: DongGongForbidden): string {
   return `${formatHour(f.forbidden_start_hour)} – ${formatHour(f.forbidden_end_hour)}`;
 }
 
-const WEEKDAYS = WEEKDAYS_TRI.map(w => `${w.zh}${w.en}`);
-const MONTH_NAMES = MONTHS_TRI.map(m => `${m.en}/${m.id} ${m.zh}`);
+// These get computed reactively inside the component via useT
 
 function ratingColor(value: number): string {
   if (value >= 4) return 'var(--tui-wood)';
@@ -55,6 +55,9 @@ const BRANCH_COLOR: Record<string, string> = {
 };
 
 export default function DongGongCalendar() {
+  const { t, tCompact } = useT();
+  const WEEKDAYS = WEEKDAYS_TRI.map(w => tCompact(w));
+  const MONTH_NAMES = MONTHS_TRI.map(m => t(m));
   const today = new Date();
   const [year, setYear] = useState(today.getFullYear());
   const [month, setMonth] = useState(today.getMonth() + 1);
@@ -159,7 +162,7 @@ export default function DongGongCalendar() {
         className="px-3 py-2 text-center font-bold text-sm"
         style={{ borderBottom: '1px solid var(--tui-border)', background: 'var(--tui-bg-alt)' }}
       >
-        {tri(CALENDAR.title)}
+        {t(CALENDAR.title)}
       </div>
 
       {/* Month navigation */}
@@ -167,7 +170,7 @@ export default function DongGongCalendar() {
         className="flex items-center justify-between px-3 py-2"
         style={{ borderBottom: '1px solid var(--tui-border)' }}
       >
-        <button onClick={goToPrevMonth} className="tui-btn px-2 py-0.5 text-sm" title={tri(CALENDAR.prev_month)}>
+        <button onClick={goToPrevMonth} className="tui-btn px-2 py-0.5 text-sm" title={t(CALENDAR.prev_month)}>
           &lt;
         </button>
         <div className="text-center">
@@ -222,7 +225,7 @@ export default function DongGongCalendar() {
             );
           })()}
         </div>
-        <button onClick={goToNextMonth} className="tui-btn px-2 py-0.5 text-sm" title={tri(CALENDAR.next_month)}>
+        <button onClick={goToNextMonth} className="tui-btn px-2 py-0.5 text-sm" title={t(CALENDAR.next_month)}>
           &gt;
         </button>
       </div>
@@ -230,13 +233,13 @@ export default function DongGongCalendar() {
       {/* Today button */}
       <div className="flex justify-center py-1.5" style={{ borderBottom: '1px solid var(--tui-border)' }}>
         <button onClick={goToToday} className="tui-btn text-xs px-3 py-0.5">
-          {triCompact(CALENDAR.today)}
+          {tCompact(CALENDAR.today)}
         </button>
       </div>
 
       {/* Loading / Error */}
       {isLoading && (
-        <div className="py-8 text-center tui-text-muted text-sm">{tri(STATUS.loading)}</div>
+        <div className="py-8 text-center tui-text-muted text-sm">{t(STATUS.loading)}</div>
       )}
       {error && (
         <div className="py-4 text-center text-sm" style={{ color: 'var(--tui-fire)' }}>{error}</div>
@@ -356,6 +359,7 @@ export default function DongGongCalendar() {
 }
 
 function DayDetail({ day, onClose }: { day: DongGongDay; onClose: () => void }) {
+  const { t } = useT();
   return (
     <div
       className="px-3 py-3"
@@ -409,10 +413,10 @@ function DayDetail({ day, onClose }: { day: DongGongDay; onClose: () => void }) 
             ✗ {day.forbidden.chinese} ({day.forbidden.english})
           </div>
           <div className="tui-text-muted mt-0.5">
-            {tri(CALENDAR.before)} {day.forbidden.solar_term_chinese} {day.forbidden.solar_term_english}
+            {t(CALENDAR.before)} {day.forbidden.solar_term_chinese} {day.forbidden.solar_term_english}
           </div>
           <div className="tui-text-muted">
-            {tri(CALENDAR.forbidden)}: {forbiddenRange(day.forbidden)}
+            {t(CALENDAR.forbidden)}: {forbiddenRange(day.forbidden)}
           </div>
         </div>
       )}
@@ -421,7 +425,7 @@ function DayDetail({ day, onClose }: { day: DongGongDay; onClose: () => void }) 
       {day.consult?.promoted && (
         <div className="mb-2 text-xs" style={{ color: 'var(--tui-text-muted)' }}>
           <span className="tui-text-muted">
-            {tri(CALENDAR.originally)}: {day.consult.original_rating.symbol} {day.consult.original_rating.chinese}
+            {t(CALENDAR.originally)}: {day.consult.original_rating.symbol} {day.consult.original_rating.chinese}
           </span>
           <span className="mx-1">—</span>
           <span style={{ color: 'var(--tui-water)' }}>{day.consult.reason}</span>
@@ -438,7 +442,7 @@ function DayDetail({ day, onClose }: { day: DongGongDay; onClose: () => void }) 
       {/* Good for */}
       {day.good_for.length > 0 && (
         <div className="mb-1.5">
-          <span className="text-xs font-bold" style={{ color: 'var(--tui-wood)' }}>{tri(CALENDAR.good_for)}: </span>
+          <span className="text-xs font-bold" style={{ color: 'var(--tui-wood)' }}>{t(CALENDAR.good_for)}: </span>
           <span className="text-xs tui-text">
             {day.good_for.map(a => a.replace(/_/g, ' ')).join(', ')}
           </span>
@@ -448,7 +452,7 @@ function DayDetail({ day, onClose }: { day: DongGongDay; onClose: () => void }) 
       {/* Bad for */}
       {day.bad_for.length > 0 && (
         <div className="mb-1.5">
-          <span className="text-xs font-bold" style={{ color: 'var(--tui-fire)' }}>{tri(CALENDAR.avoid)}: </span>
+          <span className="text-xs font-bold" style={{ color: 'var(--tui-fire)' }}>{t(CALENDAR.avoid)}: </span>
           <span className="text-xs tui-text">
             {day.bad_for.map(a => a.replace(/_/g, ' ')).join(', ')}
           </span>

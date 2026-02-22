@@ -13,7 +13,8 @@ import ProfileInfoBlock from './ProfileInfoBlock';
 import LifeEventBlock from './LifeEventBlock';
 import InlineLifeEventForm from './InlineLifeEventForm';
 import InlineSelector from './chat-form/InlineSelector';
-import { tri, triCompact, PROFILE_PAGE, CHART, EVENT_FORM } from '@/lib/t';
+import { useT } from './LanguageProvider';
+import { PROFILE_PAGE, CHART, EVENT_FORM } from '@/lib/t';
 
 interface LifeEventWithChart {
   event: LifeEvent;
@@ -39,6 +40,7 @@ const SCHOOL_OPTIONS = [
 ];
 
 export default function ProfilePage({ profileId }: ProfilePageProps) {
+  const { t } = useT();
   const router = useRouter();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [natalChartData, setNatalChartData] = useState<any>(null);
@@ -262,7 +264,7 @@ export default function ProfilePage({ profileId }: ProfilePageProps) {
     return (
       <div className="py-12 text-center tui-text-muted">
         <div className="inline-block animate-spin h-6 w-6 border-2 tui-border mr-2" style={{ borderTopColor: 'var(--tui-water)' }}></div>
-        {tri(PROFILE_PAGE.loading)}
+        {t(PROFILE_PAGE.loading)}
       </div>
     );
   }
@@ -276,7 +278,7 @@ export default function ProfilePage({ profileId }: ProfilePageProps) {
           onClick={() => router.push('/')}
           className="tui-btn"
         >
-          {tri(PROFILE_PAGE.back)}
+          {t(PROFILE_PAGE.back)}
         </button>
       </div>
     );
@@ -286,7 +288,7 @@ export default function ProfilePage({ profileId }: ProfilePageProps) {
   if (!profile) {
     return (
       <div className="py-12 text-center tui-text-muted">
-        {tri(PROFILE_PAGE.not_found)}
+        {t(PROFILE_PAGE.not_found)}
       </div>
     );
   }
@@ -309,7 +311,7 @@ export default function ProfilePage({ profileId }: ProfilePageProps) {
 
       {/* School Toggle */}
       <div className="px-4 pt-2 flex items-center gap-2">
-        <span className="tui-text-muted text-sm">{tri(CHART.school)}:</span>
+        <span className="tui-text-muted text-sm">{t(CHART.school)}:</span>
         <InlineSelector
           options={SCHOOL_OPTIONS}
           value={school}
@@ -362,7 +364,7 @@ export default function ProfilePage({ profileId }: ProfilePageProps) {
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
             </svg>
-            {tri(EVENT_FORM.add_button)}
+            {t(EVENT_FORM.add_button)}
           </button>
         )}
       </div>
