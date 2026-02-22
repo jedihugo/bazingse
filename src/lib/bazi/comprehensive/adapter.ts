@@ -15,7 +15,7 @@ import {
 import {
   DM_WEALTH_STORAGE, STORAGE_OPENER, LARGE_WEALTH_STORAGE, WEALTH_ELEMENT_STEMS,
 } from '../wealth-storage';
-import { calculateWuxing, wuxingToElementCounts, type WuxingResult } from '../wuxing/calculator';
+import { calculateWuxing, wuxingToElementCounts, type WuxingResult, type InteractionLog } from '../wuxing/calculator';
 import { chartToWuxingInput } from './wuxing-bridge';
 import { getQiPhaseForPillar } from '../qi-phase';
 import type {
@@ -1010,22 +1010,156 @@ function buildRecommendations(
 
 
 // =============================================================================
-// NARRATIVE ANALYSIS
+// NARRATIVE ANALYSIS (from WuxingResult.interactions)
 // =============================================================================
 
-function _interactionIcon(itype: string): string {
-  const map: Record<string, string> = {
-    clash: "clash",
-    harmony: "harmony",
-    three_harmony: "triangle",
-    half_three_harmony: "half_combo",
-    directional_combo: "meeting",
-    punishment: "punishment",
-    self_punishment: "punishment",
-    harm: "harm",
-    destruction: "destruction",
+/** Chinese names for wuxing interaction types */
+const WUXING_CHINESE_NAMES: Record<string, string> = {
+  PILLAR_PAIR: "柱内互动",
+  THREE_MEETINGS: "三会",
+  THREE_COMBOS: "三合",
+  SIX_HARMONIES: "六合",
+  HALF_MEETINGS: "半三会",
+  ARCHED_COMBOS: "拱合",
+  STEM_COMBOS: "天干五合",
+  SIX_CLASH: "六冲",
+  PUNISHMENT_SHI: "势刑",
+  PUNISHMENT_EN: "恩刑",
+  PUNISHMENT_SELF: "自刑",
+  PUNISHMENT_WU_LI: "无礼刑",
+  SIX_HARM: "六害",
+  DESTRUCTION: "破",
+  STEM_CLASH: "天干四冲",
+  NATURAL_FLOW: "自然流转",
+};
+
+/** English labels for wuxing interaction types */
+const WUXING_ENGLISH_NAMES: Record<string, string> = {
+  PILLAR_PAIR: "Pillar Pair",
+  THREE_MEETINGS: "Three Meetings",
+  THREE_COMBOS: "Three Combo",
+  SIX_HARMONIES: "Six Harmony",
+  HALF_MEETINGS: "Half Meeting",
+  ARCHED_COMBOS: "Arched Combo",
+  STEM_COMBOS: "Stem Combo",
+  SIX_CLASH: "Six Clash",
+  PUNISHMENT_SHI: "Punishment",
+  PUNISHMENT_EN: "Punishment",
+  PUNISHMENT_SELF: "Self Punishment",
+  PUNISHMENT_WU_LI: "Punishment",
+  SIX_HARM: "Six Harm",
+  DESTRUCTION: "Destruction",
+  STEM_CLASH: "Stem Clash",
+  NATURAL_FLOW: "Natural Flow",
+};
+
+/** Icon keys matching NarrativeCard's ICON_MAP */
+const WUXING_ICON_MAP: Record<string, string> = {
+  PILLAR_PAIR: "cross_pillar",
+  THREE_MEETINGS: "meeting",
+  THREE_COMBOS: "triangle",
+  SIX_HARMONIES: "harmony",
+  HALF_MEETINGS: "half_meeting",
+  ARCHED_COMBOS: "arch",
+  STEM_COMBOS: "stem_combo",
+  SIX_CLASH: "clash",
+  PUNISHMENT_SHI: "punishment",
+  PUNISHMENT_EN: "punishment",
+  PUNISHMENT_SELF: "punishment",
+  PUNISHMENT_WU_LI: "punishment",
+  SIX_HARM: "harm",
+  DESTRUCTION: "destruction",
+  STEM_CLASH: "stem_conflict",
+  NATURAL_FLOW: "flow",
+};
+
+/** Determine polarity from step number */
+function _wuxingPolarity(step: number): "positive" | "negative" | "neutral" {
+  if (step <= 3) return "positive";
+  if (step <= 5) return "negative";
+  return "neutral";
+}
+
+/** Parse node ID like "YP.HS" or "MP.EB" into a pillar ref */
+function _nodeIdToPillarRef(nodeId: string): Record<string, string> {
+  const positionMap: Record<string, string> = {
+    YP: "year",
+    MP: "month",
+    DP: "day",
+    HP: "hour",
+    LP: "luck",
   };
-  return map[itype] ?? itype;
+  const nodeTypeMap: Record<string, string> = {
+    HS: "stem",
+    EB: "branch",
+  };
+
+  const parts = nodeId.split(".");
+  const pillarAbbrev = parts[0] ?? "";
+  const nodeKind = parts[1] ?? "";
+
+  const position = positionMap[pillarAbbrev] ?? "unknown";
+  const nodeType = nodeTypeMap[nodeKind] ?? "hs";
+
+  return {
+    abbrev: nodeId,
+    node_type: nodeType,
+    position,
+  };
+}
+
+/** Build pillar refs from an InteractionLog entry */
+function _buildPillarRefs(log: InteractionLog): Array<Record<string, string>> {
+  const refs: Array<Record<string, string>> = [];
+  const seen = new Set<string>();
+
+  const addRef = (nodeId: string) => {
+    if (!seen.has(nodeId)) {
+      seen.add(nodeId);
+      refs.push(_nodeIdToPillarRef(nodeId));
+    }
+  };
+
+  if (log.nodeA) addRef(log.nodeA);
+  if (log.nodeB) addRef(log.nodeB);
+  if (log.nodes) {
+    for (const n of log.nodes) addRef(n);
+  }
+
+  return refs;
+}
+
+/** Build title string for a wuxing interaction log entry */
+function _wuxingTitle(log: InteractionLog): string {
+  const cn = WUXING_CHINESE_NAMES[log.type] ?? "";
+  const en = WUXING_ENGLISH_NAMES[log.type] ?? log.type.replace(/_/g, " ");
+
+  // For pillar pairs, include the relationship (盖头/截脚/生)
+  if (log.type === "PILLAR_PAIR" && log.relationship) {
+    return `${cn} ${log.relationship}`;
+  }
+
+  return `${cn} ${en}`;
+}
+
+/** Build the match string (branch names joined) */
+function _wuxingMatch(log: InteractionLog): string | null {
+  if (log.branches && log.branches.length > 0) {
+    return log.branches.join(" + ");
+  }
+  return null;
+}
+
+/** Build math_formula showing gap multiplier if < 1 */
+function _wuxingMathFormula(log: InteractionLog): string | null {
+  const parts: string[] = [];
+  if (log.gapMultiplier != null && log.gapMultiplier < 1) {
+    parts.push(`gap\u00D7${log.gapMultiplier}`);
+  }
+  if (log.transformed) {
+    parts.push("transformed \u00D72.5");
+  }
+  return parts.length > 0 ? parts.join(", ") : null;
 }
 
 function _palaceToPillarRef(palace: string): Record<string, string> {
@@ -1049,82 +1183,103 @@ function _palaceToPillarRef(palace: string): Record<string, string> {
   return { abbrev: palace.slice(0, 4), node_type: "hs", position: "unknown" };
 }
 
-function _interactionTitle(inter: BranchInteraction): string {
-  const typeNames: Record<string, string> = {
-    clash: "六冲 Clash",
-    harmony: "六合 Harmony",
-    three_harmony: "三合 Three Harmony",
-    half_three_harmony: "半三合 Half Harmony",
-    directional_combo: "三会 Directional",
-    punishment: "刑 Punishment",
-    self_punishment: "自刑 Self-Punishment",
-    harm: "害 Harm",
-    destruction: "破 Destruction",
-  };
-  return typeNames[inter.interaction_type] ?? inter.interaction_type.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
-}
-
 function buildNarrativeAnalysis(
   interactions: BranchInteraction[],
   shenSha: ShenShaResult[],
-  tgEntries: TenGodEntry[],
+  _tgEntries: TenGodEntry[],
   strength: StrengthAssessment,
   chart: ChartData,
+  wuxingResult?: WuxingResult,
 ): Record<string, unknown> {
   const cards: Array<Record<string, unknown>> = [];
   let seq = 0;
 
-  // Cards from branch interactions
-  for (const inter of interactions) {
-    seq += 1;
-    const polarity = ["clash", "punishment", "self_punishment", "harm", "destruction"].includes(inter.interaction_type) ? "negative" : "positive";
+  // --- Wuxing interaction log cards (preferred, chronological) ---
+  if (wuxingResult && wuxingResult.interactions.length > 0) {
+    // Sort by step first, then by original array order within each step
+    const sorted = [...wuxingResult.interactions].sort((a, b) => a.step - b.step);
 
-    const branchesCn: string[] = [];
-    for (const p of inter.palaces) {
-      const pLower = p.toLowerCase();
-      if (pLower.includes("year")) branchesCn.push(chart.pillars["year"].branch_chinese);
-      else if (pLower.includes("month")) branchesCn.push(chart.pillars["month"].branch_chinese);
-      else if (pLower.includes("day")) branchesCn.push(chart.pillars["day"].branch_chinese);
-      else if (pLower.includes("hour")) branchesCn.push(chart.pillars["hour"].branch_chinese);
-      else if (pLower.includes("luck") && chart.luck_pillar) branchesCn.push(chart.luck_pillar.branch_chinese);
+    for (const log of sorted) {
+      // Skip Step 0 (initial assignment) — not a visible interaction
+      if (log.step === 0) continue;
+
+      // Skip logOnly entries (same-element clashes/destructions that don't change points)
+      if (log.logOnly) continue;
+
+      seq += 1;
+
+      cards.push({
+        seq,
+        id: `wuxing_${seq}`,
+        category: "wuxing",
+        type: log.type.toLowerCase(),
+        icon: WUXING_ICON_MAP[log.type] ?? "flow",
+        title: _wuxingTitle(log),
+        chinese_name: WUXING_CHINESE_NAMES[log.type] ?? log.type,
+        polarity: _wuxingPolarity(log.step),
+        element: log.resultElement ?? null,
+        formula: log.details ?? null,
+        match: _wuxingMatch(log),
+        pillar_refs: _buildPillarRefs(log),
+        points: log.basis != null ? `basis=${log.basis.toFixed(1)}` : null,
+        math_formula: _wuxingMathFormula(log),
+        severity: "moderate",
+        priority: log.step,
+      });
     }
+  } else {
+    // Fallback: build cards from old BranchInteraction[] if no wuxing result
+    for (const inter of interactions) {
+      seq += 1;
+      const polarity = ["clash", "punishment", "self_punishment", "harm", "destruction"].includes(inter.interaction_type) ? "negative" : "positive";
 
-    let element: string | null = null;
-    for (const el of ["Wood", "Fire", "Earth", "Metal", "Water"]) {
-      if (inter.description.includes(el)) {
-        element = el;
-        break;
+      const branchesCn: string[] = [];
+      for (const p of inter.palaces) {
+        const pLower = p.toLowerCase();
+        if (pLower.includes("year")) branchesCn.push(chart.pillars["year"].branch_chinese);
+        else if (pLower.includes("month")) branchesCn.push(chart.pillars["month"].branch_chinese);
+        else if (pLower.includes("day")) branchesCn.push(chart.pillars["day"].branch_chinese);
+        else if (pLower.includes("hour")) branchesCn.push(chart.pillars["hour"].branch_chinese);
+        else if (pLower.includes("luck") && chart.luck_pillar) branchesCn.push(chart.luck_pillar.branch_chinese);
       }
-    }
 
-    cards.push({
-      seq,
-      id: `narrative_${seq}`,
-      category: "interaction",
-      type: inter.interaction_type,
-      icon: _interactionIcon(inter.interaction_type),
-      title: _interactionTitle(inter),
-      chinese_name: inter.chinese_name,
-      polarity,
-      element,
-      formula: inter.description,
-      match: branchesCn.length > 0 ? branchesCn.join(" + ") : null,
-      description: inter.description,
-      palaces: inter.palaces,
-      pillar_refs: inter.palaces.map(p => _palaceToPillarRef(p)),
-      severity: inter.severity,
-      priority: inter.severity === "severe" ? 3 : inter.severity === "moderate" ? 2 : 1,
-    });
+      let element: string | null = null;
+      for (const el of ["Wood", "Fire", "Earth", "Metal", "Water"]) {
+        if (inter.description.includes(el)) {
+          element = el;
+          break;
+        }
+      }
+
+      cards.push({
+        seq,
+        id: `narrative_${seq}`,
+        category: "interaction",
+        type: inter.interaction_type,
+        icon: inter.interaction_type,
+        title: inter.chinese_name || inter.interaction_type,
+        chinese_name: inter.chinese_name,
+        polarity,
+        element,
+        formula: inter.description,
+        match: branchesCn.length > 0 ? branchesCn.join(" + ") : null,
+        description: inter.description,
+        palaces: inter.palaces,
+        pillar_refs: inter.palaces.map(p => _palaceToPillarRef(p)),
+        severity: inter.severity,
+        priority: inter.severity === "severe" ? 3 : inter.severity === "moderate" ? 2 : 1,
+      });
+    }
   }
 
-  // Cards from present Shen Sha
+  // --- Shen Sha cards ---
   for (const s of shenSha) {
     if (!s.present) continue;
     seq += 1;
     const polarity = s.nature === "auspicious" ? "positive" : s.nature === "inauspicious" ? "negative" : "neutral";
     cards.push({
       seq,
-      id: `narrative_${seq}`,
+      id: `shensha_${seq}`,
       category: "shen_sha",
       type: s.name_english ? s.name_english.toLowerCase().replace(/ /g, "_") : "star",
       icon: "flow",
@@ -1138,13 +1293,13 @@ function buildNarrativeAnalysis(
       palaces: s.palace ? [s.palace] : [],
       pillar_refs: s.palace ? [_palaceToPillarRef(s.palace)] : [],
       severity: s.severity,
-      priority: (s.nature === "auspicious" || s.nature === "inauspicious") ? 2 : 1,
+      priority: 8,  // After all wuxing steps (1-7), shen sha comes last
     });
   }
 
-  // Sort by priority desc, then seq asc
+  // Chronological order: by step (priority field), then by seq within step
   cards.sort((a, b) => {
-    const pDiff = (b.priority as number) - (a.priority as number);
+    const pDiff = (a.priority as number) - (b.priority as number);
     if (pDiff !== 0) return pDiff;
     return (a.seq as number) - (b.seq as number);
   });
@@ -1158,6 +1313,7 @@ function buildNarrativeAnalysis(
     all_chronological: cards,
     narratives: cards.slice(0, 15),
     narratives_by_category: {
+      wuxing: cards.filter(c => c.category === "wuxing"),
       interaction: cards.filter(c => c.category === "interaction"),
       shen_sha: cards.filter(c => c.category === "shen_sha"),
     },
@@ -2099,7 +2255,7 @@ export function adaptToFrontend(chart: ChartData, results: Record<string, unknow
   response.recommendations = buildRecommendations(predictions, flags, strength, env);
 
   // Narrative
-  response.narrative_analysis = buildNarrativeAnalysis(interactions, shenSha, tgEntries, strength, chart);
+  response.narrative_analysis = buildNarrativeAnalysis(interactions, shenSha, tgEntries, strength, chart, wuxingResult);
 
   // Pattern engine (stub)
   response.pattern_engine_analysis = {
