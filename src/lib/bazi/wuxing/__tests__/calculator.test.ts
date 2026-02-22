@@ -84,9 +84,10 @@ describe('calculateWuxing', () => {
     expect(result.bonusNodes).toHaveLength(0);
   });
 
-  it('interactions is an array (empty with stubs)', () => {
+  it('interactions is an array with Step 1 entries', () => {
     expect(Array.isArray(result.interactions)).toBe(true);
-    expect(result.interactions).toHaveLength(0);
+    // Step 1 produces 4 pillar pair interactions for this chart
+    expect(result.interactions.length).toBeGreaterThanOrEqual(4);
   });
 
   it('node initial points are preserved in output', () => {
@@ -96,10 +97,9 @@ describe('calculateWuxing', () => {
     expect(result.nodes['DP.HS'].initial).toBe(10);
     expect(result.nodes['HP.HS'].initial).toBe(10);
 
-    // With stubs, delta should be 0
+    // After Step 1, HS/EB nodes have deltas; hidden stems remain unchanged
     for (const node of Object.values(result.nodes)) {
-      expect(node.delta).toBe(0);
-      expect(node.final).toBe(node.initial);
+      expect(node.delta).toBe(node.final - node.initial);
     }
   });
 });
@@ -389,21 +389,23 @@ describe('calculateWuxingUpToStep', () => {
     expect(state.season).toBe('Water');
   });
 
-  it('step=7 returns state after all step stubs', () => {
-    const state = calculateWuxingUpToStep(INPUT, 7);
-    // With stubs, points should be unchanged from init
-    const hsNodes = state.nodes.filter(n => n.slot === 'HS');
-    for (const node of hsNodes) {
-      expect(node.points).toBe(10);
-    }
+  it('step=1 modifies HS/EB points from step=0', () => {
+    const s0 = calculateWuxingUpToStep(INPUT, 0);
+    const s1 = calculateWuxingUpToStep(INPUT, 1);
+
+    // Step 1 changes HS and EB main qi nodes
+    const ypHs0 = s0.nodes.find(n => n.id === 'YP.HS')!;
+    const ypHs1 = s1.nodes.find(n => n.id === 'YP.HS')!;
+    expect(ypHs1.points).not.toBe(ypHs0.points);
   });
 
-  it('step=0 and step=7 produce same points (stubs are pass-through)', () => {
-    const s0 = calculateWuxingUpToStep(INPUT, 0);
+  it('step=7 returns state with Step 1 applied (steps 2-7 still stubs)', () => {
+    const s1 = calculateWuxingUpToStep(INPUT, 1);
     const s7 = calculateWuxingUpToStep(INPUT, 7);
 
-    for (let i = 0; i < s0.nodes.length; i++) {
-      expect(s0.nodes[i].points).toBe(s7.nodes[i].points);
+    // Steps 2-7 are still stubs, so step=1 and step=7 produce same points
+    for (let i = 0; i < s1.nodes.length; i++) {
+      expect(s1.nodes[i].points).toBe(s7.nodes[i].points);
     }
   });
 });
@@ -413,14 +415,19 @@ describe('calculateWuxingUpToStep', () => {
 // =============================================================================
 
 describe('step stubs', () => {
-  it('all stubs return the same state object', () => {
+  it('remaining stubs (steps 2-7) return the same state object', () => {
     const state = initializeState(INPUT);
-    expect(step1PillarPairs(state)).toBe(state);
     expect(step2EbPositive(state)).toBe(state);
     expect(step3HsPositive(state)).toBe(state);
     expect(step4EbNegative(state)).toBe(state);
     expect(step5HsNegative(state)).toBe(state);
     expect(step6Seasonal(state)).toBe(state);
     expect(step7NaturalFlow(state)).toBe(state);
+  });
+
+  it('step1PillarPairs mutates and returns the same state object', () => {
+    const state = initializeState(INPUT);
+    const result = step1PillarPairs(state);
+    expect(result).toBe(state);
   });
 });

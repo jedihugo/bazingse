@@ -12,8 +12,9 @@ import {
   EB_HIDDEN_STEMS,
   EB_POLARITY,
   MONTH_BRANCH_SEASON,
+  CONTROL_LOOKUP,
 } from './tables';
-import type { PillarPosition } from './tables';
+import type { PillarPosition, ControlRelation } from './tables';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -294,8 +295,73 @@ export function initializeState(input: WuxingInput): WuxingState {
 // Steps 1-7: Stubs (pass through unchanged)
 // ---------------------------------------------------------------------------
 
-/** Step 1: HS-EB pillar pair interactions (stub) */
+/**
+ * Step 1: HS↔EB pillar pair interactions.
+ *
+ * For each pillar, the HS element interacts with the EB main qi element
+ * (the first hidden stem, slot 'EB'). Hidden stems h1/h2 are NOT affected.
+ *
+ * Relationship is looked up via CONTROL_LOOKUP[hsElement][ebMainQiElement]:
+ *   SAME            → skip (no interaction)
+ *   HS_PRODUCES_EB  → HS loses 20% of basis, EB gains 30% of basis
+ *   EB_PRODUCES_HS  → EB loses 20% of basis, HS gains 30% of basis
+ *   HS_CONTROLS_EB  → HS loses 20% of basis (盖头), EB loses 30% of basis
+ *   EB_CONTROLS_HS  → EB loses 20% of basis (截脚), HS loses 30% of basis
+ *
+ * basis = min(HS.points, EB.points)
+ */
 export function step1PillarPairs(state: WuxingState): WuxingState {
+  const PILLAR_ORDER: PillarPosition[] = ['YP', 'MP', 'DP', 'HP'];
+
+  for (const pos of PILLAR_ORDER) {
+    const hsNode = state.nodes.find(n => n.id === `${pos}.HS`)!;
+    const ebNode = state.nodes.find(n => n.id === `${pos}.EB`)!;
+
+    const relation: ControlRelation = CONTROL_LOOKUP[hsNode.element][ebNode.element];
+
+    if (relation === 'SAME') continue;
+
+    const basis = Math.min(hsNode.points, ebNode.points);
+    const loss20 = basis * 0.20;
+    const effect30 = basis * 0.30;
+
+    switch (relation) {
+      case 'HS_PRODUCES_EB':
+        // Producer (HS) loses 20%, produced (EB) gains 30%
+        hsNode.points -= loss20;
+        ebNode.points += effect30;
+        break;
+
+      case 'EB_PRODUCES_HS':
+        // Producer (EB) loses 20%, produced (HS) gains 30%
+        ebNode.points -= loss20;
+        hsNode.points += effect30;
+        break;
+
+      case 'HS_CONTROLS_EB':
+        // Controller (HS) loses 20%, controlled (EB) loses 30% — 盖头
+        hsNode.points -= loss20;
+        ebNode.points -= effect30;
+        break;
+
+      case 'EB_CONTROLS_HS':
+        // Controller (EB) loses 20%, controlled (HS) loses 30% — 截脚
+        ebNode.points -= loss20;
+        hsNode.points -= effect30;
+        break;
+    }
+
+    state.interactions.push({
+      step: 1,
+      type: 'PILLAR_PAIR',
+      nodeA: hsNode.id,
+      nodeB: ebNode.id,
+      relationship: relation,
+      basis,
+      details: `${pos}: ${hsNode.stem}(${hsNode.element}) ${relation} ${ebNode.stem}(${ebNode.element}), basis=${basis}`,
+    });
+  }
+
   return state;
 }
 
