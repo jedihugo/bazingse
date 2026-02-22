@@ -79,9 +79,10 @@ describe('calculateWuxing', () => {
     expect(ranks).toEqual([1, 2, 3, 4, 5]);
   });
 
-  it('bonusNodes is an array (empty with stubs)', () => {
+  it('bonusNodes is an array (populated by Step 2)', () => {
     expect(Array.isArray(result.bonusNodes)).toBe(true);
-    expect(result.bonusNodes).toHaveLength(0);
+    // Step 2 detects combos for this chart (Yin+Hai 六合, Chou+Hai 半三会, Hai+Wei 拱合)
+    expect(result.bonusNodes.length).toBeGreaterThan(0);
   });
 
   it('interactions is an array with Step 1 entries', () => {
@@ -399,14 +400,16 @@ describe('calculateWuxingUpToStep', () => {
     expect(ypHs1.points).not.toBe(ypHs0.points);
   });
 
-  it('step=7 returns state with Step 1 applied (steps 2-7 still stubs)', () => {
-    const s1 = calculateWuxingUpToStep(INPUT, 1);
+  it('step=7 returns state with Steps 1-2 applied (steps 3-7 still stubs)', () => {
+    const s2 = calculateWuxingUpToStep(INPUT, 2);
     const s7 = calculateWuxingUpToStep(INPUT, 7);
 
-    // Steps 2-7 are still stubs, so step=1 and step=7 produce same points
-    for (let i = 0; i < s1.nodes.length; i++) {
-      expect(s1.nodes[i].points).toBe(s7.nodes[i].points);
+    // Steps 3-7 are still stubs, so step=2 and step=7 produce same node points
+    for (let i = 0; i < s2.nodes.length; i++) {
+      expect(s2.nodes[i].points).toBe(s7.nodes[i].points);
     }
+    // Bonus nodes should also match
+    expect(s2.bonusNodes.length).toBe(s7.bonusNodes.length);
   });
 });
 
@@ -415,14 +418,20 @@ describe('calculateWuxingUpToStep', () => {
 // =============================================================================
 
 describe('step stubs', () => {
-  it('remaining stubs (steps 2-7) return the same state object', () => {
+  it('remaining stubs (steps 3-7) return the same state object', () => {
     const state = initializeState(INPUT);
-    expect(step2EbPositive(state)).toBe(state);
     expect(step3HsPositive(state)).toBe(state);
     expect(step4EbNegative(state)).toBe(state);
     expect(step5HsNegative(state)).toBe(state);
     expect(step6Seasonal(state)).toBe(state);
     expect(step7NaturalFlow(state)).toBe(state);
+  });
+
+  it('step2EbPositive mutates and returns the same state object', () => {
+    const state = initializeState(INPUT);
+    step1PillarPairs(state);
+    const result = step2EbPositive(state);
+    expect(result).toBe(state);
   });
 
   it('step1PillarPairs mutates and returns the same state object', () => {
