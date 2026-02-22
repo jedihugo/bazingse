@@ -232,14 +232,14 @@ export function predictDivorceYears(
     const punishmentCheck = new Set([...natalBranches, annualBranch]);
 
     const ungrateful = new Set(["Yin", "Si", "Shen"]);
-    const ungratefulIntersect = [...ungrateful].filter(x => punishmentCheck.has(x));
+    const ungratefulIntersect = [...ungrateful].filter(x => punishmentCheck.has(x as BranchName));
     if (ungratefulIntersect.length >= 3 && ungrateful.has(annualBranch)) {
       score += 15;
       factors.push("Ungrateful punishment activated");
     }
 
     const bullying = new Set(["Chou", "Wei", "Xu"]);
-    const bullyingIntersect = [...bullying].filter(x => punishmentCheck.has(x));
+    const bullyingIntersect = [...bullying].filter(x => punishmentCheck.has(x as BranchName));
     if (bullyingIntersect.length >= 3 && bullying.has(annualBranch)) {
       score += 15;
       factors.push("Bullying punishment activated");

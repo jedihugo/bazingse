@@ -365,7 +365,7 @@ function detectPunishments(chart: ChartData): BranchInteraction[] {
         chinese_name: "自刑",
         branches: [br, br],
         palaces: positions,
-        description: `${brData.chinese}${brData.chinese}自刑 - ${brData.self_punishment_nature ?? "Self-conflict"}`,
+        description: `${brData.chinese}${brData.chinese}自刑 - ${(brData as { self_punishment_nature?: string }).self_punishment_nature ?? "Self-conflict"}`,
         activated_by_lp: activated,
         severity: "moderate",
       });

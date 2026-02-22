@@ -4,6 +4,7 @@ import 'server-only';
 // ENVIRONMENTAL QI & RELOCATION ASSESSMENT (过江龙)
 // =============================================================================
 
+import type { BranchName } from '../core';
 import { ELEMENT_CHINESE } from '../derived';
 import type { EnvironmentAssessment, ChartData, StrengthAssessment } from './models';
 import { countElements } from './strength';
@@ -93,7 +94,7 @@ function assessCrossingWater(
     if (target) {
       const natalBranches = new Set(
         ["year", "month", "day", "hour"].map(p => chart.pillars[p].branch));
-      if (natalBranches.has(target)) {
+      if (natalBranches.has(target as BranchName)) {
         hasYiMa = true;
         break;
       }

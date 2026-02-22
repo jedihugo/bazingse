@@ -1251,7 +1251,7 @@ function checkTongZi(chart: ChartData): ShenShaResult[] {
   const seasonTargets = TONG_ZI_SEASON_LOOKUP[season] ?? [];
   const elementTargets = TONG_ZI_ELEMENT_LOOKUP[dmElement] ?? [];
   const allTargets = new Set([...seasonTargets, ...elementTargets]);
-  const foundIn = [...allTargets].filter(t => natalBranches.has(t));
+  const foundIn = [...allTargets].filter(t => natalBranches.has(t as BranchName));
 
   if (foundIn.length > 0) {
     const target = foundIn[0];
