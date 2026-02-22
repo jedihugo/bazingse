@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import ThemeToggle from './ThemeToggle';
+import { triCompact, CALENDAR } from '@/lib/t';
 
 export default function Header() {
   return (
@@ -22,7 +23,7 @@ export default function Header() {
         </Link>
         <div className="flex items-center gap-2">
           <Link href="/calendar" className="tui-btn text-xs px-2 py-1 no-underline">
-            董公
+            董公 Calendar
           </Link>
           <ThemeToggle />
         </div>

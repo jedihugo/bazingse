@@ -1,6 +1,7 @@
 'use client';
 
 import NarrativeCard from './NarrativeCard';
+import { tri, CHART } from '@/lib/t';
 
 interface NarrativeDisplayProps {
   chartData: any;
@@ -27,7 +28,7 @@ export default function NarrativeDisplay({ chartData }: NarrativeDisplayProps) {
           ))}
         </div>
         <div className="mt-2 text-[9px] tui-text-dim font-mono text-right">
-          {chronological.length} interactions (chronological)
+          {chronological.length} {tri(CHART.interactions_count)}
         </div>
       </div>
     </div>

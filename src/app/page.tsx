@@ -6,6 +6,7 @@ import Header from '@/components/Header';
 import InlineProfileForm from '@/components/InlineProfileForm';
 import SearchableProfileList from '@/components/SearchableProfileList';
 import { getProfiles, deleteProfile, type Profile } from '@/lib/api';
+import { tri, HOME } from '@/lib/t';
 
 export default function Home() {
   const router = useRouter();
@@ -21,7 +22,7 @@ export default function Home() {
       setProfiles(data);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load profiles');
+      setError(err instanceof Error ? err.message : tri(HOME.failed_load));
     } finally {
       setIsLoading(false);
     }
@@ -38,13 +39,13 @@ export default function Home() {
 
   const handleDeleteProfile = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!confirm('Are you sure you want to delete this profile?')) return;
+    if (!confirm(tri(HOME.confirm_delete))) return;
 
     try {
       await deleteProfile(id);
       setProfiles(profiles.filter(p => p.id !== id));
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete profile');
+      setError(err instanceof Error ? err.message : tri(HOME.failed_delete));
     }
   };
 
@@ -54,13 +55,13 @@ export default function Home() {
       <main className="mx-auto main-content px-4 py-4">
         <div className="mx-auto" style={{ maxWidth: '800px' }}>
           <div className="flex justify-between items-center mb-4">
-            <h1 className="text-2xl font-bold tui-text">Profiles</h1>
+            <h1 className="text-2xl font-bold tui-text">{tri(HOME.profiles)}</h1>
             {!showCreateForm && (
               <button
                 onClick={() => setShowCreateForm(true)}
                 className="tui-btn"
               >
-                + New Profile
+                {tri(HOME.new_profile)}
               </button>
             )}
           </div>

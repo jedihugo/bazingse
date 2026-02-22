@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import PasswordGate from '@/components/PasswordGate';
-import LocaleProvider from '@/components/LocaleProvider';
 import { Analytics } from '@vercel/analytics/next';
 
 export const metadata: Metadata = {
@@ -43,9 +42,7 @@ export default function RootLayout({
       </head>
       <body>
         <PasswordGate>
-          <LocaleProvider>
-            {children}
-          </LocaleProvider>
+          {children}
         </PasswordGate>
         <Analytics />
       </body>

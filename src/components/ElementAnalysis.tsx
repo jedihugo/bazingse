@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { useTranslations } from 'next-intl';
+import { tri, CHART, WUXING } from '@/lib/t';
 
 interface ElementAnalysisProps {
   chartData: any;
@@ -96,7 +96,6 @@ function generateAsciiBarParts(percentage: number, yangRatio: number, width: num
 }
 
 export default function ElementAnalysis({ chartData }: ElementAnalysisProps) {
-  const t = useTranslations('elements');
 
   // Get daymaster element
   const daymasterAnalysis = chartData?.daymaster_analysis;
@@ -158,7 +157,7 @@ export default function ElementAnalysis({ chartData }: ElementAnalysisProps) {
     <div className="tui-frame mt-2">
       {/* Header */}
       <div className="tui-frame-title flex items-center justify-between">
-        <span>WU XING 五行</span>
+        <span>{tri(WUXING.title)}</span>
         <span></span>
       </div>
 
@@ -215,7 +214,7 @@ export default function ElementAnalysis({ chartData }: ElementAnalysisProps) {
 
       {/* Footer note */}
       <div className="border-t tui-border-color px-2 py-1 tui-text-muted text-center">
-        {elementData.hasPost ? 'Post-interaction' : 'Natal'}
+        {elementData.hasPost ? tri(CHART.post_interaction) : tri(CHART.natal)}
       </div>
     </div>
   );

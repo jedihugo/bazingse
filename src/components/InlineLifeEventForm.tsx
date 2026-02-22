@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
 import { ChatForm, GuidedYearInput } from './chat-form';
 import { createLifeEvent, type LifeEventCreate, type LifeEvent } from '@/lib/api';
+import { tri, triCompact, ACTIONS, EVENT_FORM, LOCATION, PROFILE_FORM } from '@/lib/t';
 
 interface InlineLifeEventFormProps {
   profileId: string;
@@ -20,7 +20,6 @@ export default function InlineLifeEventForm({
   existingDates = [],
   className = '',
 }: InlineLifeEventFormProps) {
-  const tForms = useTranslations('forms');
   const currentYear = new Date().getFullYear();
 
   // Form state
@@ -66,17 +65,17 @@ export default function InlineLifeEventForm({
     setError(null);
 
     if (!isValidYear) {
-      setError('Please enter a valid year (1900-2100)');
+      setError(tri(EVENT_FORM.valid_year));
       return;
     }
 
     if (isDuplicate) {
-      setError('This date already exists in your life events');
+      setError(tri(EVENT_FORM.duplicate));
       return;
     }
 
     if (dayNum && !monthNum) {
-      setError('Please specify a month when adding a day');
+      setError(tri(EVENT_FORM.specify_month));
       return;
     }
 
@@ -95,7 +94,7 @@ export default function InlineLifeEventForm({
       const newEvent = await createLifeEvent(profileId, eventData);
       onSuccess?.(newEvent);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create life event');
+      setError(err instanceof Error ? err.message : tri(EVENT_FORM.failed_create));
     } finally {
       setIsSubmitting(false);
     }
@@ -152,11 +151,11 @@ export default function InlineLifeEventForm({
 
   return (
     <ChatForm
-      title="Add Life Event"
+      title={tri(EVENT_FORM.add_title)}
       onSubmit={handleSubmit}
       onCancel={onCancel}
-      submitLabel="Add"
-      cancelLabel="Cancel"
+      submitLabel={triCompact(ACTIONS.add)}
+      cancelLabel={triCompact(ACTIONS.cancel)}
       isValid={isValid && !isDuplicate}
       error={error}
       className={className}
@@ -165,7 +164,7 @@ export default function InlineLifeEventForm({
       <div className="chat-field">
         <div className="chat-field-label-row">
           <span className="chat-field-label">
-            Date:<span className="chat-field-required">*</span>
+            {tri(EVENT_FORM.date)}:<span className="chat-field-required">*</span>
           </span>
           <span className="chat-field-cursor chat-field-cursor-active">{'>'}</span>
         </div>
@@ -234,7 +233,7 @@ export default function InlineLifeEventForm({
           </div>
         </div>
         <div className="chat-field-hint">
-          Year required, month and day optional
+          {tri(EVENT_FORM.year_required)}
         </div>
       </div>
 
@@ -242,9 +241,9 @@ export default function InlineLifeEventForm({
       <div className="chat-field">
         <div className="chat-field-label-row">
           <span className="chat-field-label">
-            Location:
+            {tri(EVENT_FORM.location)}:
             <span className="tui-text-muted" style={{ fontSize: '0.625rem', marginLeft: '0.25rem' }}>
-              (optional)
+              {tri(PROFILE_FORM.optional)}
             </span>
           </span>
           <span className="chat-field-cursor">{'>'}</span>
@@ -255,7 +254,7 @@ export default function InlineLifeEventForm({
             type="text"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
-            placeholder="Where did this happen?"
+            placeholder={tri(EVENT_FORM.where_happened)}
             className="tui-input w-full"
             maxLength={200}
             disabled={isSubmitting}
@@ -275,10 +274,10 @@ export default function InlineLifeEventForm({
                 background: isAbroad ? 'color-mix(in srgb, var(--tui-water) 15%, var(--tui-bg))' : 'transparent',
                 border: `1px solid ${isAbroad ? 'var(--tui-water)' : 'var(--tui-border)'}`,
               }}
-              title={tForms('location.abroad_hint')}
+              title={tri(LOCATION.abroad_hint)}
             >
               <span style={{ fontFamily: 'monospace' }}>{isAbroad ? '[x]' : '[_]'}</span>
-              <span>{tForms('location.abroad')}</span>
+              <span>{triCompact(LOCATION.abroad)}</span>
             </button>
           </div>
         )}
@@ -288,9 +287,9 @@ export default function InlineLifeEventForm({
       <div className="chat-field">
         <div className="chat-field-label-row">
           <span className="chat-field-label">
-            Notes:
+            {tri(EVENT_FORM.notes)}:
             <span className="tui-text-muted" style={{ fontSize: '0.625rem', marginLeft: '0.25rem' }}>
-              (optional)
+              {tri(PROFILE_FORM.optional)}
             </span>
           </span>
           <span className="chat-field-cursor">{'>'}</span>
@@ -299,7 +298,7 @@ export default function InlineLifeEventForm({
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            placeholder="What happened during this period?"
+            placeholder={tri(EVENT_FORM.what_happened)}
             className="tui-input w-full resize-none"
             rows={2}
             maxLength={10000}
@@ -311,7 +310,7 @@ export default function InlineLifeEventForm({
       {/* Duplicate warning */}
       {isDuplicate && (
         <div className="chat-form-error" role="alert">
-          This date already exists in your life events
+          {tri(EVENT_FORM.duplicate)}
         </div>
       )}
     </ChatForm>

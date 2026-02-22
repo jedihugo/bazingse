@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { type Profile } from '@/lib/api';
+import { tri, SEARCH, STATUS } from '@/lib/t';
 
 interface SearchableProfileListProps {
   profiles: Profile[];
@@ -132,7 +133,7 @@ export default function SearchableProfileList({
 
   if (isLoading) {
     return (
-      <div className="text-center py-12 tui-text-muted">Loading profiles...</div>
+      <div className="text-center py-12 tui-text-muted">{tri(STATUS.loading_profiles)}</div>
     );
   }
 
@@ -148,20 +149,20 @@ export default function SearchableProfileList({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Type to search..."
+            placeholder={tri(SEARCH.type_to_search)}
             className="flex-1 bg-transparent border-none outline-none tui-text"
             style={{ caretColor: 'var(--tui-water)' }}
             autoComplete="off"
             spellCheck={false}
           />
           <span className="text-xs tui-text-muted">
-            {filteredProfiles.length.toLocaleString()} profiles
+            {filteredProfiles.length.toLocaleString()} {tri(SEARCH.profiles)}
           </span>
         </div>
         <div className="mt-2 text-xs tui-text-dim flex gap-4">
-          <span>[&uarr;&darr;] Navigate</span>
-          <span>[Enter] Open</span>
-          <span>[Esc] Clear</span>
+          <span>[&uarr;&darr;] {tri(SEARCH.navigate)}</span>
+          <span>[Enter] {tri(SEARCH.open)}</span>
+          <span>[Esc] {tri(SEARCH.clear)}</span>
         </div>
       </div>
 
@@ -173,7 +174,7 @@ export default function SearchableProfileList({
       >
         {visibleProfiles.length === 0 ? (
           <div className="text-center py-8 tui-text-muted">
-            {searchQuery ? `No profiles matching "${searchQuery}"` : 'No profiles yet'}
+            {searchQuery ? `${tri(SEARCH.no_match)} "${searchQuery}"` : tri(SEARCH.no_profiles)}
           </div>
         ) : (
           <div className="space-y-1">
@@ -227,7 +228,7 @@ export default function SearchableProfileList({
                       onDeleteProfile(profile.id, e);
                     }}
                     className="delete-btn tui-text-muted p-1 opacity-0 hover:opacity-100 transition-opacity"
-                    title="Delete profile"
+                    title={tri(SEARCH.delete_profile)}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
@@ -244,8 +245,8 @@ export default function SearchableProfileList({
                 className="w-full text-center py-4 tui-text-muted text-sm cursor-pointer hover:tui-text transition-colors tui-frame mt-2"
                 style={{ borderColor: 'var(--tui-border)' }}
               >
-                Showing {visibleCount.toLocaleString()} of {filteredProfiles.length.toLocaleString()}
-                <span className="ml-2 font-bold">[Load More]</span>
+                {tri(SEARCH.showing)} {visibleCount.toLocaleString()} {tri(SEARCH.of)} {filteredProfiles.length.toLocaleString()}
+                <span className="ml-2 font-bold">{tri(SEARCH.load_more)}</span>
               </button>
             )}
           </div>

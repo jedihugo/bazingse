@@ -1,5 +1,7 @@
 'use client';
 
+import { tri, CHART } from '@/lib/t';
+
 interface SectionItem {
   label: string;
   value: string;
@@ -73,7 +75,7 @@ export default function ClientSummaryDisplay({ chartData }: { chartData: any }) 
   return (
     <div className="mt-3 space-y-1">
       <div className="text-xs tui-text-muted px-2 py-1">
-        {summary.tier === 'full' ? 'What Changed (vs Natal)' : 'Natal Analysis (Birth Chart)'}
+        {summary.tier === 'full' ? tri(CHART.what_changed) : tri(CHART.natal_analysis)}
       </div>
       {summary.sections.map((section: Section) => (
         <details
@@ -113,7 +115,7 @@ export default function ClientSummaryDisplay({ chartData }: { chartData: any }) 
               </div>
             ))}
             {!section.text && (!section.items || section.items.length === 0) && (
-              <p className="tui-text-muted text-xs">No data for this section.</p>
+              <p className="tui-text-muted text-xs">{tri(CHART.no_section_data)}</p>
             )}
           </div>
         </details>

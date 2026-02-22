@@ -3,6 +3,7 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { ChatForm, GuidedDateInput, GuidedTimeInput, GenderSelector } from './chat-form';
 import { createProfile, type ProfileCreate } from '@/lib/api';
+import { tri, triCompact, ACTIONS, PROFILE_FORM } from '@/lib/t';
 
 interface InlineProfileFormProps {
   onSuccess?: (profile: { id: string; name: string }) => void;
@@ -78,7 +79,7 @@ export default function InlineProfileForm({
   // Handle form submission
   const handleSubmit = useCallback(async () => {
     if (!isValid) {
-      setError('Please fill in all required fields');
+      setError('Please fill in all required fields / Harap isi semua kolom wajib / 請填寫所有必填項');
       return;
     }
 
@@ -97,7 +98,7 @@ export default function InlineProfileForm({
       const profile = await createProfile(data);
       onSuccess?.({ id: profile.id, name: profile.name });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create profile');
+      setError(err instanceof Error ? err.message : tri(PROFILE_FORM.failed_create));
     } finally {
       setIsSubmitting(false);
     }
@@ -124,11 +125,11 @@ export default function InlineProfileForm({
 
   return (
     <ChatForm
-      title="Create New Profile"
+      title={tri(PROFILE_FORM.create_title)}
       onSubmit={handleSubmit}
       onCancel={onCancel}
-      submitLabel="Create"
-      cancelLabel="Cancel"
+      submitLabel={triCompact(ACTIONS.create)}
+      cancelLabel={triCompact(ACTIONS.cancel)}
       isValid={isValid}
       error={error}
       className={className}
@@ -137,7 +138,7 @@ export default function InlineProfileForm({
       <div className="chat-field">
         <div className="chat-field-label-row">
           <span className="chat-field-label">
-            Name:<span className="chat-field-required">*</span>
+            {tri(PROFILE_FORM.name)}:<span className="chat-field-required">*</span>
           </span>
           <span className="chat-field-cursor chat-field-cursor-active">{'>'}</span>
         </div>
@@ -148,7 +149,7 @@ export default function InlineProfileForm({
             value={name}
             onChange={(e) => setName(e.target.value)}
             onKeyDown={handleNameKeyDown}
-            placeholder="Enter name"
+            placeholder={tri(PROFILE_FORM.enter_name)}
             className="tui-input w-full"
             disabled={isSubmitting}
             autoComplete="off"
@@ -160,7 +161,7 @@ export default function InlineProfileForm({
       <div className="chat-field">
         <div className="chat-field-label-row">
           <span className="chat-field-label">
-            Birth Date:<span className="chat-field-required">*</span>
+            {tri(PROFILE_FORM.birth_date)}:<span className="chat-field-required">*</span>
           </span>
           <span className="chat-field-cursor">{'>'}</span>
         </div>
@@ -180,7 +181,7 @@ export default function InlineProfileForm({
         </div>
         {year !== '' && month !== '' && day !== '' && !isValidDate() && (
           <div className="chat-field-hint chat-field-hint-error">
-            Invalid date
+            {tri(PROFILE_FORM.invalid_date)}
           </div>
         )}
       </div>
@@ -189,9 +190,9 @@ export default function InlineProfileForm({
       <div className="chat-field">
         <div className="chat-field-label-row">
           <span className="chat-field-label">
-            Birth Time:
+            {tri(PROFILE_FORM.birth_time)}:
             <span className="tui-text-muted" style={{ fontSize: '0.625rem', marginLeft: '0.25rem' }}>
-              (optional)
+              {tri(PROFILE_FORM.optional)}
             </span>
           </span>
           <span className="chat-field-cursor">{'>'}</span>
@@ -216,7 +217,7 @@ export default function InlineProfileForm({
       <div className="chat-field">
         <div className="chat-field-label-row">
           <span className="chat-field-label">
-            Gender:<span className="chat-field-required">*</span>
+            {tri(PROFILE_FORM.gender)}:<span className="chat-field-required">*</span>
           </span>
           <span className="chat-field-cursor">{'>'}</span>
         </div>
@@ -228,7 +229,7 @@ export default function InlineProfileForm({
           />
         </div>
         <div className="chat-field-hint">
-          Press M or F to select
+          {tri(PROFILE_FORM.press_m_or_f)}
         </div>
       </div>
 
@@ -236,9 +237,9 @@ export default function InlineProfileForm({
       <div className="chat-field">
         <div className="chat-field-label-row">
           <span className="chat-field-label">
-            WhatsApp:
+            {tri(PROFILE_FORM.whatsapp)}:
             <span className="tui-text-muted" style={{ fontSize: '0.625rem', marginLeft: '0.25rem' }}>
-              (optional)
+              {tri(PROFILE_FORM.optional)}
             </span>
           </span>
           <span className="chat-field-cursor">{'>'}</span>

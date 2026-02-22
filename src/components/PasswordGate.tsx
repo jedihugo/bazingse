@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { tri, triCompact, AUTH, ACTIONS, STATUS } from '@/lib/t';
 
 const CORRECT_PASSWORD = 'lombok29';
 const AUTH_KEY = 'bazingse_auth';
@@ -45,7 +46,7 @@ export default function PasswordGate({ children }: PasswordGateProps) {
   if (isAuthenticated === null) {
     return (
       <div className="min-h-screen tui-bg flex items-center justify-center">
-        <div className="tui-text-muted">Loading...</div>
+        <div className="tui-text-muted">{tri(STATUS.loading)}</div>
       </div>
     );
   }
@@ -63,7 +64,7 @@ export default function PasswordGate({ children }: PasswordGateProps) {
       >
         <div className="text-center mb-6">
           <h1 className="text-xl font-bold tui-text mb-2">BaZingSe</h1>
-          <p className="tui-text-muted text-sm">Enter password to continue</p>
+          <p className="tui-text-muted text-sm">{tri(AUTH.enter_password)}</p>
         </div>
 
         <form onSubmit={handleSubmit}>
@@ -79,14 +80,14 @@ export default function PasswordGate({ children }: PasswordGateProps) {
                 }}
                 onKeyDown={handleKeyDown}
                 className="flex-1 bg-transparent tui-text outline-none border-b tui-border-color focus:border-[var(--tui-water)] transition-colors"
-                placeholder="Password"
+                placeholder={tri(AUTH.password)}
                 autoFocus
                 autoComplete="off"
               />
             </div>
             {error && (
               <p className="mt-2 text-sm" style={{ color: 'var(--tui-fire)' }}>
-                Incorrect password
+                {tri(AUTH.incorrect)}
               </p>
             )}
           </div>
@@ -95,12 +96,12 @@ export default function PasswordGate({ children }: PasswordGateProps) {
             type="submit"
             className="w-full tui-btn py-2"
           >
-            Enter
+            {triCompact(ACTIONS.enter)}
           </button>
         </form>
 
         <div className="mt-4 text-center">
-          <span className="tui-text-dim text-xs">[Enter] Submit</span>
+          <span className="tui-text-dim text-xs">[Enter] {triCompact(ACTIONS.submit)}</span>
         </div>
       </div>
 

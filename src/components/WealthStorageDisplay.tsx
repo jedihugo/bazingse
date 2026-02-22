@@ -1,5 +1,7 @@
 'use client';
 
+import { tri, WEALTH } from '@/lib/t';
+
 interface WealthStorageDisplayProps {
   chartData: any;
 }
@@ -29,7 +31,7 @@ export default function WealthStorageDisplay({ chartData }: WealthStorageDisplay
   return (
     <div className="tui-frame mt-2">
       <div className="tui-frame-title flex items-center justify-between">
-        <span>WEALTH STORAGE 財庫</span>
+        <span>{tri(WEALTH.title)}</span>
         <span>
           <span className={dmColor}>{ws.daymaster_stem}</span>
           {' → '}
