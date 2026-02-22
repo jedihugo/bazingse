@@ -1839,26 +1839,29 @@ export function step8Report(state: WuxingState): Record<Element, ElementSummary>
 // ---------------------------------------------------------------------------
 
 /**
- * For each element, simulate adding 10 points and compute how balanced
- * the chart becomes. The element that creates the best balance is the
- * useful god (用神).
+ * All 10 Heavenly Stems in order, for iteration during balance simulation.
+ */
+const ALL_STEMS: StemName[] = ['Jia', 'Yi', 'Bing', 'Ding', 'Wu', 'Ji', 'Geng', 'Xin', 'Ren', 'Gui'];
+
+/**
+ * For each of the 10 stems, simulate adding a hovering +10pt HS node at gap 1
+ * to all natal visible nodes. Run half-rate Step 7 interactions between the
+ * hovering HS and each visible node (HS + EB main qi, excluding hidden stems).
  *
- * sigma = sqrt( sum( (p_i - 20%)^2 ) / 5 )
- * DM penalty: +5 if DM% < 8%, +3 if DM% > 40%
+ * After interactions, compute element percentages and σ:
+ *   σ = √(Σ(pᵢ − 20%)² / 5) + DM penalty (+5 if DM<8%, +3 if DM>40%)
  *
- * - Lowest sigma  -> useful (用神)
- * - Highest sigma -> unfavorable (忌神)
- * - Produces useful -> favorable (喜神)
- * - Produces unfavorable -> enemy (仇神)
- * - Remaining -> idle (闲神)
+ * Group by element (average σ for same-element stems — e.g., 甲 and 乙 are both Wood).
+ * Lowest σ → 用神 (useful), highest σ → 忌神 (unfavorable).
+ * 喜神 = produces 用神, 仇神 = produces 忌神, 闲神 = remaining.
  */
 export function step9BalanceSim(
   state: WuxingState,
-  elementSummary: Record<Element, ElementSummary>,
+  _elementSummary: Record<Element, ElementSummary>,
 ): FiveGods {
   const dmElement = HS_POINTS[state.input.dayPillar.stem].element;
 
-  // Current total points per element
+  // Collect base element totals from ALL nodes (primary + bonus)
   const baseTotals: Record<Element, number> = { Wood: 0, Fire: 0, Earth: 0, Metal: 0, Water: 0 };
   for (const node of state.nodes) {
     baseTotals[node.element] += node.points;
@@ -1867,47 +1870,163 @@ export function step9BalanceSim(
     baseTotals[bonus.element] += bonus.points;
   }
 
-  const baseGrand = ELEMENTS.reduce((s, el) => s + baseTotals[el], 0);
+  // Collect visible nodes: HS + EB main qi (not hidden stems h1/h2)
+  // These are the nodes that the hovering HS interacts with.
+  const visibleNodes: Array<{ element: Element; points: number }> = [];
+  for (const node of state.nodes) {
+    if (node.slot === 'HS' || node.slot === 'EB') {
+      visibleNodes.push({ element: node.element, points: node.points });
+    }
+  }
 
-  // Simulate adding 10 points to each element
-  const sigmas: Array<{ element: Element; sigma: number }> = [];
+  // Half-rate interaction constants (same as Step 7)
+  const PRODUCER_LOSS_RATE = 0.10;
+  const PRODUCED_GAIN_RATE = 0.15;
+  const CONTROLLER_LOSS_RATE = 0.10;
+  const CONTROLLED_LOSS_RATE = 0.15;
 
-  for (const testEl of ELEMENTS) {
-    const newGrand = baseGrand + 10;
-    let sumSqDev = 0;
+  // Gap multiplier for gap 1 = 0.75
+  const GAP_MULT = gapMultiplier(1);
 
-    for (const el of ELEMENTS) {
-      const newTotal = baseTotals[el] + (el === testEl ? 10 : 0);
-      const pct = (newTotal / newGrand) * 100;
-      sumSqDev += (pct - 20) ** 2;
+  // Per-stem sigma results
+  const stemSigmas: Array<{ stem: StemName; element: Element; sigma: number }> = [];
+
+  for (const stem of ALL_STEMS) {
+    const hoveringElement = HS_POINTS[stem].element;
+    let hoveringPts = 10; // Start with 10 points
+
+    // Track element deltas from interactions
+    const deltas: Record<Element, number> = { Wood: 0, Fire: 0, Earth: 0, Metal: 0, Water: 0 };
+
+    // The hovering HS starts with +10 to its element
+    deltas[hoveringElement] += 10;
+
+    // Process interactions with each visible node (continuous basis — hovering pts update)
+    for (const natal of visibleNodes) {
+      if (hoveringPts <= 0) break;
+      if (natal.points <= 0) continue;
+
+      const rel = CONTROL_LOOKUP[hoveringElement][natal.element];
+      if (rel === 'SAME') continue;
+
+      const basis = Math.min(hoveringPts, natal.points);
+
+      switch (rel) {
+        case 'HS_PRODUCES_EB': {
+          // Hovering produces natal: hovering loses, natal gains
+          const loss = basis * PRODUCER_LOSS_RATE * GAP_MULT;
+          const gain = basis * PRODUCED_GAIN_RATE * GAP_MULT;
+          hoveringPts -= loss;
+          deltas[hoveringElement] -= loss;
+          deltas[natal.element] += gain;
+          break;
+        }
+        case 'EB_PRODUCES_HS': {
+          // Natal produces hovering: natal loses, hovering gains
+          const loss = basis * PRODUCER_LOSS_RATE * GAP_MULT;
+          const gain = basis * PRODUCED_GAIN_RATE * GAP_MULT;
+          deltas[natal.element] -= loss;
+          hoveringPts += gain;
+          deltas[hoveringElement] += gain;
+          break;
+        }
+        case 'HS_CONTROLS_EB': {
+          // Hovering controls natal: both lose
+          const controllerLoss = basis * CONTROLLER_LOSS_RATE * GAP_MULT;
+          const controlledLoss = basis * CONTROLLED_LOSS_RATE * GAP_MULT;
+          hoveringPts -= controllerLoss;
+          deltas[hoveringElement] -= controllerLoss;
+          deltas[natal.element] -= controlledLoss;
+          break;
+        }
+        case 'EB_CONTROLS_HS': {
+          // Natal controls hovering: both lose
+          const controllerLoss = basis * CONTROLLER_LOSS_RATE * GAP_MULT;
+          const controlledLoss = basis * CONTROLLED_LOSS_RATE * GAP_MULT;
+          deltas[natal.element] -= controllerLoss;
+          hoveringPts -= controlledLoss;
+          deltas[hoveringElement] -= controlledLoss;
+          break;
+        }
+      }
     }
 
+    // Compute new element totals after simulation
+    const newTotals: Record<Element, number> = { ...baseTotals };
+    for (const el of ELEMENTS) {
+      newTotals[el] = Math.max(0, newTotals[el] + deltas[el]);
+    }
+
+    const newGrand = ELEMENTS.reduce((s, el) => s + newTotals[el], 0);
+
+    // Compute sigma
+    let sumSqDev = 0;
+    for (const el of ELEMENTS) {
+      const pct = newGrand > 0 ? (newTotals[el] / newGrand) * 100 : 0;
+      sumSqDev += (pct - 20) ** 2;
+    }
     let sigma = Math.sqrt(sumSqDev / 5);
 
     // DM penalty
-    const dmNewTotal = baseTotals[dmElement] + (testEl === dmElement ? 10 : 0);
-    const dmPct = (dmNewTotal / newGrand) * 100;
+    const dmPct = newGrand > 0 ? (newTotals[dmElement] / newGrand) * 100 : 0;
     if (dmPct < 8) sigma += 5;
     if (dmPct > 40) sigma += 3;
 
-    sigmas.push({ element: testEl, sigma });
+    stemSigmas.push({ stem, element: hoveringElement, sigma });
   }
 
-  // Sort by sigma ascending
-  sigmas.sort((a, b) => a.sigma - b.sigma);
+  // Group by element and average sigma for same-element stems
+  const elementSigmaMap: Record<Element, number[]> = {
+    Wood: [], Fire: [], Earth: [], Metal: [], Water: [],
+  };
+  for (const entry of stemSigmas) {
+    elementSigmaMap[entry.element].push(entry.sigma);
+  }
 
-  const useful = sigmas[0].element;
-  const unfavorable = sigmas[sigmas.length - 1].element;
+  const elementSigmas: Array<{ element: Element; avgSigma: number }> = ELEMENTS.map(el => ({
+    element: el,
+    avgSigma: elementSigmaMap[el].length > 0
+      ? elementSigmaMap[el].reduce((s, v) => s + v, 0) / elementSigmaMap[el].length
+      : Infinity,
+  }));
 
-  // favorable = element that produces useful
-  const favorable = ELEMENTS.find(el => PRODUCES[el] === useful)!;
+  // Sort by avgSigma ascending (most beneficial first)
+  elementSigmas.sort((a, b) => a.avgSigma - b.avgSigma);
 
-  // enemy = element that produces unfavorable
-  const enemy = ELEMENTS.find(el => PRODUCES[el] === unfavorable)!;
+  const useful = elementSigmas[0].element;
+  const unfavorable = elementSigmas[4].element;
 
-  // idle = the remaining element
-  const assigned = new Set([useful, favorable, unfavorable, enemy]);
-  const idle = ELEMENTS.find(el => !assigned.has(el))!;
+  // Preferred: favorable = produces useful, enemy = produces unfavorable
+  const preferredFavorable = ELEMENTS.find(el => PRODUCES[el] === useful)!;
+  const preferredEnemy = ELEMENTS.find(el => PRODUCES[el] === unfavorable)!;
+
+  let favorable: Element;
+  let enemy: Element;
+  let idle: Element;
+
+  // Check for collisions: all 5 gods must be distinct elements
+  if (
+    preferredFavorable !== useful &&
+    preferredFavorable !== unfavorable &&
+    preferredEnemy !== useful &&
+    preferredEnemy !== unfavorable &&
+    preferredFavorable !== preferredEnemy
+  ) {
+    // No collision — use preferred assignments
+    favorable = preferredFavorable;
+    enemy = preferredEnemy;
+    const assigned = new Set([useful, favorable, unfavorable, enemy]);
+    idle = ELEMENTS.find(el => !assigned.has(el))!;
+  } else {
+    // Collision — use σ ranking to assign roles
+    // σ rank: [0]=useful, [1]=2nd best, [2]=3rd, [3]=4th, [4]=unfavorable
+    // favorable = 2nd best σ (most beneficial after useful)
+    // enemy = 4th best σ (least beneficial before unfavorable)
+    // idle = remaining (3rd)
+    favorable = elementSigmas[1].element;
+    enemy = elementSigmas[3].element;
+    idle = elementSigmas[2].element;
+  }
 
   return { useful, favorable, unfavorable, enemy, idle };
 }
@@ -1952,7 +2071,7 @@ export function calculateWuxing(input: WuxingInput): WuxingResult {
   const dmPercent = elementSummary[dmElement].percent;
 
   let strength: DayMasterSummary['strength'];
-  if (dmPercent >= 35) strength = 'dominant';
+  if (dmPercent > 40) strength = 'dominant';
   else if (dmPercent >= 25) strength = 'strong';
   else if (dmPercent >= 15) strength = 'balanced';
   else if (dmPercent >= 8) strength = 'weak';
