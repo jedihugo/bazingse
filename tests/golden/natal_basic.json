@@ -1,0 +1,4347 @@
+{
+  "birth_info": {
+    "date": "1990-01-15",
+    "time": "10:30",
+    "gender": "male"
+  },
+  "analysis_info": {
+    "year": null,
+    "month": null,
+    "day": null,
+    "time": null,
+    "has_luck_pillar": false,
+    "has_annual": false,
+    "has_monthly": false,
+    "has_daily": false,
+    "has_hourly": false,
+    "annual_disabled": false,
+    "is_xiao_yun": false,
+    "da_yun_start_age": null
+  },
+  "hs_y": {
+    "id": "Ji",
+    "base": {
+      "id": "Ji",
+      "qi": {
+        "Ji": 100.0
+      }
+    },
+    "post": {
+      "id": "Ji",
+      "qi": {
+        "Ji": 100.0
+      }
+    },
+    "badges": [],
+    "base_qi": {
+      "Ji": 100.0
+    },
+    "qi_phase": {
+      "id": "diwang",
+      "chinese": "帝旺",
+      "english": "Peak",
+      "description": "Emperor stage, maximum power",
+      "strength": "peak",
+      "order": 4,
+      "stem": "Ji",
+      "branch": "Si"
+    },
+    "ten_god": "DR",
+    "interaction_ids": []
+  },
+  "eb_y": {
+    "id": "Si",
+    "base": {
+      "id": "Si",
+      "qi": {
+        "Bing": 75.0,
+        "Geng": 25.0,
+        "Wu": 10.0
+      }
+    },
+    "post": {
+      "id": "Si",
+      "qi": {
+        "Bing": 75.0,
+        "Geng": 25.0,
+        "Wu": 10.0
+      }
+    },
+    "badges": [
+      {
+        "type": "combination",
+        "interaction_id": "INT_0_half_three_harmony",
+        "chinese_name": "半三合",
+        "description": "丑巳半合Metal局 (missing 酉)"
+      }
+    ],
+    "base_qi": {
+      "Bing": 75.0,
+      "Geng": 25.0,
+      "Wu": 10.0
+    },
+    "ten_god": "7K",
+    "interaction_ids": [
+      "INT_0_half_three_harmony"
+    ]
+  },
+  "hs_m": {
+    "id": "Ding",
+    "base": {
+      "id": "Ding",
+      "qi": {
+        "Ding": 100.0
+      }
+    },
+    "post": {
+      "id": "Ding",
+      "qi": {
+        "Ding": 100.0
+      }
+    },
+    "badges": [],
+    "base_qi": {
+      "Ding": 100.0
+    },
+    "qi_phase": {
+      "id": "mu",
+      "chinese": "墓",
+      "english": "Tomb",
+      "description": "Buried, stored away (also: Storage/庫)",
+      "strength": "stored",
+      "order": 8,
+      "stem": "Ding",
+      "branch": "Chou"
+    },
+    "ten_god": "DO",
+    "interaction_ids": []
+  },
+  "eb_m": {
+    "id": "Chou",
+    "base": {
+      "id": "Chou",
+      "qi": {
+        "Ji": 75.0,
+        "Gui": 25.0,
+        "Xin": 10.0
+      }
+    },
+    "post": {
+      "id": "Chou",
+      "qi": {
+        "Ji": 75.0,
+        "Gui": 25.0,
+        "Xin": 10.0
+      }
+    },
+    "badges": [
+      {
+        "type": "combination",
+        "interaction_id": "INT_0_half_three_harmony",
+        "chinese_name": "半三合",
+        "description": "丑巳半合Metal局 (missing 酉)"
+      },
+      {
+        "type": "conflict",
+        "interaction_id": "INT_1_destruction",
+        "chinese_name": "破",
+        "description": "丑辰破"
+      }
+    ],
+    "base_qi": {
+      "Ji": 75.0,
+      "Gui": 25.0,
+      "Xin": 10.0
+    },
+    "ten_god": "DR",
+    "interaction_ids": [
+      "INT_0_half_three_harmony",
+      "INT_1_destruction"
+    ]
+  },
+  "hs_d": {
+    "id": "Geng",
+    "base": {
+      "id": "Geng",
+      "qi": {
+        "Geng": 100.0
+      }
+    },
+    "post": {
+      "id": "Geng",
+      "qi": {
+        "Geng": 100.0
+      }
+    },
+    "badges": [],
+    "base_qi": {
+      "Geng": 100.0
+    },
+    "qi_phase": {
+      "id": "yang",
+      "chinese": "養",
+      "english": "Nurturing",
+      "description": "Being nurtured in womb",
+      "strength": "nascent",
+      "order": 11,
+      "stem": "Geng",
+      "branch": "Chen"
+    },
+    "ten_god": "F",
+    "interaction_ids": []
+  },
+  "eb_d": {
+    "id": "Chen",
+    "base": {
+      "id": "Chen",
+      "qi": {
+        "Wu": 75.0,
+        "Yi": 25.0,
+        "Gui": 10.0
+      }
+    },
+    "post": {
+      "id": "Chen",
+      "qi": {
+        "Wu": 75.0,
+        "Yi": 25.0,
+        "Gui": 10.0
+      }
+    },
+    "badges": [
+      {
+        "type": "conflict",
+        "interaction_id": "INT_1_destruction",
+        "chinese_name": "破",
+        "description": "丑辰破"
+      }
+    ],
+    "base_qi": {
+      "Wu": 75.0,
+      "Yi": 25.0,
+      "Gui": 10.0
+    },
+    "ten_god": "IR",
+    "interaction_ids": [
+      "INT_1_destruction"
+    ]
+  },
+  "hs_h": {
+    "id": "Xin",
+    "base": {
+      "id": "Xin",
+      "qi": {
+        "Xin": 100.0
+      }
+    },
+    "post": {
+      "id": "Xin",
+      "qi": {
+        "Xin": 100.0
+      }
+    },
+    "badges": [],
+    "base_qi": {
+      "Xin": 100.0
+    },
+    "qi_phase": {
+      "id": "si",
+      "chinese": "死",
+      "english": "Death",
+      "description": "Dying, end of active cycle",
+      "strength": "dead",
+      "order": 7,
+      "stem": "Xin",
+      "branch": "Si"
+    },
+    "ten_god": "RW",
+    "interaction_ids": []
+  },
+  "eb_h": {
+    "id": "Si",
+    "base": {
+      "id": "Si",
+      "qi": {
+        "Bing": 75.0,
+        "Geng": 25.0,
+        "Wu": 10.0
+      }
+    },
+    "post": {
+      "id": "Si",
+      "qi": {
+        "Bing": 75.0,
+        "Geng": 25.0,
+        "Wu": 10.0
+      }
+    },
+    "badges": [],
+    "base_qi": {
+      "Bing": 75.0,
+      "Geng": 25.0,
+      "Wu": 10.0
+    },
+    "ten_god": "7K",
+    "interaction_ids": []
+  },
+  "base_element_score": {
+    "Jia": 11.1,
+    "Yi": 11.1,
+    "Bing": 125.0,
+    "Ding": 125.0,
+    "Wu": 186.6,
+    "Ji": 186.6,
+    "Geng": 179.2,
+    "Xin": 179.2,
+    "Ren": 13.8,
+    "Gui": 13.8
+  },
+  "natal_element_score": {
+    "Jia": 11.1,
+    "Yi": 11.1,
+    "Bing": 125.0,
+    "Ding": 125.0,
+    "Wu": 186.6,
+    "Ji": 186.6,
+    "Geng": 179.2,
+    "Xin": 179.2,
+    "Ren": 13.8,
+    "Gui": 13.8
+  },
+  "post_element_score": {
+    "Jia": 11.1,
+    "Yi": 11.1,
+    "Bing": 125.0,
+    "Ding": 125.0,
+    "Wu": 186.6,
+    "Ji": 186.6,
+    "Geng": 179.2,
+    "Xin": 179.2,
+    "Ren": 13.8,
+    "Gui": 13.8
+  },
+  "interactions": {
+    "INT_0_half_three_harmony": {
+      "id": "INT_0_half_three_harmony",
+      "type": "HALF_THREE_HARMONY",
+      "chinese_name": "半三合",
+      "branches": [
+        "Chou",
+        "Si"
+      ],
+      "palaces": [
+        "Year (Parents/Ancestry)",
+        "Month (Career/Social)",
+        "Hour (Children/Legacy)"
+      ],
+      "description": "丑巳半合Metal局 (missing 酉)",
+      "branch_chinese": "丑巳",
+      "severity": "mild",
+      "activated_by_lp": false
+    },
+    "INT_1_destruction": {
+      "id": "INT_1_destruction",
+      "type": "DESTRUCTION",
+      "chinese_name": "破",
+      "branches": [
+        "Chou",
+        "Chen"
+      ],
+      "palaces": [
+        "Month (Career/Social)",
+        "Day (Self/Spouse)"
+      ],
+      "description": "丑辰破",
+      "branch_chinese": "丑辰",
+      "severity": "mild",
+      "activated_by_lp": false
+    }
+  },
+  "daymaster_analysis": {
+    "daymaster": "Geng",
+    "daymaster_chinese": "庚",
+    "daymaster_element": "Metal",
+    "daymaster_polarity": "Yang",
+    "chart_type": "Strong",
+    "daymaster_percentage": 34.8,
+    "strength": "Extremely Strong",
+    "support_percentage": 63.1,
+    "seasonal_state": "Strengthening",
+    "useful_god": "Wood",
+    "favorable_elements": [
+      "Wood",
+      "Water",
+      "Fire"
+    ],
+    "unfavorable_elements": [
+      "Metal",
+      "Earth"
+    ],
+    "is_following_chart": false,
+    "following_type": null
+  },
+  "health_analysis": {
+    "health_warnings": [
+      {
+        "element": "Wood",
+        "organ_system": "Liver",
+        "zang_organ": "Liver (肝)",
+        "fu_organ": "Gallbladder (胆)",
+        "severity": "moderate",
+        "conflict_count": 0,
+        "weighted_score": 22.5,
+        "seasonal_state": "Strengthening"
+      },
+      {
+        "element": "Water",
+        "organ_system": "Kidneys",
+        "zang_organ": "Kidneys (肾)",
+        "fu_organ": "Bladder (膀胱)",
+        "severity": "moderate",
+        "conflict_count": 0,
+        "weighted_score": 19.5,
+        "seasonal_state": "Strengthening"
+      }
+    ],
+    "conflict_severity_score": 20,
+    "severity_category": "mild",
+    "most_vulnerable_element": "Wood",
+    "seasonal_vulnerability": {},
+    "analysis_text": "Monitor Liver system (Wood element). Element count is low, indicating potential vulnerability.",
+    "pattern_engine": {
+      "pattern_count": 0,
+      "compound_severity": 0,
+      "severity_level": "balanced",
+      "top_patterns": [],
+      "recommendations": []
+    }
+  },
+  "wealth_analysis": {
+    "wealth_element": "Wood",
+    "wealth_score": 50.0,
+    "wealth_change": 0.0,
+    "wealth_seasonal_state": "Strengthening",
+    "daymaster_can_handle": true,
+    "storage_status": "unknown",
+    "opportunities": [],
+    "risks": [
+      "Too many companions (Friend + Rob Wealth) = competition problems, wealth leakage, relationship interference",
+      "Rob Wealth present = money lost through others, partnerships can drain wealth, competitive spending",
+      "Ten Evils Great Defeat (十恶大败) in chart"
+    ],
+    "outlook": "challenging",
+    "analysis_text": "Wealth element (Wood) faces challenges. Too many companions (Friend + Rob Wealth) = competition problems, wealth leakage, relationship interference",
+    "opportunity_score": 50,
+    "risk_score": 60,
+    "has_exceptional_opportunity": false,
+    "pattern_engine": {
+      "pattern_count": 3,
+      "compound_severity": 30,
+      "severity_level": "warning",
+      "top_patterns": [
+        {
+          "chinese_name": "companion_heavy",
+          "severity": 0.7,
+          "level": "moderate"
+        },
+        {
+          "chinese_name": "rw_present",
+          "severity": 0.7,
+          "level": "moderate"
+        },
+        {
+          "chinese_name": "十恶大败",
+          "severity": 0.9,
+          "level": "severe"
+        }
+      ],
+      "recommendations": []
+    }
+  },
+  "learning_analysis": {
+    "resource_element": "Earth",
+    "output_element": "Water",
+    "resource_score": 50.0,
+    "resource_change": 0.0,
+    "resource_seasonal_state": "Strengthening",
+    "output_score": 50.0,
+    "output_change": 0.0,
+    "output_seasonal_state": "Strengthening",
+    "daymaster_can_focus": true,
+    "daymaster_can_absorb": true,
+    "opportunities": [],
+    "blocks": [],
+    "outlook": "favorable",
+    "breakthrough_likely": false,
+    "analysis_text": "Resource element (Earth) is present. Learning capacity is good.",
+    "pattern_engine": {
+      "pattern_count": 0,
+      "compound_severity": 0,
+      "severity_level": "balanced",
+      "top_patterns": [],
+      "recommendations": []
+    }
+  },
+  "ten_gods_detail": {
+    "day_master": "Geng",
+    "day_master_element": "Metal",
+    "nodes": {
+      "year_stem": {
+        "stem": "Ji",
+        "ten_god": "DR",
+        "ten_god_english": "Direct Resource",
+        "ten_god_chinese": "正印",
+        "visible": true,
+        "position": "year"
+      },
+      "year_branch_primary_qi": {
+        "stem": "Bing",
+        "ten_god": "7K",
+        "ten_god_english": "Seven Killings",
+        "ten_god_chinese": "七殺",
+        "visible": false,
+        "position": "year"
+      },
+      "year_branch_hidden_1": {
+        "stem": "Geng",
+        "ten_god": "F",
+        "ten_god_english": "Friend",
+        "ten_god_chinese": "比肩",
+        "visible": false,
+        "position": "year"
+      },
+      "year_branch_hidden_2": {
+        "stem": "Wu",
+        "ten_god": "IR",
+        "ten_god_english": "Indirect Resource",
+        "ten_god_chinese": "偏印",
+        "visible": false,
+        "position": "year"
+      },
+      "month_stem": {
+        "stem": "Ding",
+        "ten_god": "DO",
+        "ten_god_english": "Direct Officer",
+        "ten_god_chinese": "正官",
+        "visible": true,
+        "position": "month"
+      },
+      "month_branch_primary_qi": {
+        "stem": "Ji",
+        "ten_god": "DR",
+        "ten_god_english": "Direct Resource",
+        "ten_god_chinese": "正印",
+        "visible": false,
+        "position": "month"
+      },
+      "month_branch_hidden_1": {
+        "stem": "Gui",
+        "ten_god": "HO",
+        "ten_god_english": "Hurting Officer",
+        "ten_god_chinese": "傷官",
+        "visible": false,
+        "position": "month"
+      },
+      "month_branch_hidden_2": {
+        "stem": "Xin",
+        "ten_god": "RW",
+        "ten_god_english": "Rob Wealth",
+        "ten_god_chinese": "劫財",
+        "visible": false,
+        "position": "month"
+      },
+      "day_stem": {
+        "stem": "Geng",
+        "ten_god": "F",
+        "ten_god_english": "Friend",
+        "ten_god_chinese": "比肩",
+        "visible": true,
+        "position": "day"
+      },
+      "day_branch_primary_qi": {
+        "stem": "Wu",
+        "ten_god": "IR",
+        "ten_god_english": "Indirect Resource",
+        "ten_god_chinese": "偏印",
+        "visible": false,
+        "position": "day"
+      },
+      "day_branch_hidden_1": {
+        "stem": "Yi",
+        "ten_god": "DW",
+        "ten_god_english": "Direct Wealth",
+        "ten_god_chinese": "正財",
+        "visible": false,
+        "position": "day"
+      },
+      "day_branch_hidden_2": {
+        "stem": "Gui",
+        "ten_god": "HO",
+        "ten_god_english": "Hurting Officer",
+        "ten_god_chinese": "傷官",
+        "visible": false,
+        "position": "day"
+      },
+      "hour_stem": {
+        "stem": "Xin",
+        "ten_god": "RW",
+        "ten_god_english": "Rob Wealth",
+        "ten_god_chinese": "劫財",
+        "visible": true,
+        "position": "hour"
+      },
+      "hour_branch_primary_qi": {
+        "stem": "Bing",
+        "ten_god": "7K",
+        "ten_god_english": "Seven Killings",
+        "ten_god_chinese": "七殺",
+        "visible": false,
+        "position": "hour"
+      },
+      "hour_branch_hidden_1": {
+        "stem": "Geng",
+        "ten_god": "F",
+        "ten_god_english": "Friend",
+        "ten_god_chinese": "比肩",
+        "visible": false,
+        "position": "hour"
+      },
+      "hour_branch_hidden_2": {
+        "stem": "Wu",
+        "ten_god": "IR",
+        "ten_god_english": "Indirect Resource",
+        "ten_god_chinese": "偏印",
+        "visible": false,
+        "position": "hour"
+      }
+    },
+    "summary": {
+      "wealth_nodes": [
+        "day_branch_hidden_1"
+      ],
+      "resource_nodes": [
+        "year_stem",
+        "year_branch_hidden_2",
+        "month_branch_primary_qi",
+        "day_branch_primary_qi",
+        "hour_branch_hidden_2"
+      ],
+      "output_nodes": [
+        "month_branch_hidden_1",
+        "day_branch_hidden_2"
+      ],
+      "officer_nodes": [
+        "year_branch_primary_qi",
+        "month_stem",
+        "hour_branch_primary_qi"
+      ],
+      "companion_nodes": [
+        "year_branch_hidden_1",
+        "month_branch_hidden_2",
+        "day_stem",
+        "hour_stem",
+        "hour_branch_hidden_1"
+      ]
+    },
+    "warnings": [
+      {
+        "ten_god": "RW",
+        "ten_god_chinese": "劫財",
+        "ten_god_english": "Rob Wealth",
+        "pillar": "hour",
+        "message": "Rob Wealth present — wealth drained through others, competition",
+        "message_chinese": "劫財現 — 財被他人所奪，競爭激烈",
+        "message_id": "Rob Wealth hadir — kekayaan terkuras oleh orang lain, persaingan"
+      },
+      {
+        "ten_god": "RW",
+        "ten_god_chinese": "劫財",
+        "ten_god_english": "Rob Wealth",
+        "pillar": "day",
+        "message": "Too many companions (Friend + Rob Wealth) = competition problems, wealth leakage, relationship interference",
+        "message_chinese": "Too many companions (Friend + Rob Wealth) = competition problems, wealth leakage, relationship interference",
+        "message_id": "Too many companions (Friend + Rob Wealth) = competition problems, wealth leakage, relationship interference"
+      }
+    ],
+    "opportunities": []
+  },
+  "special_stars": [
+    {
+      "chinese_name": "天乙贵人",
+      "english_name": "Heavenly Noble",
+      "target_branch": "Chou",
+      "palace": "month",
+      "nature": "auspicious",
+      "impact": "",
+      "severity": "mild",
+      "is_void": false,
+      "derivation": "For Geng DM: Tian Yi at 丑 (Chou). Found in month palace.",
+      "life_areas": [
+        "career",
+        "relationship",
+        "wealth"
+      ]
+    },
+    {
+      "chinese_name": "太极贵人",
+      "english_name": "Tai Ji Noble",
+      "target_branch": "Chou",
+      "palace": "month",
+      "nature": "auspicious",
+      "impact": "",
+      "severity": "mild",
+      "is_void": false,
+      "derivation": "For Geng DM: Tai Ji at 丑. In month.",
+      "life_areas": [
+        "career",
+        "education"
+      ]
+    },
+    {
+      "chinese_name": "天德贵人",
+      "english_name": "Heavenly Virtue",
+      "target_branch": "Geng",
+      "palace": "day",
+      "nature": "auspicious",
+      "impact": "",
+      "severity": "mild",
+      "is_void": false,
+      "derivation": "For 丑 month: Tian De = Geng. PRESENT.",
+      "life_areas": [
+        "general",
+        "health"
+      ]
+    },
+    {
+      "chinese_name": "月德贵人",
+      "english_name": "Monthly Virtue",
+      "target_branch": "Geng",
+      "palace": "day",
+      "nature": "auspicious",
+      "impact": "",
+      "severity": "mild",
+      "is_void": false,
+      "derivation": "For 丑 month: Yue De = 庚. PRESENT.",
+      "life_areas": [
+        "general",
+        "health"
+      ]
+    },
+    {
+      "chinese_name": "天喜",
+      "english_name": "Heavenly Happiness",
+      "target_branch": "Chen",
+      "palace": "day",
+      "nature": "auspicious",
+      "impact": "",
+      "severity": "mild",
+      "is_void": false,
+      "derivation": "For 巳 year: Tian Xi at 辰. PRESENT.",
+      "life_areas": [
+        "marriage",
+        "celebration"
+      ]
+    },
+    {
+      "chinese_name": "华盖",
+      "english_name": "Canopy Star",
+      "target_branch": "Chou",
+      "palace": "month",
+      "nature": "mixed",
+      "impact": "",
+      "severity": "mild",
+      "is_void": false,
+      "derivation": "For year branch 巳: Hua Gai at 丑. In month.",
+      "life_areas": [
+        "spirituality",
+        "education"
+      ]
+    },
+    {
+      "chinese_name": "华盖",
+      "english_name": "Canopy Star",
+      "target_branch": "Chen",
+      "palace": "day",
+      "nature": "mixed",
+      "impact": "",
+      "severity": "mild",
+      "is_void": false,
+      "derivation": "For day branch 辰: Hua Gai at 辰. In day.",
+      "life_areas": [
+        "spirituality",
+        "education"
+      ]
+    },
+    {
+      "chinese_name": "地网",
+      "english_name": "Earth's Snare",
+      "target_branch": "Si",
+      "palace": "year",
+      "nature": "inauspicious",
+      "impact": "",
+      "severity": "moderate",
+      "is_void": false,
+      "derivation": "巳 in year palace = Earth's Snare (地网).",
+      "life_areas": [
+        "legal",
+        "relationship"
+      ]
+    },
+    {
+      "chinese_name": "地网",
+      "english_name": "Earth's Snare",
+      "target_branch": "Chen",
+      "palace": "day",
+      "nature": "inauspicious",
+      "impact": "",
+      "severity": "moderate",
+      "is_void": false,
+      "derivation": "辰 in day palace = Earth's Snare (地网).",
+      "life_areas": [
+        "legal",
+        "relationship"
+      ]
+    },
+    {
+      "chinese_name": "地网",
+      "english_name": "Earth's Snare",
+      "target_branch": "Si",
+      "palace": "year",
+      "nature": "inauspicious",
+      "impact": "",
+      "severity": "moderate",
+      "is_void": false,
+      "derivation": "巳 in year palace = Earth's Snare (地网).",
+      "life_areas": [
+        "legal",
+        "relationship"
+      ]
+    },
+    {
+      "chinese_name": "寡宿",
+      "english_name": "Widow Star",
+      "target_branch": "Chen",
+      "palace": "day",
+      "nature": "inauspicious",
+      "impact": "",
+      "severity": "moderate",
+      "is_void": false,
+      "derivation": "For 巳 year: Gua Su at 辰. PRESENT.",
+      "life_areas": [
+        "relationship"
+      ]
+    },
+    {
+      "chinese_name": "十恶大败",
+      "english_name": "Ten Evils Great Defeat",
+      "target_branch": "",
+      "palace": "",
+      "nature": "inauspicious",
+      "impact": "",
+      "severity": "severe",
+      "is_void": false,
+      "derivation": "Day Pillar 庚辰: IS a Ten Evils day.",
+      "life_areas": [
+        "wealth",
+        "general"
+      ]
+    },
+    {
+      "chinese_name": "魁罡",
+      "english_name": "Kui Gang",
+      "target_branch": "",
+      "palace": "",
+      "nature": "mixed",
+      "impact": "",
+      "severity": "moderate",
+      "is_void": false,
+      "derivation": "Day Pillar 庚辰: IS a Kui Gang day.",
+      "life_areas": [
+        "career",
+        "authority",
+        "marriage"
+      ]
+    },
+    {
+      "chinese_name": "绞",
+      "english_name": "Strangle Star",
+      "target_branch": "Chen",
+      "palace": "day",
+      "nature": "inauspicious",
+      "impact": "",
+      "severity": "moderate",
+      "is_void": false,
+      "derivation": "Year 巳: Strangle at 辰. PRESENT.",
+      "life_areas": [
+        "legal",
+        "disputes"
+      ]
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": "high",
+      "order": 1,
+      "domain": "general",
+      "title": "Strengthen Wood Element",
+      "description": "Your useful god is Wood. Favorable elements: Wood, Water, Fire. Wear colors: green, emerald, jade green. Direction: East."
+    },
+    {
+      "priority": "medium",
+      "order": 2,
+      "domain": "environment",
+      "title": "Consider Relocation Near Water",
+      "description": "This chart moderately benefits from crossing water. Living near water or abroad will significantly help."
+    },
+    {
+      "priority": "high",
+      "order": 3,
+      "domain": "wealth",
+      "title": "Address Wealth Concerns",
+      "description": "Ten Evils Great Defeat (十恶大败) in chart"
+    },
+    {
+      "priority": "medium",
+      "order": 4,
+      "domain": "character",
+      "title": "Address Character Concerns",
+      "description": "Earth's Snare (地网) in year"
+    }
+  ],
+  "narrative_analysis": {
+    "all_chronological": [
+      {
+        "seq": 1,
+        "id": "narrative_3",
+        "category": "shen_sha",
+        "type": "heavenly_noble",
+        "icon": "flow",
+        "title": "天乙贵人 Heavenly Noble",
+        "chinese_name": "天乙贵人",
+        "polarity": "positive",
+        "element": null,
+        "formula": "For Geng DM: Tian Yi at 丑 (Chou). Found in month palace.",
+        "match": "month",
+        "description": "Heavenly Noble present in month",
+        "palaces": [
+          "month"
+        ],
+        "pillar_refs": [
+          {
+            "abbrev": "HS-M",
+            "node_type": "hs",
+            "position": "month"
+          }
+        ],
+        "severity": "mild",
+        "priority": 2
+      },
+      {
+        "seq": 2,
+        "id": "narrative_4",
+        "category": "shen_sha",
+        "type": "tai_ji_noble",
+        "icon": "flow",
+        "title": "太极贵人 Tai Ji Noble",
+        "chinese_name": "太极贵人",
+        "polarity": "positive",
+        "element": null,
+        "formula": "For Geng DM: Tai Ji at 丑. In month.",
+        "match": "month",
+        "description": "Tai Ji Noble present in month",
+        "palaces": [
+          "month"
+        ],
+        "pillar_refs": [
+          {
+            "abbrev": "HS-M",
+            "node_type": "hs",
+            "position": "month"
+          }
+        ],
+        "severity": "mild",
+        "priority": 2
+      },
+      {
+        "seq": 3,
+        "id": "narrative_5",
+        "category": "shen_sha",
+        "type": "heavenly_virtue",
+        "icon": "flow",
+        "title": "天德贵人 Heavenly Virtue",
+        "chinese_name": "天德贵人",
+        "polarity": "positive",
+        "element": null,
+        "formula": "For 丑 month: Tian De = Geng. PRESENT.",
+        "match": "day",
+        "description": "Heavenly Virtue present in day",
+        "palaces": [
+          "day"
+        ],
+        "pillar_refs": [
+          {
+            "abbrev": "HS-D",
+            "node_type": "hs",
+            "position": "day"
+          }
+        ],
+        "severity": "mild",
+        "priority": 2
+      },
+      {
+        "seq": 4,
+        "id": "narrative_6",
+        "category": "shen_sha",
+        "type": "monthly_virtue",
+        "icon": "flow",
+        "title": "月德贵人 Monthly Virtue",
+        "chinese_name": "月德贵人",
+        "polarity": "positive",
+        "element": null,
+        "formula": "For 丑 month: Yue De = 庚. PRESENT.",
+        "match": "day",
+        "description": "Monthly Virtue present in day",
+        "palaces": [
+          "day"
+        ],
+        "pillar_refs": [
+          {
+            "abbrev": "HS-D",
+            "node_type": "hs",
+            "position": "day"
+          }
+        ],
+        "severity": "mild",
+        "priority": 2
+      },
+      {
+        "seq": 5,
+        "id": "narrative_7",
+        "category": "shen_sha",
+        "type": "heavenly_happiness",
+        "icon": "flow",
+        "title": "天喜 Heavenly Happiness",
+        "chinese_name": "天喜",
+        "polarity": "positive",
+        "element": null,
+        "formula": "For 巳 year: Tian Xi at 辰. PRESENT.",
+        "match": "day",
+        "description": "Heavenly Happiness present in day",
+        "palaces": [
+          "day"
+        ],
+        "pillar_refs": [
+          {
+            "abbrev": "HS-D",
+            "node_type": "hs",
+            "position": "day"
+          }
+        ],
+        "severity": "mild",
+        "priority": 2
+      },
+      {
+        "seq": 6,
+        "id": "narrative_10",
+        "category": "shen_sha",
+        "type": "earth's_snare",
+        "icon": "flow",
+        "title": "地网 Earth's Snare",
+        "chinese_name": "地网",
+        "polarity": "negative",
+        "element": null,
+        "formula": "巳 in year palace = Earth's Snare (地网).",
+        "match": "year",
+        "description": "Earth's Snare present in year",
+        "palaces": [
+          "year"
+        ],
+        "pillar_refs": [
+          {
+            "abbrev": "HS-Y",
+            "node_type": "hs",
+            "position": "year"
+          }
+        ],
+        "severity": "moderate",
+        "priority": 2
+      },
+      {
+        "seq": 7,
+        "id": "narrative_11",
+        "category": "shen_sha",
+        "type": "earth's_snare",
+        "icon": "flow",
+        "title": "地网 Earth's Snare",
+        "chinese_name": "地网",
+        "polarity": "negative",
+        "element": null,
+        "formula": "辰 in day palace = Earth's Snare (地网).",
+        "match": "day",
+        "description": "Earth's Snare present in day",
+        "palaces": [
+          "day"
+        ],
+        "pillar_refs": [
+          {
+            "abbrev": "HS-D",
+            "node_type": "hs",
+            "position": "day"
+          }
+        ],
+        "severity": "moderate",
+        "priority": 2
+      },
+      {
+        "seq": 8,
+        "id": "narrative_12",
+        "category": "shen_sha",
+        "type": "earth's_snare",
+        "icon": "flow",
+        "title": "地网 Earth's Snare",
+        "chinese_name": "地网",
+        "polarity": "negative",
+        "element": null,
+        "formula": "巳 in year palace = Earth's Snare (地网).",
+        "match": "year",
+        "description": "Earth's Snare present in year",
+        "palaces": [
+          "year"
+        ],
+        "pillar_refs": [
+          {
+            "abbrev": "HS-Y",
+            "node_type": "hs",
+            "position": "year"
+          }
+        ],
+        "severity": "moderate",
+        "priority": 2
+      },
+      {
+        "seq": 9,
+        "id": "narrative_13",
+        "category": "shen_sha",
+        "type": "widow_star",
+        "icon": "flow",
+        "title": "寡宿 Widow Star",
+        "chinese_name": "寡宿",
+        "polarity": "negative",
+        "element": null,
+        "formula": "For 巳 year: Gua Su at 辰. PRESENT.",
+        "match": "day",
+        "description": "Widow Star present in day",
+        "palaces": [
+          "day"
+        ],
+        "pillar_refs": [
+          {
+            "abbrev": "HS-D",
+            "node_type": "hs",
+            "position": "day"
+          }
+        ],
+        "severity": "moderate",
+        "priority": 2
+      },
+      {
+        "seq": 10,
+        "id": "narrative_14",
+        "category": "shen_sha",
+        "type": "ten_evils_great_defeat",
+        "icon": "flow",
+        "title": "十恶大败 Ten Evils Great Defeat",
+        "chinese_name": "十恶大败",
+        "polarity": "negative",
+        "element": null,
+        "formula": "Day Pillar 庚辰: IS a Ten Evils day.",
+        "match": null,
+        "description": "Ten Evils Great Defeat present in chart",
+        "palaces": [],
+        "pillar_refs": [],
+        "severity": "severe",
+        "priority": 2
+      },
+      {
+        "seq": 11,
+        "id": "narrative_16",
+        "category": "shen_sha",
+        "type": "strangle_star",
+        "icon": "flow",
+        "title": "绞 Strangle Star",
+        "chinese_name": "绞",
+        "polarity": "negative",
+        "element": null,
+        "formula": "Year 巳: Strangle at 辰. PRESENT.",
+        "match": "day",
+        "description": "Strangle Star present in day",
+        "palaces": [
+          "day"
+        ],
+        "pillar_refs": [
+          {
+            "abbrev": "HS-D",
+            "node_type": "hs",
+            "position": "day"
+          }
+        ],
+        "severity": "moderate",
+        "priority": 2
+      },
+      {
+        "seq": 12,
+        "id": "narrative_1",
+        "category": "interaction",
+        "type": "half_three_harmony",
+        "icon": "half_combo",
+        "title": "半三合 Half Harmony",
+        "chinese_name": "半三合",
+        "polarity": "positive",
+        "element": "Metal",
+        "formula": "丑巳半合Metal局 (missing 酉)",
+        "match": "巳 + 丑 + 巳",
+        "description": "丑巳半合Metal局 (missing 酉)",
+        "palaces": [
+          "Year (Parents/Ancestry)",
+          "Month (Career/Social)",
+          "Hour (Children/Legacy)"
+        ],
+        "pillar_refs": [
+          {
+            "abbrev": "HS-Y",
+            "node_type": "hs",
+            "position": "year"
+          },
+          {
+            "abbrev": "HS-M",
+            "node_type": "hs",
+            "position": "month"
+          },
+          {
+            "abbrev": "HS-H",
+            "node_type": "hs",
+            "position": "hour"
+          }
+        ],
+        "severity": "mild",
+        "priority": 1
+      },
+      {
+        "seq": 13,
+        "id": "narrative_2",
+        "category": "interaction",
+        "type": "destruction",
+        "icon": "destruction",
+        "title": "破 Destruction",
+        "chinese_name": "破",
+        "polarity": "negative",
+        "element": null,
+        "formula": "丑辰破",
+        "match": "丑 + 辰",
+        "description": "丑辰破",
+        "palaces": [
+          "Month (Career/Social)",
+          "Day (Self/Spouse)"
+        ],
+        "pillar_refs": [
+          {
+            "abbrev": "HS-M",
+            "node_type": "hs",
+            "position": "month"
+          },
+          {
+            "abbrev": "HS-D",
+            "node_type": "hs",
+            "position": "day"
+          }
+        ],
+        "severity": "mild",
+        "priority": 1
+      },
+      {
+        "seq": 14,
+        "id": "narrative_8",
+        "category": "shen_sha",
+        "type": "canopy_star",
+        "icon": "flow",
+        "title": "华盖 Canopy Star",
+        "chinese_name": "华盖",
+        "polarity": "neutral",
+        "element": null,
+        "formula": "For year branch 巳: Hua Gai at 丑. In month.",
+        "match": "month",
+        "description": "Canopy Star present in month",
+        "palaces": [
+          "month"
+        ],
+        "pillar_refs": [
+          {
+            "abbrev": "HS-M",
+            "node_type": "hs",
+            "position": "month"
+          }
+        ],
+        "severity": "mild",
+        "priority": 1
+      },
+      {
+        "seq": 15,
+        "id": "narrative_9",
+        "category": "shen_sha",
+        "type": "canopy_star",
+        "icon": "flow",
+        "title": "华盖 Canopy Star",
+        "chinese_name": "华盖",
+        "polarity": "neutral",
+        "element": null,
+        "formula": "For day branch 辰: Hua Gai at 辰. In day.",
+        "match": "day",
+        "description": "Canopy Star present in day",
+        "palaces": [
+          "day"
+        ],
+        "pillar_refs": [
+          {
+            "abbrev": "HS-D",
+            "node_type": "hs",
+            "position": "day"
+          }
+        ],
+        "severity": "mild",
+        "priority": 1
+      },
+      {
+        "seq": 16,
+        "id": "narrative_15",
+        "category": "shen_sha",
+        "type": "kui_gang",
+        "icon": "flow",
+        "title": "魁罡 Kui Gang",
+        "chinese_name": "魁罡",
+        "polarity": "neutral",
+        "element": null,
+        "formula": "Day Pillar 庚辰: IS a Kui Gang day.",
+        "match": null,
+        "description": "Kui Gang present in chart",
+        "palaces": [],
+        "pillar_refs": [],
+        "severity": "moderate",
+        "priority": 1
+      }
+    ],
+    "narratives": [
+      {
+        "seq": 1,
+        "id": "narrative_3",
+        "category": "shen_sha",
+        "type": "heavenly_noble",
+        "icon": "flow",
+        "title": "天乙贵人 Heavenly Noble",
+        "chinese_name": "天乙贵人",
+        "polarity": "positive",
+        "element": null,
+        "formula": "For Geng DM: Tian Yi at 丑 (Chou). Found in month palace.",
+        "match": "month",
+        "description": "Heavenly Noble present in month",
+        "palaces": [
+          "month"
+        ],
+        "pillar_refs": [
+          {
+            "abbrev": "HS-M",
+            "node_type": "hs",
+            "position": "month"
+          }
+        ],
+        "severity": "mild",
+        "priority": 2
+      },
+      {
+        "seq": 2,
+        "id": "narrative_4",
+        "category": "shen_sha",
+        "type": "tai_ji_noble",
+        "icon": "flow",
+        "title": "太极贵人 Tai Ji Noble",
+        "chinese_name": "太极贵人",
+        "polarity": "positive",
+        "element": null,
+        "formula": "For Geng DM: Tai Ji at 丑. In month.",
+        "match": "month",
+        "description": "Tai Ji Noble present in month",
+        "palaces": [
+          "month"
+        ],
+        "pillar_refs": [
+          {
+            "abbrev": "HS-M",
+            "node_type": "hs",
+            "position": "month"
+          }
+        ],
+        "severity": "mild",
+        "priority": 2
+      },
+      {
+        "seq": 3,
+        "id": "narrative_5",
+        "category": "shen_sha",
+        "type": "heavenly_virtue",
+        "icon": "flow",
+        "title": "天德贵人 Heavenly Virtue",
+        "chinese_name": "天德贵人",
+        "polarity": "positive",
+        "element": null,
+        "formula": "For 丑 month: Tian De = Geng. PRESENT.",
+        "match": "day",
+        "description": "Heavenly Virtue present in day",
+        "palaces": [
+          "day"
+        ],
+        "pillar_refs": [
+          {
+            "abbrev": "HS-D",
+            "node_type": "hs",
+            "position": "day"
+          }
+        ],
+        "severity": "mild",
+        "priority": 2
+      },
+      {
+        "seq": 4,
+        "id": "narrative_6",
+        "category": "shen_sha",
+        "type": "monthly_virtue",
+        "icon": "flow",
+        "title": "月德贵人 Monthly Virtue",
+        "chinese_name": "月德贵人",
+        "polarity": "positive",
+        "element": null,
+        "formula": "For 丑 month: Yue De = 庚. PRESENT.",
+        "match": "day",
+        "description": "Monthly Virtue present in day",
+        "palaces": [
+          "day"
+        ],
+        "pillar_refs": [
+          {
+            "abbrev": "HS-D",
+            "node_type": "hs",
+            "position": "day"
+          }
+        ],
+        "severity": "mild",
+        "priority": 2
+      },
+      {
+        "seq": 5,
+        "id": "narrative_7",
+        "category": "shen_sha",
+        "type": "heavenly_happiness",
+        "icon": "flow",
+        "title": "天喜 Heavenly Happiness",
+        "chinese_name": "天喜",
+        "polarity": "positive",
+        "element": null,
+        "formula": "For 巳 year: Tian Xi at 辰. PRESENT.",
+        "match": "day",
+        "description": "Heavenly Happiness present in day",
+        "palaces": [
+          "day"
+        ],
+        "pillar_refs": [
+          {
+            "abbrev": "HS-D",
+            "node_type": "hs",
+            "position": "day"
+          }
+        ],
+        "severity": "mild",
+        "priority": 2
+      },
+      {
+        "seq": 6,
+        "id": "narrative_10",
+        "category": "shen_sha",
+        "type": "earth's_snare",
+        "icon": "flow",
+        "title": "地网 Earth's Snare",
+        "chinese_name": "地网",
+        "polarity": "negative",
+        "element": null,
+        "formula": "巳 in year palace = Earth's Snare (地网).",
+        "match": "year",
+        "description": "Earth's Snare present in year",
+        "palaces": [
+          "year"
+        ],
+        "pillar_refs": [
+          {
+            "abbrev": "HS-Y",
+            "node_type": "hs",
+            "position": "year"
+          }
+        ],
+        "severity": "moderate",
+        "priority": 2
+      },
+      {
+        "seq": 7,
+        "id": "narrative_11",
+        "category": "shen_sha",
+        "type": "earth's_snare",
+        "icon": "flow",
+        "title": "地网 Earth's Snare",
+        "chinese_name": "地网",
+        "polarity": "negative",
+        "element": null,
+        "formula": "辰 in day palace = Earth's Snare (地网).",
+        "match": "day",
+        "description": "Earth's Snare present in day",
+        "palaces": [
+          "day"
+        ],
+        "pillar_refs": [
+          {
+            "abbrev": "HS-D",
+            "node_type": "hs",
+            "position": "day"
+          }
+        ],
+        "severity": "moderate",
+        "priority": 2
+      },
+      {
+        "seq": 8,
+        "id": "narrative_12",
+        "category": "shen_sha",
+        "type": "earth's_snare",
+        "icon": "flow",
+        "title": "地网 Earth's Snare",
+        "chinese_name": "地网",
+        "polarity": "negative",
+        "element": null,
+        "formula": "巳 in year palace = Earth's Snare (地网).",
+        "match": "year",
+        "description": "Earth's Snare present in year",
+        "palaces": [
+          "year"
+        ],
+        "pillar_refs": [
+          {
+            "abbrev": "HS-Y",
+            "node_type": "hs",
+            "position": "year"
+          }
+        ],
+        "severity": "moderate",
+        "priority": 2
+      },
+      {
+        "seq": 9,
+        "id": "narrative_13",
+        "category": "shen_sha",
+        "type": "widow_star",
+        "icon": "flow",
+        "title": "寡宿 Widow Star",
+        "chinese_name": "寡宿",
+        "polarity": "negative",
+        "element": null,
+        "formula": "For 巳 year: Gua Su at 辰. PRESENT.",
+        "match": "day",
+        "description": "Widow Star present in day",
+        "palaces": [
+          "day"
+        ],
+        "pillar_refs": [
+          {
+            "abbrev": "HS-D",
+            "node_type": "hs",
+            "position": "day"
+          }
+        ],
+        "severity": "moderate",
+        "priority": 2
+      },
+      {
+        "seq": 10,
+        "id": "narrative_14",
+        "category": "shen_sha",
+        "type": "ten_evils_great_defeat",
+        "icon": "flow",
+        "title": "十恶大败 Ten Evils Great Defeat",
+        "chinese_name": "十恶大败",
+        "polarity": "negative",
+        "element": null,
+        "formula": "Day Pillar 庚辰: IS a Ten Evils day.",
+        "match": null,
+        "description": "Ten Evils Great Defeat present in chart",
+        "palaces": [],
+        "pillar_refs": [],
+        "severity": "severe",
+        "priority": 2
+      },
+      {
+        "seq": 11,
+        "id": "narrative_16",
+        "category": "shen_sha",
+        "type": "strangle_star",
+        "icon": "flow",
+        "title": "绞 Strangle Star",
+        "chinese_name": "绞",
+        "polarity": "negative",
+        "element": null,
+        "formula": "Year 巳: Strangle at 辰. PRESENT.",
+        "match": "day",
+        "description": "Strangle Star present in day",
+        "palaces": [
+          "day"
+        ],
+        "pillar_refs": [
+          {
+            "abbrev": "HS-D",
+            "node_type": "hs",
+            "position": "day"
+          }
+        ],
+        "severity": "moderate",
+        "priority": 2
+      },
+      {
+        "seq": 12,
+        "id": "narrative_1",
+        "category": "interaction",
+        "type": "half_three_harmony",
+        "icon": "half_combo",
+        "title": "半三合 Half Harmony",
+        "chinese_name": "半三合",
+        "polarity": "positive",
+        "element": "Metal",
+        "formula": "丑巳半合Metal局 (missing 酉)",
+        "match": "巳 + 丑 + 巳",
+        "description": "丑巳半合Metal局 (missing 酉)",
+        "palaces": [
+          "Year (Parents/Ancestry)",
+          "Month (Career/Social)",
+          "Hour (Children/Legacy)"
+        ],
+        "pillar_refs": [
+          {
+            "abbrev": "HS-Y",
+            "node_type": "hs",
+            "position": "year"
+          },
+          {
+            "abbrev": "HS-M",
+            "node_type": "hs",
+            "position": "month"
+          },
+          {
+            "abbrev": "HS-H",
+            "node_type": "hs",
+            "position": "hour"
+          }
+        ],
+        "severity": "mild",
+        "priority": 1
+      },
+      {
+        "seq": 13,
+        "id": "narrative_2",
+        "category": "interaction",
+        "type": "destruction",
+        "icon": "destruction",
+        "title": "破 Destruction",
+        "chinese_name": "破",
+        "polarity": "negative",
+        "element": null,
+        "formula": "丑辰破",
+        "match": "丑 + 辰",
+        "description": "丑辰破",
+        "palaces": [
+          "Month (Career/Social)",
+          "Day (Self/Spouse)"
+        ],
+        "pillar_refs": [
+          {
+            "abbrev": "HS-M",
+            "node_type": "hs",
+            "position": "month"
+          },
+          {
+            "abbrev": "HS-D",
+            "node_type": "hs",
+            "position": "day"
+          }
+        ],
+        "severity": "mild",
+        "priority": 1
+      },
+      {
+        "seq": 14,
+        "id": "narrative_8",
+        "category": "shen_sha",
+        "type": "canopy_star",
+        "icon": "flow",
+        "title": "华盖 Canopy Star",
+        "chinese_name": "华盖",
+        "polarity": "neutral",
+        "element": null,
+        "formula": "For year branch 巳: Hua Gai at 丑. In month.",
+        "match": "month",
+        "description": "Canopy Star present in month",
+        "palaces": [
+          "month"
+        ],
+        "pillar_refs": [
+          {
+            "abbrev": "HS-M",
+            "node_type": "hs",
+            "position": "month"
+          }
+        ],
+        "severity": "mild",
+        "priority": 1
+      },
+      {
+        "seq": 15,
+        "id": "narrative_9",
+        "category": "shen_sha",
+        "type": "canopy_star",
+        "icon": "flow",
+        "title": "华盖 Canopy Star",
+        "chinese_name": "华盖",
+        "polarity": "neutral",
+        "element": null,
+        "formula": "For day branch 辰: Hua Gai at 辰. In day.",
+        "match": "day",
+        "description": "Canopy Star present in day",
+        "palaces": [
+          "day"
+        ],
+        "pillar_refs": [
+          {
+            "abbrev": "HS-D",
+            "node_type": "hs",
+            "position": "day"
+          }
+        ],
+        "severity": "mild",
+        "priority": 1
+      }
+    ],
+    "narratives_by_category": {
+      "interaction": [
+        {
+          "seq": 12,
+          "id": "narrative_1",
+          "category": "interaction",
+          "type": "half_three_harmony",
+          "icon": "half_combo",
+          "title": "半三合 Half Harmony",
+          "chinese_name": "半三合",
+          "polarity": "positive",
+          "element": "Metal",
+          "formula": "丑巳半合Metal局 (missing 酉)",
+          "match": "巳 + 丑 + 巳",
+          "description": "丑巳半合Metal局 (missing 酉)",
+          "palaces": [
+            "Year (Parents/Ancestry)",
+            "Month (Career/Social)",
+            "Hour (Children/Legacy)"
+          ],
+          "pillar_refs": [
+            {
+              "abbrev": "HS-Y",
+              "node_type": "hs",
+              "position": "year"
+            },
+            {
+              "abbrev": "HS-M",
+              "node_type": "hs",
+              "position": "month"
+            },
+            {
+              "abbrev": "HS-H",
+              "node_type": "hs",
+              "position": "hour"
+            }
+          ],
+          "severity": "mild",
+          "priority": 1
+        },
+        {
+          "seq": 13,
+          "id": "narrative_2",
+          "category": "interaction",
+          "type": "destruction",
+          "icon": "destruction",
+          "title": "破 Destruction",
+          "chinese_name": "破",
+          "polarity": "negative",
+          "element": null,
+          "formula": "丑辰破",
+          "match": "丑 + 辰",
+          "description": "丑辰破",
+          "palaces": [
+            "Month (Career/Social)",
+            "Day (Self/Spouse)"
+          ],
+          "pillar_refs": [
+            {
+              "abbrev": "HS-M",
+              "node_type": "hs",
+              "position": "month"
+            },
+            {
+              "abbrev": "HS-D",
+              "node_type": "hs",
+              "position": "day"
+            }
+          ],
+          "severity": "mild",
+          "priority": 1
+        }
+      ],
+      "shen_sha": [
+        {
+          "seq": 1,
+          "id": "narrative_3",
+          "category": "shen_sha",
+          "type": "heavenly_noble",
+          "icon": "flow",
+          "title": "天乙贵人 Heavenly Noble",
+          "chinese_name": "天乙贵人",
+          "polarity": "positive",
+          "element": null,
+          "formula": "For Geng DM: Tian Yi at 丑 (Chou). Found in month palace.",
+          "match": "month",
+          "description": "Heavenly Noble present in month",
+          "palaces": [
+            "month"
+          ],
+          "pillar_refs": [
+            {
+              "abbrev": "HS-M",
+              "node_type": "hs",
+              "position": "month"
+            }
+          ],
+          "severity": "mild",
+          "priority": 2
+        },
+        {
+          "seq": 2,
+          "id": "narrative_4",
+          "category": "shen_sha",
+          "type": "tai_ji_noble",
+          "icon": "flow",
+          "title": "太极贵人 Tai Ji Noble",
+          "chinese_name": "太极贵人",
+          "polarity": "positive",
+          "element": null,
+          "formula": "For Geng DM: Tai Ji at 丑. In month.",
+          "match": "month",
+          "description": "Tai Ji Noble present in month",
+          "palaces": [
+            "month"
+          ],
+          "pillar_refs": [
+            {
+              "abbrev": "HS-M",
+              "node_type": "hs",
+              "position": "month"
+            }
+          ],
+          "severity": "mild",
+          "priority": 2
+        },
+        {
+          "seq": 3,
+          "id": "narrative_5",
+          "category": "shen_sha",
+          "type": "heavenly_virtue",
+          "icon": "flow",
+          "title": "天德贵人 Heavenly Virtue",
+          "chinese_name": "天德贵人",
+          "polarity": "positive",
+          "element": null,
+          "formula": "For 丑 month: Tian De = Geng. PRESENT.",
+          "match": "day",
+          "description": "Heavenly Virtue present in day",
+          "palaces": [
+            "day"
+          ],
+          "pillar_refs": [
+            {
+              "abbrev": "HS-D",
+              "node_type": "hs",
+              "position": "day"
+            }
+          ],
+          "severity": "mild",
+          "priority": 2
+        },
+        {
+          "seq": 4,
+          "id": "narrative_6",
+          "category": "shen_sha",
+          "type": "monthly_virtue",
+          "icon": "flow",
+          "title": "月德贵人 Monthly Virtue",
+          "chinese_name": "月德贵人",
+          "polarity": "positive",
+          "element": null,
+          "formula": "For 丑 month: Yue De = 庚. PRESENT.",
+          "match": "day",
+          "description": "Monthly Virtue present in day",
+          "palaces": [
+            "day"
+          ],
+          "pillar_refs": [
+            {
+              "abbrev": "HS-D",
+              "node_type": "hs",
+              "position": "day"
+            }
+          ],
+          "severity": "mild",
+          "priority": 2
+        },
+        {
+          "seq": 5,
+          "id": "narrative_7",
+          "category": "shen_sha",
+          "type": "heavenly_happiness",
+          "icon": "flow",
+          "title": "天喜 Heavenly Happiness",
+          "chinese_name": "天喜",
+          "polarity": "positive",
+          "element": null,
+          "formula": "For 巳 year: Tian Xi at 辰. PRESENT.",
+          "match": "day",
+          "description": "Heavenly Happiness present in day",
+          "palaces": [
+            "day"
+          ],
+          "pillar_refs": [
+            {
+              "abbrev": "HS-D",
+              "node_type": "hs",
+              "position": "day"
+            }
+          ],
+          "severity": "mild",
+          "priority": 2
+        },
+        {
+          "seq": 6,
+          "id": "narrative_10",
+          "category": "shen_sha",
+          "type": "earth's_snare",
+          "icon": "flow",
+          "title": "地网 Earth's Snare",
+          "chinese_name": "地网",
+          "polarity": "negative",
+          "element": null,
+          "formula": "巳 in year palace = Earth's Snare (地网).",
+          "match": "year",
+          "description": "Earth's Snare present in year",
+          "palaces": [
+            "year"
+          ],
+          "pillar_refs": [
+            {
+              "abbrev": "HS-Y",
+              "node_type": "hs",
+              "position": "year"
+            }
+          ],
+          "severity": "moderate",
+          "priority": 2
+        },
+        {
+          "seq": 7,
+          "id": "narrative_11",
+          "category": "shen_sha",
+          "type": "earth's_snare",
+          "icon": "flow",
+          "title": "地网 Earth's Snare",
+          "chinese_name": "地网",
+          "polarity": "negative",
+          "element": null,
+          "formula": "辰 in day palace = Earth's Snare (地网).",
+          "match": "day",
+          "description": "Earth's Snare present in day",
+          "palaces": [
+            "day"
+          ],
+          "pillar_refs": [
+            {
+              "abbrev": "HS-D",
+              "node_type": "hs",
+              "position": "day"
+            }
+          ],
+          "severity": "moderate",
+          "priority": 2
+        },
+        {
+          "seq": 8,
+          "id": "narrative_12",
+          "category": "shen_sha",
+          "type": "earth's_snare",
+          "icon": "flow",
+          "title": "地网 Earth's Snare",
+          "chinese_name": "地网",
+          "polarity": "negative",
+          "element": null,
+          "formula": "巳 in year palace = Earth's Snare (地网).",
+          "match": "year",
+          "description": "Earth's Snare present in year",
+          "palaces": [
+            "year"
+          ],
+          "pillar_refs": [
+            {
+              "abbrev": "HS-Y",
+              "node_type": "hs",
+              "position": "year"
+            }
+          ],
+          "severity": "moderate",
+          "priority": 2
+        },
+        {
+          "seq": 9,
+          "id": "narrative_13",
+          "category": "shen_sha",
+          "type": "widow_star",
+          "icon": "flow",
+          "title": "寡宿 Widow Star",
+          "chinese_name": "寡宿",
+          "polarity": "negative",
+          "element": null,
+          "formula": "For 巳 year: Gua Su at 辰. PRESENT.",
+          "match": "day",
+          "description": "Widow Star present in day",
+          "palaces": [
+            "day"
+          ],
+          "pillar_refs": [
+            {
+              "abbrev": "HS-D",
+              "node_type": "hs",
+              "position": "day"
+            }
+          ],
+          "severity": "moderate",
+          "priority": 2
+        },
+        {
+          "seq": 10,
+          "id": "narrative_14",
+          "category": "shen_sha",
+          "type": "ten_evils_great_defeat",
+          "icon": "flow",
+          "title": "十恶大败 Ten Evils Great Defeat",
+          "chinese_name": "十恶大败",
+          "polarity": "negative",
+          "element": null,
+          "formula": "Day Pillar 庚辰: IS a Ten Evils day.",
+          "match": null,
+          "description": "Ten Evils Great Defeat present in chart",
+          "palaces": [],
+          "pillar_refs": [],
+          "severity": "severe",
+          "priority": 2
+        },
+        {
+          "seq": 11,
+          "id": "narrative_16",
+          "category": "shen_sha",
+          "type": "strangle_star",
+          "icon": "flow",
+          "title": "绞 Strangle Star",
+          "chinese_name": "绞",
+          "polarity": "negative",
+          "element": null,
+          "formula": "Year 巳: Strangle at 辰. PRESENT.",
+          "match": "day",
+          "description": "Strangle Star present in day",
+          "palaces": [
+            "day"
+          ],
+          "pillar_refs": [
+            {
+              "abbrev": "HS-D",
+              "node_type": "hs",
+              "position": "day"
+            }
+          ],
+          "severity": "moderate",
+          "priority": 2
+        },
+        {
+          "seq": 14,
+          "id": "narrative_8",
+          "category": "shen_sha",
+          "type": "canopy_star",
+          "icon": "flow",
+          "title": "华盖 Canopy Star",
+          "chinese_name": "华盖",
+          "polarity": "neutral",
+          "element": null,
+          "formula": "For year branch 巳: Hua Gai at 丑. In month.",
+          "match": "month",
+          "description": "Canopy Star present in month",
+          "palaces": [
+            "month"
+          ],
+          "pillar_refs": [
+            {
+              "abbrev": "HS-M",
+              "node_type": "hs",
+              "position": "month"
+            }
+          ],
+          "severity": "mild",
+          "priority": 1
+        },
+        {
+          "seq": 15,
+          "id": "narrative_9",
+          "category": "shen_sha",
+          "type": "canopy_star",
+          "icon": "flow",
+          "title": "华盖 Canopy Star",
+          "chinese_name": "华盖",
+          "polarity": "neutral",
+          "element": null,
+          "formula": "For day branch 辰: Hua Gai at 辰. In day.",
+          "match": "day",
+          "description": "Canopy Star present in day",
+          "palaces": [
+            "day"
+          ],
+          "pillar_refs": [
+            {
+              "abbrev": "HS-D",
+              "node_type": "hs",
+              "position": "day"
+            }
+          ],
+          "severity": "mild",
+          "priority": 1
+        },
+        {
+          "seq": 16,
+          "id": "narrative_15",
+          "category": "shen_sha",
+          "type": "kui_gang",
+          "icon": "flow",
+          "title": "魁罡 Kui Gang",
+          "chinese_name": "魁罡",
+          "polarity": "neutral",
+          "element": null,
+          "formula": "Day Pillar 庚辰: IS a Kui Gang day.",
+          "match": null,
+          "description": "Kui Gang present in chart",
+          "palaces": [],
+          "pillar_refs": [],
+          "severity": "moderate",
+          "priority": 1
+        }
+      ]
+    },
+    "element_context": {
+      "daymaster": "Geng",
+      "daymaster_element": "Metal",
+      "strength": "extremely_strong"
+    },
+    "remedies": [],
+    "quick_remedies": []
+  },
+  "pattern_engine_analysis": {
+    "enhanced_patterns": [],
+    "domain_analysis": {},
+    "recommendations": [
+      {
+        "priority": "high",
+        "order": 1,
+        "domain": "general",
+        "title": "Strengthen Wood Element",
+        "description": "Your useful god is Wood. Favorable elements: Wood, Water, Fire. Wear colors: green, emerald, jade green. Direction: East."
+      },
+      {
+        "priority": "medium",
+        "order": 2,
+        "domain": "environment",
+        "title": "Consider Relocation Near Water",
+        "description": "This chart moderately benefits from crossing water. Living near water or abroad will significantly help."
+      },
+      {
+        "priority": "high",
+        "order": 3,
+        "domain": "wealth",
+        "title": "Address Wealth Concerns",
+        "description": "Ten Evils Great Defeat (十恶大败) in chart"
+      },
+      {
+        "priority": "medium",
+        "order": 4,
+        "domain": "character",
+        "title": "Address Character Concerns",
+        "description": "Earth's Snare (地网) in year"
+      }
+    ],
+    "special_stars": [
+      {
+        "chinese_name": "天乙贵人",
+        "english_name": "Heavenly Noble",
+        "target_branch": "Chou",
+        "palace": "month",
+        "nature": "auspicious",
+        "impact": "",
+        "severity": "mild",
+        "is_void": false,
+        "derivation": "For Geng DM: Tian Yi at 丑 (Chou). Found in month palace.",
+        "life_areas": [
+          "career",
+          "relationship",
+          "wealth"
+        ]
+      },
+      {
+        "chinese_name": "太极贵人",
+        "english_name": "Tai Ji Noble",
+        "target_branch": "Chou",
+        "palace": "month",
+        "nature": "auspicious",
+        "impact": "",
+        "severity": "mild",
+        "is_void": false,
+        "derivation": "For Geng DM: Tai Ji at 丑. In month.",
+        "life_areas": [
+          "career",
+          "education"
+        ]
+      },
+      {
+        "chinese_name": "天德贵人",
+        "english_name": "Heavenly Virtue",
+        "target_branch": "Geng",
+        "palace": "day",
+        "nature": "auspicious",
+        "impact": "",
+        "severity": "mild",
+        "is_void": false,
+        "derivation": "For 丑 month: Tian De = Geng. PRESENT.",
+        "life_areas": [
+          "general",
+          "health"
+        ]
+      },
+      {
+        "chinese_name": "月德贵人",
+        "english_name": "Monthly Virtue",
+        "target_branch": "Geng",
+        "palace": "day",
+        "nature": "auspicious",
+        "impact": "",
+        "severity": "mild",
+        "is_void": false,
+        "derivation": "For 丑 month: Yue De = 庚. PRESENT.",
+        "life_areas": [
+          "general",
+          "health"
+        ]
+      },
+      {
+        "chinese_name": "天喜",
+        "english_name": "Heavenly Happiness",
+        "target_branch": "Chen",
+        "palace": "day",
+        "nature": "auspicious",
+        "impact": "",
+        "severity": "mild",
+        "is_void": false,
+        "derivation": "For 巳 year: Tian Xi at 辰. PRESENT.",
+        "life_areas": [
+          "marriage",
+          "celebration"
+        ]
+      },
+      {
+        "chinese_name": "华盖",
+        "english_name": "Canopy Star",
+        "target_branch": "Chou",
+        "palace": "month",
+        "nature": "mixed",
+        "impact": "",
+        "severity": "mild",
+        "is_void": false,
+        "derivation": "For year branch 巳: Hua Gai at 丑. In month.",
+        "life_areas": [
+          "spirituality",
+          "education"
+        ]
+      },
+      {
+        "chinese_name": "华盖",
+        "english_name": "Canopy Star",
+        "target_branch": "Chen",
+        "palace": "day",
+        "nature": "mixed",
+        "impact": "",
+        "severity": "mild",
+        "is_void": false,
+        "derivation": "For day branch 辰: Hua Gai at 辰. In day.",
+        "life_areas": [
+          "spirituality",
+          "education"
+        ]
+      },
+      {
+        "chinese_name": "地网",
+        "english_name": "Earth's Snare",
+        "target_branch": "Si",
+        "palace": "year",
+        "nature": "inauspicious",
+        "impact": "",
+        "severity": "moderate",
+        "is_void": false,
+        "derivation": "巳 in year palace = Earth's Snare (地网).",
+        "life_areas": [
+          "legal",
+          "relationship"
+        ]
+      },
+      {
+        "chinese_name": "地网",
+        "english_name": "Earth's Snare",
+        "target_branch": "Chen",
+        "palace": "day",
+        "nature": "inauspicious",
+        "impact": "",
+        "severity": "moderate",
+        "is_void": false,
+        "derivation": "辰 in day palace = Earth's Snare (地网).",
+        "life_areas": [
+          "legal",
+          "relationship"
+        ]
+      },
+      {
+        "chinese_name": "地网",
+        "english_name": "Earth's Snare",
+        "target_branch": "Si",
+        "palace": "year",
+        "nature": "inauspicious",
+        "impact": "",
+        "severity": "moderate",
+        "is_void": false,
+        "derivation": "巳 in year palace = Earth's Snare (地网).",
+        "life_areas": [
+          "legal",
+          "relationship"
+        ]
+      },
+      {
+        "chinese_name": "寡宿",
+        "english_name": "Widow Star",
+        "target_branch": "Chen",
+        "palace": "day",
+        "nature": "inauspicious",
+        "impact": "",
+        "severity": "moderate",
+        "is_void": false,
+        "derivation": "For 巳 year: Gua Su at 辰. PRESENT.",
+        "life_areas": [
+          "relationship"
+        ]
+      },
+      {
+        "chinese_name": "十恶大败",
+        "english_name": "Ten Evils Great Defeat",
+        "target_branch": "",
+        "palace": "",
+        "nature": "inauspicious",
+        "impact": "",
+        "severity": "severe",
+        "is_void": false,
+        "derivation": "Day Pillar 庚辰: IS a Ten Evils day.",
+        "life_areas": [
+          "wealth",
+          "general"
+        ]
+      },
+      {
+        "chinese_name": "魁罡",
+        "english_name": "Kui Gang",
+        "target_branch": "",
+        "palace": "",
+        "nature": "mixed",
+        "impact": "",
+        "severity": "moderate",
+        "is_void": false,
+        "derivation": "Day Pillar 庚辰: IS a Kui Gang day.",
+        "life_areas": [
+          "career",
+          "authority",
+          "marriage"
+        ]
+      },
+      {
+        "chinese_name": "绞",
+        "english_name": "Strangle Star",
+        "target_branch": "Chen",
+        "palace": "day",
+        "nature": "inauspicious",
+        "impact": "",
+        "severity": "moderate",
+        "is_void": false,
+        "derivation": "Year 巳: Strangle at 辰. PRESENT.",
+        "life_areas": [
+          "legal",
+          "disputes"
+        ]
+      }
+    ]
+  },
+  "wealth_storage_analysis": {
+    "daymaster_element": "Metal",
+    "daymaster_stem": "Geng",
+    "wealth_element": "Wood",
+    "wealth_stems": [
+      "Jia",
+      "Yi"
+    ],
+    "wealth_storage_branch": "Wei",
+    "opener_branch": "Chou",
+    "storages": [],
+    "all_storages": [],
+    "summary": "No wealth storage (财库) found for Metal DM. Storage branch Wei (未) not in chart."
+  },
+  "unit_tracker": null,
+  "mappings": {
+    "heavenly_stems": {
+      "Jia": {
+        "id": "Jia",
+        "pinyin": "Jia",
+        "chinese": "甲",
+        "english": "Jia",
+        "hex_color": "#c2d4be"
+      },
+      "Yi": {
+        "id": "Yi",
+        "pinyin": "Yi",
+        "chinese": "乙",
+        "english": "Yi",
+        "hex_color": "#d6e2bb"
+      },
+      "Bing": {
+        "id": "Bing",
+        "pinyin": "Bing",
+        "chinese": "丙",
+        "english": "Bing",
+        "hex_color": "#fca5a5"
+      },
+      "Ding": {
+        "id": "Ding",
+        "pinyin": "Ding",
+        "chinese": "丁",
+        "english": "Ding",
+        "hex_color": "#f9d3ad"
+      },
+      "Wu": {
+        "id": "Wu",
+        "pinyin": "Wu",
+        "chinese": "戊",
+        "english": "Wu",
+        "hex_color": "#e6ceb7"
+      },
+      "Ji": {
+        "id": "Ji",
+        "pinyin": "Ji",
+        "chinese": "己",
+        "english": "Ji",
+        "hex_color": "#efe3cc"
+      },
+      "Geng": {
+        "id": "Geng",
+        "pinyin": "Geng",
+        "chinese": "庚",
+        "english": "Geng",
+        "hex_color": "#ccd8e6"
+      },
+      "Xin": {
+        "id": "Xin",
+        "pinyin": "Xin",
+        "chinese": "辛",
+        "english": "Xin",
+        "hex_color": "#e6e8f7"
+      },
+      "Ren": {
+        "id": "Ren",
+        "pinyin": "Ren",
+        "chinese": "壬",
+        "english": "Ren",
+        "hex_color": "#b9cbff"
+      },
+      "Gui": {
+        "id": "Gui",
+        "pinyin": "Gui",
+        "chinese": "癸",
+        "english": "Gui",
+        "hex_color": "#e0e9ff"
+      }
+    },
+    "earthly_branches": {
+      "Zi": {
+        "id": "Zi",
+        "chinese": "子",
+        "animal": "Rat",
+        "hex_color": "#b9cbff",
+        "qi": [
+          {
+            "stem": "Gui",
+            "score": 100,
+            "stem_chinese": "癸",
+            "element": "Water",
+            "polarity": "Yin",
+            "hex_color": "#e0e9ff"
+          }
+        ]
+      },
+      "Chou": {
+        "id": "Chou",
+        "chinese": "丑",
+        "animal": "Ox",
+        "hex_color": "#efe3cc",
+        "qi": [
+          {
+            "stem": "Ji",
+            "score": 75,
+            "stem_chinese": "己",
+            "element": "Earth",
+            "polarity": "Yin",
+            "hex_color": "#efe3cc"
+          },
+          {
+            "stem": "Gui",
+            "score": 25,
+            "stem_chinese": "癸",
+            "element": "Water",
+            "polarity": "Yin",
+            "hex_color": "#e0e9ff"
+          },
+          {
+            "stem": "Xin",
+            "score": 10,
+            "stem_chinese": "辛",
+            "element": "Metal",
+            "polarity": "Yin",
+            "hex_color": "#e6e8f7"
+          }
+        ]
+      },
+      "Yin": {
+        "id": "Yin",
+        "chinese": "寅",
+        "animal": "Tiger",
+        "hex_color": "#c2d4be",
+        "qi": [
+          {
+            "stem": "Jia",
+            "score": 75,
+            "stem_chinese": "甲",
+            "element": "Wood",
+            "polarity": "Yang",
+            "hex_color": "#c2d4be"
+          },
+          {
+            "stem": "Bing",
+            "score": 25,
+            "stem_chinese": "丙",
+            "element": "Fire",
+            "polarity": "Yang",
+            "hex_color": "#fca5a5"
+          },
+          {
+            "stem": "Wu",
+            "score": 10,
+            "stem_chinese": "戊",
+            "element": "Earth",
+            "polarity": "Yang",
+            "hex_color": "#e6ceb7"
+          }
+        ]
+      },
+      "Mao": {
+        "id": "Mao",
+        "chinese": "卯",
+        "animal": "Rabbit",
+        "hex_color": "#d6e2bb",
+        "qi": [
+          {
+            "stem": "Yi",
+            "score": 100,
+            "stem_chinese": "乙",
+            "element": "Wood",
+            "polarity": "Yin",
+            "hex_color": "#d6e2bb"
+          }
+        ]
+      },
+      "Chen": {
+        "id": "Chen",
+        "chinese": "辰",
+        "animal": "Dragon",
+        "hex_color": "#e6ceb7",
+        "qi": [
+          {
+            "stem": "Wu",
+            "score": 75,
+            "stem_chinese": "戊",
+            "element": "Earth",
+            "polarity": "Yang",
+            "hex_color": "#e6ceb7"
+          },
+          {
+            "stem": "Yi",
+            "score": 25,
+            "stem_chinese": "乙",
+            "element": "Wood",
+            "polarity": "Yin",
+            "hex_color": "#d6e2bb"
+          },
+          {
+            "stem": "Gui",
+            "score": 10,
+            "stem_chinese": "癸",
+            "element": "Water",
+            "polarity": "Yin",
+            "hex_color": "#e0e9ff"
+          }
+        ]
+      },
+      "Si": {
+        "id": "Si",
+        "chinese": "巳",
+        "animal": "Snake",
+        "hex_color": "#f9d3ad",
+        "qi": [
+          {
+            "stem": "Bing",
+            "score": 75,
+            "stem_chinese": "丙",
+            "element": "Fire",
+            "polarity": "Yang",
+            "hex_color": "#fca5a5"
+          },
+          {
+            "stem": "Geng",
+            "score": 25,
+            "stem_chinese": "庚",
+            "element": "Metal",
+            "polarity": "Yang",
+            "hex_color": "#ccd8e6"
+          },
+          {
+            "stem": "Wu",
+            "score": 10,
+            "stem_chinese": "戊",
+            "element": "Earth",
+            "polarity": "Yang",
+            "hex_color": "#e6ceb7"
+          }
+        ]
+      },
+      "Wu": {
+        "id": "Wu",
+        "chinese": "午",
+        "animal": "Horse",
+        "hex_color": "#f3adae",
+        "qi": [
+          {
+            "stem": "Ding",
+            "score": 80,
+            "stem_chinese": "丁",
+            "element": "Fire",
+            "polarity": "Yin",
+            "hex_color": "#f9d3ad"
+          },
+          {
+            "stem": "Ji",
+            "score": 20,
+            "stem_chinese": "己",
+            "element": "Earth",
+            "polarity": "Yin",
+            "hex_color": "#efe3cc"
+          }
+        ]
+      },
+      "Wei": {
+        "id": "Wei",
+        "chinese": "未",
+        "animal": "Goat",
+        "hex_color": "#efe3cc",
+        "qi": [
+          {
+            "stem": "Ji",
+            "score": 75,
+            "stem_chinese": "己",
+            "element": "Earth",
+            "polarity": "Yin",
+            "hex_color": "#efe3cc"
+          },
+          {
+            "stem": "Ding",
+            "score": 25,
+            "stem_chinese": "丁",
+            "element": "Fire",
+            "polarity": "Yin",
+            "hex_color": "#f9d3ad"
+          },
+          {
+            "stem": "Yi",
+            "score": 10,
+            "stem_chinese": "乙",
+            "element": "Wood",
+            "polarity": "Yin",
+            "hex_color": "#d6e2bb"
+          }
+        ]
+      },
+      "Shen": {
+        "id": "Shen",
+        "chinese": "申",
+        "animal": "Monkey",
+        "hex_color": "#ccd8e6",
+        "qi": [
+          {
+            "stem": "Geng",
+            "score": 75,
+            "stem_chinese": "庚",
+            "element": "Metal",
+            "polarity": "Yang",
+            "hex_color": "#ccd8e6"
+          },
+          {
+            "stem": "Ren",
+            "score": 25,
+            "stem_chinese": "壬",
+            "element": "Water",
+            "polarity": "Yang",
+            "hex_color": "#b9cbff"
+          },
+          {
+            "stem": "Wu",
+            "score": 10,
+            "stem_chinese": "戊",
+            "element": "Earth",
+            "polarity": "Yang",
+            "hex_color": "#e6ceb7"
+          }
+        ]
+      },
+      "You": {
+        "id": "You",
+        "chinese": "酉",
+        "animal": "Rooster",
+        "hex_color": "#e6e8f7",
+        "qi": [
+          {
+            "stem": "Xin",
+            "score": 100,
+            "stem_chinese": "辛",
+            "element": "Metal",
+            "polarity": "Yin",
+            "hex_color": "#e6e8f7"
+          }
+        ]
+      },
+      "Xu": {
+        "id": "Xu",
+        "chinese": "戌",
+        "animal": "Dog",
+        "hex_color": "#e6ceb7",
+        "qi": [
+          {
+            "stem": "Wu",
+            "score": 75,
+            "stem_chinese": "戊",
+            "element": "Earth",
+            "polarity": "Yang",
+            "hex_color": "#e6ceb7"
+          },
+          {
+            "stem": "Xin",
+            "score": 25,
+            "stem_chinese": "辛",
+            "element": "Metal",
+            "polarity": "Yin",
+            "hex_color": "#e6e8f7"
+          },
+          {
+            "stem": "Ding",
+            "score": 10,
+            "stem_chinese": "丁",
+            "element": "Fire",
+            "polarity": "Yin",
+            "hex_color": "#f9d3ad"
+          }
+        ]
+      },
+      "Hai": {
+        "id": "Hai",
+        "chinese": "亥",
+        "animal": "Pig",
+        "hex_color": "#e0e9ff",
+        "qi": [
+          {
+            "stem": "Ren",
+            "score": 80,
+            "stem_chinese": "壬",
+            "element": "Water",
+            "polarity": "Yang",
+            "hex_color": "#b9cbff"
+          },
+          {
+            "stem": "Jia",
+            "score": 20,
+            "stem_chinese": "甲",
+            "element": "Wood",
+            "polarity": "Yang",
+            "hex_color": "#c2d4be"
+          }
+        ]
+      }
+    },
+    "ten_gods": {
+      "Jia": {
+        "Jia": {
+          "id": "F",
+          "abbreviation": "F",
+          "english": "Friend",
+          "chinese": "比肩",
+          "pinyin": "bǐ jiān",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Yi": {
+          "id": "RW",
+          "abbreviation": "RW",
+          "english": "Rob Wealth",
+          "chinese": "劫財",
+          "pinyin": "jié cái",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Bing": {
+          "id": "EG",
+          "abbreviation": "EG",
+          "english": "Eating God",
+          "chinese": "食神",
+          "pinyin": "shí shén",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Ding": {
+          "id": "HO",
+          "abbreviation": "HO",
+          "english": "Hurting Officer",
+          "chinese": "傷官",
+          "pinyin": "shāng guān",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Wu": {
+          "id": "IW",
+          "abbreviation": "IW",
+          "english": "Indirect Wealth",
+          "chinese": "偏財",
+          "pinyin": "piān cái",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Ji": {
+          "id": "DW",
+          "abbreviation": "DW",
+          "english": "Direct Wealth",
+          "chinese": "正財",
+          "pinyin": "zhèng cái",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Geng": {
+          "id": "7K",
+          "abbreviation": "7K",
+          "english": "Seven Killings",
+          "chinese": "七殺",
+          "pinyin": "qī shā",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Xin": {
+          "id": "DO",
+          "abbreviation": "DO",
+          "english": "Direct Officer",
+          "chinese": "正官",
+          "pinyin": "zhèng guān",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Ren": {
+          "id": "IR",
+          "abbreviation": "IR",
+          "english": "Indirect Resource",
+          "chinese": "偏印",
+          "pinyin": "piān yìn",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Gui": {
+          "id": "DR",
+          "abbreviation": "DR",
+          "english": "Direct Resource",
+          "chinese": "正印",
+          "pinyin": "zhèng yìn",
+          "meaning_male": [],
+          "meaning_female": []
+        }
+      },
+      "Yi": {
+        "Yi": {
+          "id": "F",
+          "abbreviation": "F",
+          "english": "Friend",
+          "chinese": "比肩",
+          "pinyin": "bǐ jiān",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Jia": {
+          "id": "RW",
+          "abbreviation": "RW",
+          "english": "Rob Wealth",
+          "chinese": "劫財",
+          "pinyin": "jié cái",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Ding": {
+          "id": "EG",
+          "abbreviation": "EG",
+          "english": "Eating God",
+          "chinese": "食神",
+          "pinyin": "shí shén",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Bing": {
+          "id": "HO",
+          "abbreviation": "HO",
+          "english": "Hurting Officer",
+          "chinese": "傷官",
+          "pinyin": "shāng guān",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Ji": {
+          "id": "IW",
+          "abbreviation": "IW",
+          "english": "Indirect Wealth",
+          "chinese": "偏財",
+          "pinyin": "piān cái",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Wu": {
+          "id": "DW",
+          "abbreviation": "DW",
+          "english": "Direct Wealth",
+          "chinese": "正財",
+          "pinyin": "zhèng cái",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Xin": {
+          "id": "7K",
+          "abbreviation": "7K",
+          "english": "Seven Killings",
+          "chinese": "七殺",
+          "pinyin": "qī shā",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Geng": {
+          "id": "DO",
+          "abbreviation": "DO",
+          "english": "Direct Officer",
+          "chinese": "正官",
+          "pinyin": "zhèng guān",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Gui": {
+          "id": "IR",
+          "abbreviation": "IR",
+          "english": "Indirect Resource",
+          "chinese": "偏印",
+          "pinyin": "piān yìn",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Ren": {
+          "id": "DR",
+          "abbreviation": "DR",
+          "english": "Direct Resource",
+          "chinese": "正印",
+          "pinyin": "zhèng yìn",
+          "meaning_male": [],
+          "meaning_female": []
+        }
+      },
+      "Bing": {
+        "Bing": {
+          "id": "F",
+          "abbreviation": "F",
+          "english": "Friend",
+          "chinese": "比肩",
+          "pinyin": "bǐ jiān",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Ding": {
+          "id": "RW",
+          "abbreviation": "RW",
+          "english": "Rob Wealth",
+          "chinese": "劫財",
+          "pinyin": "jié cái",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Wu": {
+          "id": "EG",
+          "abbreviation": "EG",
+          "english": "Eating God",
+          "chinese": "食神",
+          "pinyin": "shí shén",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Ji": {
+          "id": "HO",
+          "abbreviation": "HO",
+          "english": "Hurting Officer",
+          "chinese": "傷官",
+          "pinyin": "shāng guān",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Geng": {
+          "id": "IW",
+          "abbreviation": "IW",
+          "english": "Indirect Wealth",
+          "chinese": "偏財",
+          "pinyin": "piān cái",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Xin": {
+          "id": "DW",
+          "abbreviation": "DW",
+          "english": "Direct Wealth",
+          "chinese": "正財",
+          "pinyin": "zhèng cái",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Ren": {
+          "id": "7K",
+          "abbreviation": "7K",
+          "english": "Seven Killings",
+          "chinese": "七殺",
+          "pinyin": "qī shā",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Gui": {
+          "id": "DO",
+          "abbreviation": "DO",
+          "english": "Direct Officer",
+          "chinese": "正官",
+          "pinyin": "zhèng guān",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Jia": {
+          "id": "IR",
+          "abbreviation": "IR",
+          "english": "Indirect Resource",
+          "chinese": "偏印",
+          "pinyin": "piān yìn",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Yi": {
+          "id": "DR",
+          "abbreviation": "DR",
+          "english": "Direct Resource",
+          "chinese": "正印",
+          "pinyin": "zhèng yìn",
+          "meaning_male": [],
+          "meaning_female": []
+        }
+      },
+      "Ding": {
+        "Ding": {
+          "id": "F",
+          "abbreviation": "F",
+          "english": "Friend",
+          "chinese": "比肩",
+          "pinyin": "bǐ jiān",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Bing": {
+          "id": "RW",
+          "abbreviation": "RW",
+          "english": "Rob Wealth",
+          "chinese": "劫財",
+          "pinyin": "jié cái",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Ji": {
+          "id": "EG",
+          "abbreviation": "EG",
+          "english": "Eating God",
+          "chinese": "食神",
+          "pinyin": "shí shén",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Wu": {
+          "id": "HO",
+          "abbreviation": "HO",
+          "english": "Hurting Officer",
+          "chinese": "傷官",
+          "pinyin": "shāng guān",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Xin": {
+          "id": "IW",
+          "abbreviation": "IW",
+          "english": "Indirect Wealth",
+          "chinese": "偏財",
+          "pinyin": "piān cái",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Geng": {
+          "id": "DW",
+          "abbreviation": "DW",
+          "english": "Direct Wealth",
+          "chinese": "正財",
+          "pinyin": "zhèng cái",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Gui": {
+          "id": "7K",
+          "abbreviation": "7K",
+          "english": "Seven Killings",
+          "chinese": "七殺",
+          "pinyin": "qī shā",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Ren": {
+          "id": "DO",
+          "abbreviation": "DO",
+          "english": "Direct Officer",
+          "chinese": "正官",
+          "pinyin": "zhèng guān",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Yi": {
+          "id": "IR",
+          "abbreviation": "IR",
+          "english": "Indirect Resource",
+          "chinese": "偏印",
+          "pinyin": "piān yìn",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Jia": {
+          "id": "DR",
+          "abbreviation": "DR",
+          "english": "Direct Resource",
+          "chinese": "正印",
+          "pinyin": "zhèng yìn",
+          "meaning_male": [],
+          "meaning_female": []
+        }
+      },
+      "Wu": {
+        "Wu": {
+          "id": "F",
+          "abbreviation": "F",
+          "english": "Friend",
+          "chinese": "比肩",
+          "pinyin": "bǐ jiān",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Ji": {
+          "id": "RW",
+          "abbreviation": "RW",
+          "english": "Rob Wealth",
+          "chinese": "劫財",
+          "pinyin": "jié cái",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Geng": {
+          "id": "EG",
+          "abbreviation": "EG",
+          "english": "Eating God",
+          "chinese": "食神",
+          "pinyin": "shí shén",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Xin": {
+          "id": "HO",
+          "abbreviation": "HO",
+          "english": "Hurting Officer",
+          "chinese": "傷官",
+          "pinyin": "shāng guān",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Ren": {
+          "id": "IW",
+          "abbreviation": "IW",
+          "english": "Indirect Wealth",
+          "chinese": "偏財",
+          "pinyin": "piān cái",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Gui": {
+          "id": "DW",
+          "abbreviation": "DW",
+          "english": "Direct Wealth",
+          "chinese": "正財",
+          "pinyin": "zhèng cái",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Jia": {
+          "id": "7K",
+          "abbreviation": "7K",
+          "english": "Seven Killings",
+          "chinese": "七殺",
+          "pinyin": "qī shā",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Yi": {
+          "id": "DO",
+          "abbreviation": "DO",
+          "english": "Direct Officer",
+          "chinese": "正官",
+          "pinyin": "zhèng guān",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Bing": {
+          "id": "IR",
+          "abbreviation": "IR",
+          "english": "Indirect Resource",
+          "chinese": "偏印",
+          "pinyin": "piān yìn",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Ding": {
+          "id": "DR",
+          "abbreviation": "DR",
+          "english": "Direct Resource",
+          "chinese": "正印",
+          "pinyin": "zhèng yìn",
+          "meaning_male": [],
+          "meaning_female": []
+        }
+      },
+      "Ji": {
+        "Ji": {
+          "id": "F",
+          "abbreviation": "F",
+          "english": "Friend",
+          "chinese": "比肩",
+          "pinyin": "bǐ jiān",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Wu": {
+          "id": "RW",
+          "abbreviation": "RW",
+          "english": "Rob Wealth",
+          "chinese": "劫財",
+          "pinyin": "jié cái",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Xin": {
+          "id": "EG",
+          "abbreviation": "EG",
+          "english": "Eating God",
+          "chinese": "食神",
+          "pinyin": "shí shén",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Geng": {
+          "id": "HO",
+          "abbreviation": "HO",
+          "english": "Hurting Officer",
+          "chinese": "傷官",
+          "pinyin": "shāng guān",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Gui": {
+          "id": "IW",
+          "abbreviation": "IW",
+          "english": "Indirect Wealth",
+          "chinese": "偏財",
+          "pinyin": "piān cái",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Ren": {
+          "id": "DW",
+          "abbreviation": "DW",
+          "english": "Direct Wealth",
+          "chinese": "正財",
+          "pinyin": "zhèng cái",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Yi": {
+          "id": "7K",
+          "abbreviation": "7K",
+          "english": "Seven Killings",
+          "chinese": "七殺",
+          "pinyin": "qī shā",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Jia": {
+          "id": "DO",
+          "abbreviation": "DO",
+          "english": "Direct Officer",
+          "chinese": "正官",
+          "pinyin": "zhèng guān",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Ding": {
+          "id": "IR",
+          "abbreviation": "IR",
+          "english": "Indirect Resource",
+          "chinese": "偏印",
+          "pinyin": "piān yìn",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Bing": {
+          "id": "DR",
+          "abbreviation": "DR",
+          "english": "Direct Resource",
+          "chinese": "正印",
+          "pinyin": "zhèng yìn",
+          "meaning_male": [],
+          "meaning_female": []
+        }
+      },
+      "Geng": {
+        "Geng": {
+          "id": "F",
+          "abbreviation": "F",
+          "english": "Friend",
+          "chinese": "比肩",
+          "pinyin": "bǐ jiān",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Xin": {
+          "id": "RW",
+          "abbreviation": "RW",
+          "english": "Rob Wealth",
+          "chinese": "劫財",
+          "pinyin": "jié cái",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Ren": {
+          "id": "EG",
+          "abbreviation": "EG",
+          "english": "Eating God",
+          "chinese": "食神",
+          "pinyin": "shí shén",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Gui": {
+          "id": "HO",
+          "abbreviation": "HO",
+          "english": "Hurting Officer",
+          "chinese": "傷官",
+          "pinyin": "shāng guān",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Jia": {
+          "id": "IW",
+          "abbreviation": "IW",
+          "english": "Indirect Wealth",
+          "chinese": "偏財",
+          "pinyin": "piān cái",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Yi": {
+          "id": "DW",
+          "abbreviation": "DW",
+          "english": "Direct Wealth",
+          "chinese": "正財",
+          "pinyin": "zhèng cái",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Bing": {
+          "id": "7K",
+          "abbreviation": "7K",
+          "english": "Seven Killings",
+          "chinese": "七殺",
+          "pinyin": "qī shā",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Ding": {
+          "id": "DO",
+          "abbreviation": "DO",
+          "english": "Direct Officer",
+          "chinese": "正官",
+          "pinyin": "zhèng guān",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Wu": {
+          "id": "IR",
+          "abbreviation": "IR",
+          "english": "Indirect Resource",
+          "chinese": "偏印",
+          "pinyin": "piān yìn",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Ji": {
+          "id": "DR",
+          "abbreviation": "DR",
+          "english": "Direct Resource",
+          "chinese": "正印",
+          "pinyin": "zhèng yìn",
+          "meaning_male": [],
+          "meaning_female": []
+        }
+      },
+      "Xin": {
+        "Xin": {
+          "id": "F",
+          "abbreviation": "F",
+          "english": "Friend",
+          "chinese": "比肩",
+          "pinyin": "bǐ jiān",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Geng": {
+          "id": "RW",
+          "abbreviation": "RW",
+          "english": "Rob Wealth",
+          "chinese": "劫財",
+          "pinyin": "jié cái",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Gui": {
+          "id": "EG",
+          "abbreviation": "EG",
+          "english": "Eating God",
+          "chinese": "食神",
+          "pinyin": "shí shén",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Ren": {
+          "id": "HO",
+          "abbreviation": "HO",
+          "english": "Hurting Officer",
+          "chinese": "傷官",
+          "pinyin": "shāng guān",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Yi": {
+          "id": "IW",
+          "abbreviation": "IW",
+          "english": "Indirect Wealth",
+          "chinese": "偏財",
+          "pinyin": "piān cái",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Jia": {
+          "id": "DW",
+          "abbreviation": "DW",
+          "english": "Direct Wealth",
+          "chinese": "正財",
+          "pinyin": "zhèng cái",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Ding": {
+          "id": "7K",
+          "abbreviation": "7K",
+          "english": "Seven Killings",
+          "chinese": "七殺",
+          "pinyin": "qī shā",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Bing": {
+          "id": "DO",
+          "abbreviation": "DO",
+          "english": "Direct Officer",
+          "chinese": "正官",
+          "pinyin": "zhèng guān",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Ji": {
+          "id": "IR",
+          "abbreviation": "IR",
+          "english": "Indirect Resource",
+          "chinese": "偏印",
+          "pinyin": "piān yìn",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Wu": {
+          "id": "DR",
+          "abbreviation": "DR",
+          "english": "Direct Resource",
+          "chinese": "正印",
+          "pinyin": "zhèng yìn",
+          "meaning_male": [],
+          "meaning_female": []
+        }
+      },
+      "Ren": {
+        "Ren": {
+          "id": "F",
+          "abbreviation": "F",
+          "english": "Friend",
+          "chinese": "比肩",
+          "pinyin": "bǐ jiān",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Gui": {
+          "id": "RW",
+          "abbreviation": "RW",
+          "english": "Rob Wealth",
+          "chinese": "劫財",
+          "pinyin": "jié cái",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Jia": {
+          "id": "EG",
+          "abbreviation": "EG",
+          "english": "Eating God",
+          "chinese": "食神",
+          "pinyin": "shí shén",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Yi": {
+          "id": "HO",
+          "abbreviation": "HO",
+          "english": "Hurting Officer",
+          "chinese": "傷官",
+          "pinyin": "shāng guān",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Bing": {
+          "id": "IW",
+          "abbreviation": "IW",
+          "english": "Indirect Wealth",
+          "chinese": "偏財",
+          "pinyin": "piān cái",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Ding": {
+          "id": "DW",
+          "abbreviation": "DW",
+          "english": "Direct Wealth",
+          "chinese": "正財",
+          "pinyin": "zhèng cái",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Wu": {
+          "id": "7K",
+          "abbreviation": "7K",
+          "english": "Seven Killings",
+          "chinese": "七殺",
+          "pinyin": "qī shā",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Ji": {
+          "id": "DO",
+          "abbreviation": "DO",
+          "english": "Direct Officer",
+          "chinese": "正官",
+          "pinyin": "zhèng guān",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Geng": {
+          "id": "IR",
+          "abbreviation": "IR",
+          "english": "Indirect Resource",
+          "chinese": "偏印",
+          "pinyin": "piān yìn",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Xin": {
+          "id": "DR",
+          "abbreviation": "DR",
+          "english": "Direct Resource",
+          "chinese": "正印",
+          "pinyin": "zhèng yìn",
+          "meaning_male": [],
+          "meaning_female": []
+        }
+      },
+      "Gui": {
+        "Gui": {
+          "id": "F",
+          "abbreviation": "F",
+          "english": "Friend",
+          "chinese": "比肩",
+          "pinyin": "bǐ jiān",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Ren": {
+          "id": "RW",
+          "abbreviation": "RW",
+          "english": "Rob Wealth",
+          "chinese": "劫財",
+          "pinyin": "jié cái",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Yi": {
+          "id": "EG",
+          "abbreviation": "EG",
+          "english": "Eating God",
+          "chinese": "食神",
+          "pinyin": "shí shén",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Jia": {
+          "id": "HO",
+          "abbreviation": "HO",
+          "english": "Hurting Officer",
+          "chinese": "傷官",
+          "pinyin": "shāng guān",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Ding": {
+          "id": "IW",
+          "abbreviation": "IW",
+          "english": "Indirect Wealth",
+          "chinese": "偏財",
+          "pinyin": "piān cái",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Bing": {
+          "id": "DW",
+          "abbreviation": "DW",
+          "english": "Direct Wealth",
+          "chinese": "正財",
+          "pinyin": "zhèng cái",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Ji": {
+          "id": "7K",
+          "abbreviation": "7K",
+          "english": "Seven Killings",
+          "chinese": "七殺",
+          "pinyin": "qī shā",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Wu": {
+          "id": "DO",
+          "abbreviation": "DO",
+          "english": "Direct Officer",
+          "chinese": "正官",
+          "pinyin": "zhèng guān",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Xin": {
+          "id": "IR",
+          "abbreviation": "IR",
+          "english": "Indirect Resource",
+          "chinese": "偏印",
+          "pinyin": "piān yìn",
+          "meaning_male": [],
+          "meaning_female": []
+        },
+        "Geng": {
+          "id": "DR",
+          "abbreviation": "DR",
+          "english": "Direct Resource",
+          "chinese": "正印",
+          "pinyin": "zhèng yìn",
+          "meaning_male": [],
+          "meaning_female": []
+        }
+      }
+    },
+    "event_types": {
+      "registration": {
+        "hex_color": "#60a5fa",
+        "icon": "",
+        "label": "Registration"
+      },
+      "seasonal": {
+        "hex_color": "#fbbf24",
+        "icon": "",
+        "label": "Seasonal"
+      },
+      "controlling": {
+        "hex_color": "#f87171",
+        "icon": "",
+        "label": "Controlling"
+      },
+      "controlled": {
+        "hex_color": "#f87171",
+        "icon": "",
+        "label": "Controlled"
+      },
+      "control": {
+        "hex_color": "#f87171",
+        "icon": "",
+        "label": "Control"
+      },
+      "producing": {
+        "hex_color": "#4ade80",
+        "icon": "",
+        "label": "Producing"
+      },
+      "produced": {
+        "hex_color": "#4ade80",
+        "icon": "",
+        "label": "Produced"
+      },
+      "generation": {
+        "hex_color": "#4ade80",
+        "icon": "",
+        "label": "Generation"
+      },
+      "combination": {
+        "hex_color": "#c084fc",
+        "icon": "",
+        "label": "Combination"
+      },
+      "conflict": {
+        "hex_color": "#fb923c",
+        "icon": "",
+        "label": "Conflict"
+      },
+      "conflict_aggressor": {
+        "hex_color": "#fb923c",
+        "icon": "",
+        "label": "Conflict"
+      },
+      "conflict_victim": {
+        "hex_color": "#fb923c",
+        "icon": "",
+        "label": "Conflict"
+      },
+      "same_element": {
+        "hex_color": "#2dd4bf",
+        "icon": "",
+        "label": "Same Element"
+      }
+    },
+    "ten_gods_styling": {
+      "DM": {
+        "hex_color": "#9333ea",
+        "bg_hex": "#f3e8ff",
+        "label": "Day Master"
+      },
+      "F": {
+        "hex_color": "#2563eb",
+        "bg_hex": "#dbeafe",
+        "label": "Friend"
+      },
+      "RW": {
+        "hex_color": "#3b82f6",
+        "bg_hex": "#eff6ff",
+        "label": "Rob Wealth"
+      },
+      "EG": {
+        "hex_color": "#16a34a",
+        "bg_hex": "#dcfce7",
+        "label": "Eating God"
+      },
+      "HO": {
+        "hex_color": "#22c55e",
+        "bg_hex": "#f0fdf4",
+        "label": "Hurting Officer"
+      },
+      "IW": {
+        "hex_color": "#ca8a04",
+        "bg_hex": "#fef9c3",
+        "label": "Indirect Wealth"
+      },
+      "DW": {
+        "hex_color": "#eab308",
+        "bg_hex": "#fefce8",
+        "label": "Direct Wealth"
+      },
+      "7K": {
+        "hex_color": "#dc2626",
+        "bg_hex": "#fee2e2",
+        "label": "Seven Killings"
+      },
+      "DO": {
+        "hex_color": "#ef4444",
+        "bg_hex": "#fef2f2",
+        "label": "Direct Officer"
+      },
+      "IR": {
+        "hex_color": "#4b5563",
+        "bg_hex": "#f3f4f6",
+        "label": "Indirect Resource"
+      },
+      "DR": {
+        "hex_color": "#6b7280",
+        "bg_hex": "#f9fafb",
+        "label": "Direct Resource"
+      }
+    },
+    "elements": {
+      "Wood": {
+        "hex_color": "#22c55e",
+        "hex_color_yang": "#16a34a",
+        "hex_color_yin": "#4ade80"
+      },
+      "Fire": {
+        "hex_color": "#ef4444",
+        "hex_color_yang": "#dc2626",
+        "hex_color_yin": "#f87171"
+      },
+      "Earth": {
+        "hex_color": "#ca8a04",
+        "hex_color_yang": "#a16207",
+        "hex_color_yin": "#eab308"
+      },
+      "Metal": {
+        "hex_color": "#6b7280",
+        "hex_color_yang": "#4b5563",
+        "hex_color_yin": "#9ca3af"
+      },
+      "Water": {
+        "hex_color": "#3b82f6",
+        "hex_color_yang": "#2563eb",
+        "hex_color_yin": "#60a5fa"
+      }
+    }
+  },
+  "comprehensive_report": "# Comprehensive BaZi Analysis Report\n\n**Gender**: Male | **Age**: 36 | **Birth Year**: 1990\n\n---\n\n## SECTION 1: CHART SETUP\n\n### Four Pillars (四柱)\n\n| | Year (年柱) | Month (月柱) | Day (日柱) | Hour (时柱) |\n|---|---|---|---|---|\n| **Palace** | Parents/Ancestry | Career/Social | Self/Spouse | Children/Legacy |\n| **Heavenly Stem** | 己 (Ji) Earth | 丁 (Ding) Fire | 庚 (Geng) Metal | 辛 (Xin) Metal |\n| **Earthly Branch** | 巳 (Si) Fire | 丑 (Chou) Earth | 辰 (Chen) Earth | 巳 (Si) Fire |\n| **Hidden Stems** | 丙(75), 庚(25), 戊(10) | 己(75), 癸(25), 辛(10) | 戊(75), 乙(25), 癸(10) | 丙(75), 庚(25), 戊(10) |\n\n### Day Master (日主)\n\n**庚 (Geng) — Metal Yang**\n\n*Geng Metal = the battle axe or raw ore. Tough, decisive, sharp, confrontational.*\n\nPersonality: decisive, blunt, confrontational, loyal, justice-oriented\n\n### Ten Gods Map (十神)\n\n| Location | Stem | Ten God | Chinese |\n|---|---|---|---|\n| year_stem | 己 (Ji) | Direct Resource (DR) | 正印 |\n| year_branch_primary_qi (hidden) | 丙 (Bing) | Seven Killings (7K) | 七殺 |\n| year_branch_hidden_1 (hidden) | 庚 (Geng) | Friend (F) | 比肩 |\n| year_branch_hidden_2 (hidden) | 戊 (Wu) | Indirect Resource (IR) | 偏印 |\n| month_stem | 丁 (Ding) | Direct Officer (DO) | 正官 |\n| month_branch_primary_qi (hidden) | 己 (Ji) | Direct Resource (DR) | 正印 |\n| month_branch_hidden_1 (hidden) | 癸 (Gui) | Hurting Officer (HO) | 傷官 |\n| month_branch_hidden_2 (hidden) | 辛 (Xin) | Rob Wealth (RW) | 劫財 |\n| day_stem | 庚 (Geng) | Friend (F) | 比肩 |\n| day_branch_primary_qi (hidden) | 戊 (Wu) | Indirect Resource (IR) | 偏印 |\n| day_branch_hidden_1 (hidden) | 乙 (Yi) | Direct Wealth (DW) | 正財 |\n| day_branch_hidden_2 (hidden) | 癸 (Gui) | Hurting Officer (HO) | 傷官 |\n| hour_stem | 辛 (Xin) | Rob Wealth (RW) | 劫財 |\n| hour_branch_primary_qi (hidden) | 丙 (Bing) | Seven Killings (7K) | 七殺 |\n| hour_branch_hidden_1 (hidden) | 庚 (Geng) | Friend (F) | 比肩 |\n| hour_branch_hidden_2 (hidden) | 戊 (Wu) | Indirect Resource (IR) | 偏印 |\n\n---\n\n## SECTION 2: DAY MASTER STRENGTH ASSESSMENT\n\n**Score: 32.3/100** (50 = perfectly balanced)\n\n- Support count: 5.3\n- Drain count: 3.1\n- Seasonal state: Strengthening\n- Verdict: **EXTREMELY STRONG**\n\n*This Day Master has far too much fuel. Energy is excessive — needs heavy draining.*\n\n### Useful God (用神): **Wood** (木)\n\n- Favorable elements: Wood (木), Water (水), Fire (火)\n- Unfavorable elements: Metal (金), Earth (土)\n\n---\n\n## SECTION 3: TEN GODS DEEP ANALYSIS (十神)\n\n| Ten God | Chinese | Strength | Visible | Hidden | Locations |\n|---|---|---|---|---|---|\n| Friend (F) | 比肩 | **PROMINENT** | 1 | 2 | year_branch_hidden_1, day_stem, hour_branch_hidden_1 |\n| Rob Wealth (RW) | 劫財 | **PROMINENT** | 1 | 1 | month_branch_hidden_2, hour_stem |\n| Eating God (EG) | 食神 | **ABSENT** | 0 | 0 |  |\n| Hurting Officer (HO) | 傷官 | **PRESENT** | 0 | 2 | month_branch_hidden_1, day_branch_hidden_2 |\n| Indirect Wealth (IW) | 偏財 | **ABSENT** | 0 | 0 |  |\n| Direct Wealth (DW) | 正財 | **HIDDEN_ONLY** | 0 | 1 | day_branch_hidden_1 |\n| Seven Killings (7K) | 七殺 | **PRESENT** | 0 | 2 | year_branch_primary_qi, hour_branch_primary_qi |\n| Direct Officer (DO) | 正官 | **PRESENT** | 1 | 0 | month_stem |\n| Indirect Resource (IR) | 偏印 | **PRESENT** | 0 | 3 | year_branch_hidden_2, day_branch_primary_qi, hour_branch_hidden_2 |\n| Direct Resource (DR) | 正印 | **PROMINENT** | 1 | 1 | year_stem, month_branch_primary_qi |\n\n**Friend (比肩)**: Friend (比肩) is PROMINENT — strong self-identity, competitive nature, many rivals in same field.\n\n**Rob Wealth (劫財)**: Prominent Rob Wealth = money bleeds out. Others take what should be yours.\n\n**Eating God (食神)**: Eating God (食神) is absent — lacks natural creative expression and easy joy.\n\n**Hurting Officer (傷官)**: Hurting Officer (傷官) is present — creative edge with some authority conflicts.\n\n**Indirect Wealth (偏財)**: Indirect Wealth (偏財) is absent — windfall opportunities rare, must earn steadily.\n\n**Direct Wealth (正財)**: Direct Wealth (正財) is present — stable finances and commitment capacity.\n\n**Seven Killings (七殺)**: Seven Killings (七殺) is present — some authority and competitive edge.\n\n**Direct Officer (正官)**: Direct Officer (正官) is present — reasonable discipline and career structure.\n\n**Indirect Resource (偏印)**: Indirect Resource (偏印) is present — some unconventional wisdom and backing.\n\n**Direct Resource (正印)**: Direct Resource (正印) is PROMINENT — strong support system, education, maternal bond, physical health.\n\n### Spouse Star: wife star (正財)\n\nStatus: HIDDEN_ONLY. Locations: day_branch_hidden_1\n\n### Children Stars: 7K / DO\n\n### Notable Patterns\n\n- **companion_heavy**: Too many companions (Friend + Rob Wealth) = competition problems, wealth leakage, relationship interference\n- **rw_present**: Rob Wealth present = money lost through others, partnerships can drain wealth, competitive spending\n\n\n---\n\n## SECTION 4: BRANCH INTERACTIONS (地支关系)\n\n### Half Three Harmony (半三合)\n\n- **丑巳半合Metal局 (missing 酉)**\n  - Palaces: Year (Parents/Ancestry), Month (Career/Social), Hour (Children/Legacy)\n  - Severity: mild\n\n### Destructions (破)\n\n- **丑辰破**\n  - Palaces: Month (Career/Social), Day (Self/Spouse)\n  - Severity: mild\n\n\n---\n\n## SECTION 5: SHEN SHA FULL AUDIT (神煞)\n\n### Present Stars\n\n| Star | Chinese | Location | Palace | Nature | Severity | Void? |\n|---|---|---|---|---|---|---|\n| Heavenly Noble | 天乙贵人 | Chou | month | auspicious | mild |  |\n| Tai Ji Noble | 太极贵人 | Chou | month | auspicious | mild |  |\n| Heavenly Virtue | 天德贵人 | Geng | day | auspicious | mild |  |\n| Monthly Virtue | 月德贵人 | Geng | day | auspicious | mild |  |\n| Heavenly Happiness | 天喜 | Chen | day | auspicious | mild |  |\n| Canopy Star | 华盖 | Chou | month | mixed | mild |  |\n| Canopy Star | 华盖 | Chen | day | mixed | mild |  |\n| Earth's Snare | 地网 | Si | year | inauspicious | moderate |  |\n| Earth's Snare | 地网 | Chen | day | inauspicious | moderate |  |\n| Earth's Snare | 地网 | Si | year | inauspicious | moderate |  |\n| Widow Star | 寡宿 | Chen | day | inauspicious | moderate |  |\n| Ten Evils Great Defeat | 十恶大败 |  |  | inauspicious | severe |  |\n| Kui Gang | 魁罡 |  |  | mixed | moderate |  |\n| Strangle Star | 绞 | Chen | day | inauspicious | moderate |  |\n\n### Derivation Details\n\n- **天乙贵人 (Heavenly Noble)**: For Geng DM: Tian Yi at 丑 (Chou). Found in month palace.\n  - *Heavenly Noble — powerful protector. In trouble, help always comes from unexpected sources.*\n- **太极贵人 (Tai Ji Noble)**: For Geng DM: Tai Ji at 丑. In month.\n  - *Tai Ji Noble — spiritual intelligence. Natural affinity for metaphysics and wisdom.*\n- **天德贵人 (Heavenly Virtue)**: For 丑 month: Tian De = Geng. PRESENT.\n  - *Heavenly Virtue — moral protection. Reduces severity of misfortune.*\n- **月德贵人 (Monthly Virtue)**: For 丑 month: Yue De = 庚. PRESENT.\n  - *Monthly Virtue — secondary protection layer. Softens monthly negative events.*\n- **天喜 (Heavenly Happiness)**: For 巳 year: Tian Xi at 辰. PRESENT.\n  - *Heavenly Happiness — joy and celebration energy.*\n- **华盖 (Canopy Star)**: For year branch 巳: Hua Gai at 丑. In month.\n  - *Hua Gai present = the hermit's star. Deep thinker, but lonely unless embraced.*\n- **华盖 (Canopy Star)**: For day branch 辰: Hua Gai at 辰. In day.\n  - *Canopy Star — solitary, spiritual, intellectual. Prefers isolation over crowds.*\n- **地网 (Earth's Snare)**: 巳 in year palace = Earth's Snare (地网).\n  - *Earth's Snare — grounded but trapped. Difficulty escaping situations.*\n- **地网 (Earth's Snare)**: 辰 in day palace = Earth's Snare (地网).\n  - *Earth's Snare — grounded but trapped. Difficulty escaping situations.*\n- **地网 (Earth's Snare)**: 巳 in year palace = Earth's Snare (地网).\n  - *Earth's Snare — grounded but trapped. Difficulty escaping situations.*\n- **寡宿 (Widow Star)**: For 巳 year: Gua Su at 辰. PRESENT.\n  - *Widow Star — loneliness in relationships, especially for females.*\n- **十恶大败 (Ten Evils Great Defeat)**: Day Pillar 庚辰: IS a Ten Evils day.\n  - *Ten Evils Great Defeat — historical marker for extreme misfortune with wealth.*\n- **魁罡 (Kui Gang)**: Day Pillar 庚辰: IS a Kui Gang day.\n  - *Kui Gang — powerful, commanding, but hard on relationships and self.*\n- **绞 (Strangle Star)**: Year 巳: Strangle at 辰. PRESENT.\n  - *Strangle Star — suffocating situations, trapped in conflicts.*\n\n### Notable Absences\n\n- **天乙贵人 (Heavenly Noble)**: No Heavenly Noble = less natural protection. Must build own safety nets.\n- **文昌贵人 (Academic Star)**: No Academic Star. Education success requires more effort.\n- **禄神 (Prosperity Star)**: No Prosperity Star = wealth must be actively fought for.\n- **将星 (General Star)**: No General Star = must build authority from scratch.\n- **天医 (Heavenly Doctor)**: No Heavenly Doctor = health needs more active management.\n- **红鸾 (Red Phoenix)**: No Red Phoenix = romance comes later or with less intensity.\n\n\n---\n\n## SECTION 6: RED FLAGS — DIRECT AND UNFILTERED\n\n### Marriage & Relationships (5 indicators)\n\n- **[MODERATE] companion_heavy** (ten_god): Too many companions (Friend + Rob Wealth) = competition problems, wealth leakage, relationship interference\n- **[MODERATE] 地网** (shen_sha): Earth's Snare (地网) in year\n- **[MODERATE] 地网** (shen_sha): Earth's Snare (地网) in day\n- **[MODERATE] 地网** (shen_sha): Earth's Snare (地网) in year\n- **[MODERATE] 寡宿** (shen_sha): Widow Star (寡宿) in day\n\n*5 separate indicators affect marriage & relationships.* This is a moderate concern. Requires conscious management.\n\n### Wealth & Finances (3 indicators)\n\n- **[SEVERE] 十恶大败** (shen_sha): Ten Evils Great Defeat (十恶大败) in chart\n- **[MODERATE] companion_heavy** (ten_god): Too many companions (Friend + Rob Wealth) = competition problems, wealth leakage, relationship interference\n- **[MODERATE] rw_present** (ten_god): Rob Wealth present = money lost through others, partnerships can drain wealth, competitive spending\n\n*3 separate indicators affect wealth & finances.* Moderate flag. Left unchecked, this will create problems.\n\n### Career & Authority\n\nNo significant red flags in this area.\n\n### Health\n\nNo significant red flags in this area.\n\n### Character & Behavior (6 indicators)\n\n- **[SEVERE] 十恶大败** (shen_sha): Ten Evils Great Defeat (十恶大败) in chart\n- **[MODERATE] 地网** (shen_sha): Earth's Snare (地网) in year\n- **[MODERATE] 地网** (shen_sha): Earth's Snare (地网) in day\n- **[MODERATE] 地网** (shen_sha): Earth's Snare (地网) in year\n- **[MODERATE] 绞** (shen_sha): Strangle Star (绞) in day\n- **[MODERATE] 绞** (shen_sha): Strangle Star (绞) in day\n\n*6 separate indicators affect character & behavior.* This is a moderate concern. Requires conscious management.\n\n\n---\n\n## SECTION 7: CURRENT LUCK PILLAR ANALYSIS (大运)\n\nNo luck pillar provided.\n\n\n---\n\n## SECTION 8: HEALTH ANALYSIS (健康)\n\n### Element Balance\n\n| Element | Count | Status | Organs at Risk |\n|---|---|---|---|\n| Wood (木) | 0.2 | DEFICIENT | fatigue, poor vision, weak tendons, indecisiveness |\n| Fire (火) | 2.5 | Balanced | — |\n| Earth (土) | 2.7 | EXCESS | overthinking, bloating, weight gain, obsessive worry |\n| Metal (金) | 2.6 | EXCESS | grief, skin problems, respiratory tightness, constipation |\n| Water (水) | 0.3 | DEFICIENT | lower back pain, weak bones, hearing loss, infertility, premature aging |\n\n### Organ Systems at Risk\n\n- **Wood DEFICIENT**: Liver (肝) and Gallbladder (胆) weakened. Watch for: fatigue, poor vision, weak tendons, indecisiveness. Body parts affected: eyes, tendons, nails.\n- **Earth EXCESS**: Spleen (脾) and Stomach (胃) overloaded. Watch for: overthinking, bloating, weight gain, obsessive worry. Body parts affected: mouth, muscles, flesh.\n- **Metal EXCESS**: Lungs (肺) and Large Intestine (大肠) overloaded. Watch for: grief, skin problems, respiratory tightness, constipation. Body parts affected: nose, skin, body hair.\n- **Water DEFICIENT**: Kidneys (肾) and Bladder (膀胱) weakened. Watch for: lower back pain, weak bones, hearing loss, infertility, premature aging. Body parts affected: ears, bones, reproductive system.\n\n### Health-Related Stars\n\n- **天德贵人 (Heavenly Virtue)**: Heavenly Virtue — moral protection. Reduces severity of misfortune.\n- **月德贵人 (Monthly Virtue)**: Monthly Virtue — secondary protection layer. Softens monthly negative events.\n\n\n---\n\n## SECTION 9: REMEDIES & WHAT MUST CHANGE\n\n### 9a. Elemental Remedies\n\n**Useful God Element: Wood (木)**\n\n- **Colors to wear**: green, emerald, jade green\n- **Colors to avoid**: white, gold, silver\n- **Favorable directions**: East, Southeast, North, South\n- **Industries**: education, publishing, forestry, fashion, health food\n- **Environment**: plants, especially tall leafy ones, wooden furniture\n\n### 9b. Behavioral Changes\n\n- Channel excess energy into productive output (creative work, exercise).\n- Practice patience and listening. Your strength can bulldoze others.\n- Give more than you take. Generosity balances your chart.\n\n### 9c. Relationship Guidance\n\n- Best partner element alignment: Wood (木)\n- Your spouse palace (Day Branch): 辰 (Chen)\n\n### 9d. Financial Strategy\n\n- Wealth element (Wood) can be handled. Take calculated risks in favorable years.\n\n### 9e. Relocation & Environment\n\n- Crossing Water benefit: **MODERATE** (score: 3/5)\n  - Water is a favorable element for this chart\n  - Water element severely depleted (count: 0.3)\n  - Fire+Earth dominance (2.5+2.7) needs Water to balance\n- Ideal climate: warm and humid, with abundant vegetation\n- Ideal geography: forested areas, near parks and greenery\n\n**This chart moderately benefits from crossing water. Living near water or abroad will significantly help.**\n\n\n---\n\n## SECTION 10: LIFE EVENT PREDICTIONS\n\n### Marriage Timing\n\n| Year | Age | Score | Key Factors |\n|---|---|---|---|\n| 2017 | 27 | 45.0 | Peach Blossom (桃花) activated; Spouse palace harmonized by annual branch; Prime marriage age window (male 26-33) |\n| 2018 | 28 | 45.0 | Hong Luan (红鸾) activated; Spouse palace clashed (can trigger marriage event); Prime marriage age window (male 26-33) |\n| 2012 | 22 | 35.0 | Tian Xi (天喜) activated; Spouse star in annual branch hidden stem |\n| 2015 | 25 | 35.0 | Spouse star (DW) in annual stem; Spouse star in annual branch hidden stem |\n| 2029 | 39 | 35.0 | Peach Blossom (桃花) activated; Spouse palace harmonized by annual branch |\n\n### Divorce/Separation Risk\n\n| Year | Age | Score | Key Factors |\n|---|---|---|---|\n| 2018 | 28 | 25.0 | Spouse palace directly clashed |\n| 2030 | 40 | 25.0 | Spouse palace directly clashed |\n| 2042 | 52 | 25.0 | Spouse palace directly clashed |\n| 2011 | 21 | 20.0 | Rob Wealth appears (competitor for spouse) |\n| 2021 | 31 | 20.0 | Rob Wealth appears (competitor for spouse) |\n\n### Children Arrival\n\n| Year | Age | Score | Key Factors |\n|---|---|---|---|\n| 2026 | 36 | 43.0 | Children star (7K) in annual stem; Children star in annual branch |\n| 2016 | 26 | 40.0 | Children star (7K) in annual stem; Children palace harmonized |\n| 2027 | 37 | 35.0 | Children star (DO) in annual stem; Children star in annual branch |\n| 2037 | 47 | 35.0 | Children star (DO) in annual stem; Children star in annual branch |\n| 2017 | 27 | 33.0 | Children star (DO) in annual stem |\n\n### Career Peaks\n\n| Year | Age | Score | Key Factors |\n|---|---|---|---|\n| 2027 | 37 | 30.0 | Direct Officer year (recognition, promotion); Career palace clashed (career change event) |\n| 2044 | 54 | 30.0 | Indirect Wealth year (windfall, opportunity); Career palace harmonized |\n| 2017 | 27 | 20.0 | Direct Officer year (recognition, promotion) |\n| 2037 | 47 | 20.0 | Direct Officer year (recognition, promotion) |\n| 2047 | 57 | 20.0 | Direct Officer year (recognition, promotion) |\n\n\n---\n\n## SECTION 11: HONEST SUMMARY\n\n### Core Life Lesson\n\n*You have abundant energy but it needs direction. Your lesson is channeling power into productive outlets rather than letting it stagnate.*\n\n### Designed For vs. Fighting Against\n\nThis chart is designed to thrive with **Wood** energy — education type environments.\n\nThe biggest fight is against excessive **Metal** energy, which stagnates this chart.\n\n### The Single Most Important Thing\n\n**Balance is everything.** Your chart has real strengths but also real vulnerabilities. The useful god (Wood) must be consistently present in your environment, career, and relationships. When it is, everything flows. When it isn't, problems compound.\n",
+  "qi_phase_analysis": {
+    "pillars": {
+      "year": {
+        "phase_id": "changsheng",
+        "phase_chinese": "長生",
+        "phase_english": "Birth",
+        "strength": "strong",
+        "interpretation": "Born into a growing family, pioneering lineage, ancestors who started fresh",
+        "tandem_effects": [
+          {
+            "shen_sha": "天乙贵人",
+            "effect": "Blessed beginning — protected by helpers, smooth start in that domain",
+            "spiritual_bonus": 0
+          }
+        ]
+      },
+      "month": {
+        "phase_id": "mu",
+        "phase_chinese": "墓",
+        "phase_english": "Tomb",
+        "strength": "stored",
+        "interpretation": "Career potential locked away, stored professional capabilities awaiting release via clash",
+        "tandem_effects": [
+          {
+            "shen_sha": "华盖",
+            "effect": "Deep spiritual storage — can perceive hidden/mystical things, meditation talent",
+            "spiritual_bonus": 10
+          }
+        ]
+      },
+      "day": {
+        "phase_id": "yang",
+        "phase_chinese": "養",
+        "phase_english": "Nurturing",
+        "strength": "nascent",
+        "interpretation": "Nurturing relationship, patient partnership, self being cultivated over time",
+        "tandem_effects": [
+          {
+            "shen_sha": "天乙贵人",
+            "effect": "Nurturing protected by noble people — slow but blessed development",
+            "spiritual_bonus": 0
+          }
+        ]
+      },
+      "hour": {
+        "phase_id": "changsheng",
+        "phase_chinese": "長生",
+        "phase_english": "Birth",
+        "strength": "strong",
+        "interpretation": "Children with great potential, legacy of new beginnings, vibrant old age",
+        "tandem_effects": [
+          {
+            "shen_sha": "天乙贵人",
+            "effect": "Blessed beginning — protected by helpers, smooth start in that domain",
+            "spiritual_bonus": 0
+          }
+        ]
+      }
+    },
+    "spiritual_bonus": 10
+  },
+  "spiritual_sensitivity": {
+    "score": 70,
+    "level": "strong",
+    "label_en": "Strong Sensitivity",
+    "label_zh": "高度敏感",
+    "description_en": "Can perceive spirits or energies. Attracted to mystical/occult knowledge. May have experienced unexplainable events. Should develop this ability rather than suppress it.",
+    "description_zh": "能感知灵体或能量。被神秘/玄学知识吸引。可能经历过无法解释的事件。应该发展这种能力，而不是压制它。",
+    "indicators": [
+      {
+        "name": "Canopy Star (Hua Gai)",
+        "name_zh": "华盖",
+        "weight": 25,
+        "reason": "THE classical spiritual marker — solitary, introspective, drawn to metaphysics"
+      },
+      {
+        "name": "Tai Ji Noble",
+        "name_zh": "太极贵人",
+        "weight": 15,
+        "reason": "Metaphysical intelligence — natural affinity for yin-yang and the unseen"
+      },
+      {
+        "name": "Indirect Resource (Pian Yin) Prominent",
+        "name_zh": "偏印突出",
+        "weight": 15,
+        "reason": "Unconventional perception — 3 Indirect Resource stems found. Channel for non-physical knowledge"
+      },
+      {
+        "name": "Multiple Yin Stems (3/4)",
+        "name_zh": "多阴干(3/4)",
+        "weight": 5,
+        "reason": "Yin energy is more receptive to the spiritual/invisible realm"
+      },
+      {
+        "name": "Qi Phase + Shen Sha Tandem Effects",
+        "name_zh": "十二长生+神煞联动效应",
+        "weight": 10,
+        "reason": "Qi phase combinations amplify spiritual sensitivity (see qi phase analysis)"
+      }
+    ],
+    "guidance_en": "Strong spiritual sensitivity — you likely already experience unexplainable phenomena. This ability should be DEVELOPED, not suppressed. Suppressing it causes anxiety, insomnia, and restlessness. Seek a qualified spiritual teacher or mentor.",
+    "guidance_zh": "灵性敏感度很强——你很可能已经经历过无法解释的现象。这种能力应该被发展，而不是压制。压制它会导致焦虑、失眠和不安。 建议寻找合格的灵性导师。"
+  },
+  "client_summary": {
+    "tier": "natal",
+    "sections": [
+      {
+        "id": "chart_overview",
+        "title": "Your Chart",
+        "title_zh": "命盤概覽",
+        "items": [
+          {
+            "label": "Day Master",
+            "value": "Geng Metal (庚金) — Geng Metal = the battle axe or raw ore. Tough, decisive, sharp, confrontational."
+          },
+          {
+            "label": "Personality",
+            "value": "decisive, blunt, confrontational, loyal, justice-oriented"
+          }
+        ]
+      },
+      {
+        "id": "strength",
+        "title": "Strength Assessment",
+        "title_zh": "日主強弱",
+        "severity": "strong",
+        "text": "The Day Master is EXTREMELY STRONG. There is overwhelming support with very little opposition.",
+        "items": [
+          {
+            "label": "Score",
+            "value": "34.8% (20% = balanced)"
+          },
+          {
+            "label": "Useful God",
+            "value": "Wood — most deficient at 2.1% — adding it brings the chart closest to balance"
+          },
+          {
+            "label": "Favorable",
+            "value": "Wood (wealth — absorbs your strength), Water (output — channels excess energy), Fire (officer — disciplines your energy)"
+          },
+          {
+            "label": "Unfavorable",
+            "value": "Metal (companion — overloads the chart), Earth (resource — fuels already excessive Metal)"
+          },
+          {
+            "label": "Best Luck Combos",
+            "value": "Water+Wood, Wood, Water"
+          },
+          {
+            "label": "Why?",
+            "value": "Your Geng Metal is extremely strong at 34.8% (20% = balanced). Massive imbalance. Adding Wood brings the biggest correction. Avoid Metal, Earth — they fuel the excess."
+          }
+        ]
+      },
+      {
+        "id": "ten_gods",
+        "title": "Ten Gods Profile",
+        "title_zh": "十神分析",
+        "text": "Dominant: Friend, Rob Wealth, Direct Resource",
+        "items": [
+          {
+            "label": "F (比肩)",
+            "value": "Friend (比肩) is PROMINENT — strong self-identity, competitive nature, many rivals in same field.",
+            "severity": "info"
+          },
+          {
+            "label": "RW (劫財)",
+            "value": "Rob Wealth (劫財) is PROMINENT — this is a major red flag for finances. Money comes and goes. Partnerships drain wealth. Competitive spending.",
+            "severity": "warning"
+          },
+          {
+            "label": "EG (食神)",
+            "value": "Eating God (食神) is absent — lacks natural creative expression and easy joy."
+          },
+          {
+            "label": "HO (傷官)",
+            "value": "Hurting Officer (傷官) is present — creative edge with some authority conflicts."
+          },
+          {
+            "label": "IW (偏財)",
+            "value": "Indirect Wealth (偏財) is absent — windfall opportunities rare, must earn steadily."
+          },
+          {
+            "label": "DW (正財)",
+            "value": "Direct Wealth (正財) is present — stable finances and commitment capacity."
+          },
+          {
+            "label": "7K (七殺)",
+            "value": "Seven Killings (七殺) is present — some authority and competitive edge."
+          },
+          {
+            "label": "DO (正官)",
+            "value": "Direct Officer (正官) is present — reasonable discipline and career structure."
+          },
+          {
+            "label": "IR (偏印)",
+            "value": "Indirect Resource (偏印) is present — some unconventional wisdom and backing."
+          },
+          {
+            "label": "DR (正印)",
+            "value": "Prominent Direct Resource = well-educated, good health foundation, strong maternal connection.",
+            "severity": "info"
+          }
+        ]
+      },
+      {
+        "id": "interactions",
+        "title": "Branch Interactions",
+        "title_zh": "地支關係",
+        "text": "1 positive, 1 negative interactions found",
+        "items": [
+          {
+            "label": "半三合 Half Three Harmony",
+            "value": "Year (Parents/Ancestry) vs Month (Career/Social) vs Hour (Children/Legacy) — 丑巳半合Metal局 (missing 酉)",
+            "severity": "positive"
+          },
+          {
+            "label": "破 Destruction",
+            "value": "Month (Career/Social) vs Day (Self/Spouse) — 丑辰破",
+            "severity": "mild"
+          }
+        ]
+      },
+      {
+        "id": "shen_sha",
+        "title": "Special Stars",
+        "title_zh": "神煞",
+        "items": [
+          {
+            "label": "天乙贵人 Heavenly Noble",
+            "value": "Tian Yi present = a guardian angel energy. People naturally want to help you.",
+            "severity": "positive"
+          },
+          {
+            "label": "太极贵人 Tai Ji Noble",
+            "value": "Tai Ji Noble — spiritual intelligence. Natural affinity for metaphysics and wisdom.",
+            "severity": "positive"
+          },
+          {
+            "label": "天德贵人 Heavenly Virtue",
+            "value": "Heavenly Virtue — moral protection. Reduces severity of misfortune.",
+            "severity": "positive"
+          },
+          {
+            "label": "月德贵人 Monthly Virtue",
+            "value": "Monthly Virtue — secondary protection layer. Softens monthly negative events.",
+            "severity": "positive"
+          },
+          {
+            "label": "天喜 Heavenly Happiness",
+            "value": "Heavenly Happiness — joy and celebration energy.",
+            "severity": "positive"
+          },
+          {
+            "label": "华盖 Canopy Star",
+            "value": "Canopy Star — solitary, spiritual, intellectual. Prefers isolation over crowds.",
+            "severity": "info"
+          },
+          {
+            "label": "华盖 Canopy Star",
+            "value": "Canopy Star — solitary, spiritual, intellectual. Prefers isolation over crowds.",
+            "severity": "info"
+          },
+          {
+            "label": "地网 Earth's Snare",
+            "value": "Earth's Snare — grounded but trapped. Difficulty escaping situations.",
+            "severity": "negative"
+          },
+          {
+            "label": "地网 Earth's Snare",
+            "value": "Earth's Snare — grounded but trapped. Difficulty escaping situations.",
+            "severity": "negative"
+          },
+          {
+            "label": "地网 Earth's Snare",
+            "value": "Earth's Snare — grounded but trapped. Difficulty escaping situations.",
+            "severity": "negative"
+          },
+          {
+            "label": "寡宿 Widow Star",
+            "value": "Widow Star — loneliness in relationships, especially for females.",
+            "severity": "negative"
+          },
+          {
+            "label": "十恶大败 Ten Evils Great Defeat",
+            "value": "Ten Evils Great Defeat — historical marker for extreme misfortune with wealth.",
+            "severity": "negative"
+          },
+          {
+            "label": "魁罡 Kui Gang",
+            "value": "Kui Gang — powerful, commanding, but hard on relationships and self.",
+            "severity": "info"
+          },
+          {
+            "label": "绞 Strangle Star",
+            "value": "Strangle Star — suffocating situations, trapped in conflicts.",
+            "severity": "negative"
+          }
+        ]
+      },
+      {
+        "id": "red_flags",
+        "title": "Red Flags",
+        "title_zh": "警示",
+        "items": [
+          {
+            "label": "Wealth",
+            "value": "companion_heavy — Too many companions (Friend + Rob Wealth) = competition problems, wealth leakage, relationship interference",
+            "severity": "moderate"
+          },
+          {
+            "label": "Wealth",
+            "value": "rw_present — Rob Wealth present = money lost through others, partnerships can drain wealth, competitive spending",
+            "severity": "moderate"
+          },
+          {
+            "label": "Wealth",
+            "value": "十恶大败 — Ten Evils Great Defeat (十恶大败) in chart",
+            "severity": "severe"
+          },
+          {
+            "label": "Character",
+            "value": "地网 — Earth's Snare (地网) in year",
+            "severity": "moderate"
+          },
+          {
+            "label": "Character",
+            "value": "地网 — Earth's Snare (地网) in day",
+            "severity": "moderate"
+          },
+          {
+            "label": "Character",
+            "value": "地网 — Earth's Snare (地网) in year",
+            "severity": "moderate"
+          },
+          {
+            "label": "Character",
+            "value": "寡宿 — Widow Star (寡宿) in day",
+            "severity": "moderate"
+          },
+          {
+            "label": "Character",
+            "value": "绞 — Strangle Star (绞) in day",
+            "severity": "moderate"
+          }
+        ]
+      },
+      {
+        "id": "natal_predictions",
+        "title": "Life Predictions",
+        "title_zh": "命理預測",
+        "text": "Based on natal chart structure — what your birth chart says about marriage, children, and wealth potential",
+        "items": [
+          {
+            "label": "Marriage: LATE",
+            "value": "wife star (正財) only in hidden stems — marriage comes late or needs effort | Rob Wealth prominent — competition/interference in relationships | Best year: 2017 (age 27, score 45) — Peach Blossom (桃花) activated; Spouse palace harmonized by annual branch",
+            "severity": "warning"
+          },
+          {
+            "label": "Divorce Risk: LOW",
+            "value": "No major divorce indicators in natal chart",
+            "severity": "positive"
+          },
+          {
+            "label": "Children: est. 2+",
+            "value": "7K (七殺) present — sons likely | DO (正官) present — daughters likely | Children star in hour pillar (children palace) — strong fertility indicator | Best year: 2026 (age 36)",
+            "severity": "positive"
+          },
+          {
+            "label": "Wealth: 6-7 figures",
+            "value": "Direct Wealth present — steady income capacity | Strong DM can hold wealth — good earning capacity | Rob Wealth prominent — money drains through competition/others | Warning: Too many companions (Friend + Rob Wealth) = competition problems, wealth leakage, relationship interference | Warning: Rob Wealth present = money lost through others, partnerships can drain wealth, competitive spending | Average wealth capacity — steady income but unlikely to break into high wealth without favorable luck. | Best career year: 2027 (age 37)",
+            "severity": "info"
+          }
+        ]
+      },
+      {
+        "id": "health",
+        "title": "Health",
+        "title_zh": "健康",
+        "items": [
+          {
+            "label": "Liver (肝) (Wood)",
+            "value": "Wood severely deficient (3%). fatigue, poor vision, weak tendons, indecisiveness. Wood in Trapped (囚) seasonal state — heightened liver vulnerability. Body parts: eyes, tendons, nails.",
+            "severity": "warning"
+          },
+          {
+            "label": "Heart (心) (Fire)",
+            "value": "Fire above average (30%). Watch for: anxiety, insomnia, heart palpitations, inflammation. Water controls Fire. Weak Water means cardiovascular system (Heart) can become unregulated. Body parts: tongue, blood vessels, complexion.",
+            "severity": "warning"
+          },
+          {
+            "label": "Spleen (脾) (Earth)",
+            "value": "Earth above average (32%). Watch for: overthinking, bloating, weight gain, obsessive worry. Wood controls Earth. Weak Wood means digestive system (Spleen/Stomach) can become unregulated. Body parts: mouth, muscles, flesh.",
+            "severity": "warning"
+          },
+          {
+            "label": "Lungs (肺) (Metal)",
+            "value": "Metal above average (31%). Watch for: grief, skin problems, respiratory tightness, constipation. Body parts: nose, skin, body hair.",
+            "severity": "mild"
+          },
+          {
+            "label": "Kidneys (肾) (Water)",
+            "value": "Water severely deficient (4%). lower back pain, weak bones, hearing loss, infertility, premature aging. Water in Dead (死) seasonal state — heightened kidneys vulnerability. Body parts: ears, bones, reproductive system.",
+            "severity": "warning"
+          }
+        ]
+      },
+      {
+        "id": "remedies",
+        "title": "Remedies",
+        "title_zh": "化解建議",
+        "items": [
+          {
+            "label": "Colors",
+            "value": "Wear green, emerald, jade green (Wood element)"
+          },
+          {
+            "label": "Direction",
+            "value": "East"
+          },
+          {
+            "label": "Industries",
+            "value": "education, publishing, forestry, fashion, health food"
+          },
+          {
+            "label": "Avoid Colors",
+            "value": "white, gold, silver"
+          },
+          {
+            "label": "Health + Useful God synergy (Wood)",
+            "value": "Your useful god (Wood) also addresses your liver health. Practice eye care, stretch regularly, manage anger through movement/exercise",
+            "severity": "positive"
+          },
+          {
+            "label": "Health: Kidneys (Water)",
+            "value": "Low Water weakens kidneys. Secondary remedy: add black, dark blue accessories. Strengthen lower back and bones, protect hearing, manage fear and anxiety",
+            "severity": "info"
+          }
+        ]
+      },
+      {
+        "id": "summary",
+        "title": "Honest Summary",
+        "title_zh": "總結",
+        "text": "You are Geng Metal (庚金). Personality: decisive, blunt, confrontational, loyal, justice-oriented. Your Day Master is extremely strong (35% element presence, 20% = balanced). You have overwhelming energy. The risk is stagnation and bulldozing over others. Marriage: No major obstacles in the natal chart. Timing and luck pillar alignment will determine when. Wealth: Rob Wealth is prominent — money comes but also leaves through others. Avoid partnerships and lending. Protect what you earn. Health: Watch Liver (Wood), Kidneys (Water) — these elements are deficient in your chart. Life lesson: You have abundant energy but it needs direction. Your lesson is channeling power into productive outlets rather than letting it stagnate. Your useful god is Wood (currently at 2.1% — most deficient). Adding Wood brings the chart closest to 20% equilibrium across all five elements. Favorable: Wood, Water, Fire. Unfavorable: Metal, Earth (already excessive). Everything in your life improves when you increase Wood element exposure."
+      }
+    ]
+  },
+  "school": "classic"
+}

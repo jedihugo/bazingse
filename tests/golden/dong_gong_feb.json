@@ -1,0 +1,1309 @@
+{
+  "year": 2026,
+  "month": 2,
+  "first_day_weekday": 0,
+  "days_in_month": 28,
+  "days": [
+    {
+      "day": 1,
+      "weekday": 0,
+      "day_stem": "Bing",
+      "day_branch": "Wu",
+      "day_stem_chinese": "丙",
+      "day_branch_chinese": "午",
+      "pillar": "Bing Wu",
+      "year_stem": "Yi",
+      "year_branch": "Si",
+      "year_stem_chinese": "乙",
+      "year_branch_chinese": "巳",
+      "chinese_month": 12,
+      "chinese_month_name": "十二月",
+      "moon_phase": {
+        "emoji": "🌔",
+        "english": "Waxing Gibbous",
+        "chinese": "盈凸月",
+        "lunar_day": 14
+      },
+      "officer": {
+        "id": "Zhi",
+        "chinese": "執",
+        "english": "Initiate"
+      },
+      "rating": {
+        "id": "dire",
+        "value": 1,
+        "symbol": "✗",
+        "chinese": "大凶"
+      },
+      "good_for": [
+        "renovation",
+        "marriage",
+        "moving",
+        "business",
+        "travel",
+        "groundbreaking",
+        "burial"
+      ],
+      "bad_for": [],
+      "description_chinese": "庚午,天月二德。如庚午年作庚山甲向,宜可收納音也。況其日有用庚辰時者,時遇三合照甲庚,而庚祿居中,辰馬又值壬中,此之謂生成祿馬日,龍馬遇祿星,聖人面面星有黃羅、紫檀、天皇、地皇、金銀寶樓,眾吉星蓋照,主益子孫、旺家門、進田產、遷祿位,壬午並吉,餘午次吉,丙午正四廢,凶。",
+      "description_english": "Geng Wu 庚午 Days have the Heavenly 天德 and Monthly Virtue 月德 Stars present. Hence, during a Geng Wu Year 庚午年, use the Geng Sitting 庚山, Jia Facing 甲向 setup to receive Na Yin Qi. One can also utilize the Geng Chen 庚辰 Hour, to produce a Three Harmony Shining on Jia and Geng 三合照甲庚 formation, where the Geng Prosperous 祿 Branch resides in the Shen 申 (Monkey) Stem. Such a day is also known as a Prosperous Sky Horse Day 生成祿馬日, which is further supported by a host of auspicious stars including the Yellow Spiral 黃羅, Purple Sandalwood 紫檀, Heavenly Emperor 天皇, Earthly Emperor 地皇, Golden Ingot 金銀 and Precious Building 寶樓. This combination brings about an increase in wealth and good advancement opportunities in life. Do note however that while Ren Wu 壬午 Days are also very auspicious days, the other Wu 午 (Horse) days are only considered second-tier options. Only the Bing Wu 丙午 day is completely unusable, as it is one of the Direct Abandonment 正四廢 Days.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 2,
+      "weekday": 1,
+      "day_stem": "Ding",
+      "day_branch": "Wei",
+      "day_stem_chinese": "丁",
+      "day_branch_chinese": "未",
+      "pillar": "Ding Wei",
+      "year_stem": "Yi",
+      "year_branch": "Si",
+      "year_stem_chinese": "乙",
+      "year_branch_chinese": "巳",
+      "chinese_month": 12,
+      "chinese_month_name": "十二月",
+      "moon_phase": {
+        "emoji": "🌕",
+        "english": "Full Moon",
+        "chinese": "满月",
+        "lunar_day": 15
+      },
+      "officer": {
+        "id": "Po",
+        "chinese": "破",
+        "english": "Destruction"
+      },
+      "rating": {
+        "id": "excellent",
+        "value": 5,
+        "symbol": "★",
+        "chinese": "大吉"
+      },
+      "good_for": [
+        "groundbreaking",
+        "marriage",
+        "travel",
+        "moving",
+        "business"
+      ],
+      "bad_for": [],
+      "description_chinese": "丁未水居巨鰲,癸未水入秦州,內有文昌貴顯之星,宜動土、興工、出行、入宅、娶親、開張,百事大吉。己未、辛未,熬入中宮,凶,乙未亦不利。",
+      "description_english": "Qi is prosperous and thriving on Ding Wei 丁未 and Gui Wei 癸未 Days, which also enjoy the positive energies of the Literary Arts 文昌 Star. As such, these days are suitable groundbreaking, marriage, travel, moving into a new house or opening a business, as all endeavors undertaken will bear fruit. Ji Wei 己未, Xin Wei 辛未 and Yi Wei 乙未 Days, however, harbor Sha Qi, and should hence be avoided.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 3,
+      "weekday": 2,
+      "day_stem": "Wu",
+      "day_branch": "Shen",
+      "day_stem_chinese": "戊",
+      "day_branch_chinese": "申",
+      "pillar": "Wu Shen",
+      "year_stem": "Yi",
+      "year_branch": "Si",
+      "year_stem_chinese": "乙",
+      "year_branch_chinese": "巳",
+      "chinese_month": 12,
+      "chinese_month_name": "十二月",
+      "moon_phase": {
+        "emoji": "🌖",
+        "english": "Waning Gibbous",
+        "chinese": "亏凸月",
+        "lunar_day": 16
+      },
+      "officer": {
+        "id": "Wei",
+        "chinese": "危",
+        "english": "Danger"
+      },
+      "rating": {
+        "id": "inauspicious",
+        "value": 2,
+        "symbol": "▲",
+        "chinese": "凶"
+      },
+      "good_for": [
+        "minor_repairs",
+        "burial"
+      ],
+      "bad_for": [
+        "major_renovations",
+        "business",
+        "moving",
+        "marriage"
+      ],
+      "description_chinese": "庚申天月二德,宜修造、安葬、小小營為,次吉。如大家千百工以上起造、開張、入宅、婚等事,卻不宜。其日熬入中宮,不利家長人者,雖有天、月二德,亦無如之何作,用事損傷手足、匠夫。破失損壞器血。大作遭見損、小作緩慾,若作牛羊豬圈,六十日、一百二十日內便見虎狼傷害,更生瘟疫。甲申起造、安葬吉。丙申、壬申只宜埋葬吉。戊申日未詳。",
+      "description_english": "Although a Geng Shen 庚申 Day is marked by the presence of the Heavenly and Earthly Virtue 天月二德 Stars, it is only suitable for minor repairs and burial. This day should not be used for major renovations, opening a business, moving into a new house or marriage, as this would result in Sha Qi entering the Central Palace, and harming the eldest member in a family. Worse still, anyone who taps into the energies of this day will be likely attacked by a tiger or wolf, and/or fall ill easily, within 60 to 120 days. A Jia Shen 甲申 Day may also be used for minor repairs and burial, while Bing Shen 丙申 and Ren Shen 壬申 Days are especially auspicious days for burial.",
+      "forbidden": {
+        "type": "four_extinction",
+        "chinese": "四絕",
+        "english": "Four Extinction",
+        "solar_term_id": "li_chun",
+        "solar_term_chinese": "立春",
+        "solar_term_english": "Li Chun",
+        "forbidden_start_hour": 4.03,
+        "forbidden_end_hour": 24
+      },
+      "consult": null
+    },
+    {
+      "day": 4,
+      "weekday": 3,
+      "day_stem": "Ji",
+      "day_branch": "You",
+      "day_stem_chinese": "己",
+      "day_branch_chinese": "酉",
+      "pillar": "Ji You",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 1,
+      "chinese_month_name": "正月",
+      "moon_phase": {
+        "emoji": "🌖",
+        "english": "Waning Gibbous",
+        "chinese": "亏凸月",
+        "lunar_day": 17
+      },
+      "officer": {
+        "id": "Wei",
+        "chinese": "危",
+        "english": "Danger"
+      },
+      "rating": {
+        "id": "inauspicious",
+        "value": 2,
+        "symbol": "▲",
+        "chinese": "凶"
+      },
+      "good_for": [
+        "burial",
+        "travel",
+        "debt_collection",
+        "meeting_officials"
+      ],
+      "bad_for": [
+        "construction",
+        "marriage"
+      ],
+      "description_chinese": "辛酉正四廢，不宜用事。惟丁酉有天德福星蓋照，宜安葬、出行、開張、星蓋吉。只不宜起造、婚姻、嫁娶等事，乃比和之日也。餘酉日均不可用。",
+      "description_english": "Xin You is Four Abandonment Day - unsuitable for activities. Only Ding You has Heavenly Virtue and Prosperity stars shining upon it, suitable for burial, travel, opening business - the stars are auspicious. Just not suitable for construction, marriage, or wedding matters - this is a Harmonizing Day. Other You days cannot be used.",
+      "forbidden": {
+        "type": "four_extinction",
+        "chinese": "四絕",
+        "english": "Four Extinction",
+        "solar_term_id": "li_chun",
+        "solar_term_chinese": "立春",
+        "solar_term_english": "Li Chun",
+        "forbidden_start_hour": 0,
+        "forbidden_end_hour": 4.03
+      },
+      "consult": null
+    },
+    {
+      "day": 5,
+      "weekday": 4,
+      "day_stem": "Geng",
+      "day_branch": "Xu",
+      "day_stem_chinese": "庚",
+      "day_branch_chinese": "戌",
+      "pillar": "Geng Xu",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 1,
+      "chinese_month_name": "正月",
+      "moon_phase": {
+        "emoji": "🌖",
+        "english": "Waning Gibbous",
+        "chinese": "亏凸月",
+        "lunar_day": 18
+      },
+      "officer": {
+        "id": "Cheng",
+        "chinese": "成",
+        "english": "Success"
+      },
+      "rating": {
+        "id": "inauspicious",
+        "value": 2,
+        "symbol": "▲",
+        "chinese": "凶"
+      },
+      "good_for": [],
+      "bad_for": [
+        "construction",
+        "marriage",
+        "moving",
+        "important_activities"
+      ],
+      "description_chinese": "天喜、地網星同臨，不宜犯之。主家長病、人口不義、冷退。丙戌、戊戌、庚戌、壬戌，熬集中宮，犯之主首殺人、兄弟不義、死別生離，尤忌起造、婚姻、入宅、修作。",
+      "description_english": "Sky Happiness and Earthly Net stars arrive together - should not be violated. Causes elders' illness, disloyal people, decline and withdrawal. Bing Xu, Wu Xu, Geng Xu, Ren Xu have negative Qi concentrated in Central Palace - those who violate face leading to killing, disloyal brothers, separation in death or life. Especially avoid construction, marriage, moving in, renovation.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 6,
+      "weekday": 5,
+      "day_stem": "Xin",
+      "day_branch": "Hai",
+      "day_stem_chinese": "辛",
+      "day_branch_chinese": "亥",
+      "pillar": "Xin Hai",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 1,
+      "chinese_month_name": "正月",
+      "moon_phase": {
+        "emoji": "🌖",
+        "english": "Waning Gibbous",
+        "chinese": "亏凸月",
+        "lunar_day": 19
+      },
+      "officer": {
+        "id": "Shou",
+        "chinese": "收",
+        "english": "Receive"
+      },
+      "rating": {
+        "id": "inauspicious",
+        "value": 2,
+        "symbol": "▲",
+        "chinese": "凶"
+      },
+      "good_for": [],
+      "bad_for": [
+        "important_activities",
+        "construction",
+        "marriage"
+      ],
+      "description_chinese": "有勾絞不宜用事。犯之損家長、害子孫。六十日、一百二十日內主南方白衣刑剋、男女多災，大凶。惟平日地支與月建陰陽合德者次吉。",
+      "description_english": "Has Grappling Hook star - not suitable for activities. Those who violate will harm elders and grandchildren. Within 60-120 days there will be punishment from white-clothed people from the south, many disasters for men and women - greatly inauspicious. Only days where earthly branch has Yin-Yang harmonious virtue with monthly establishment are secondarily auspicious.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 7,
+      "weekday": 6,
+      "day_stem": "Ren",
+      "day_branch": "Zi",
+      "day_stem_chinese": "壬",
+      "day_branch_chinese": "子",
+      "pillar": "Ren Zi",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 1,
+      "chinese_month_name": "正月",
+      "moon_phase": {
+        "emoji": "🌖",
+        "english": "Waning Gibbous",
+        "chinese": "亏凸月",
+        "lunar_day": 20
+      },
+      "officer": {
+        "id": "Kai",
+        "chinese": "開",
+        "english": "Open"
+      },
+      "rating": {
+        "id": "consult",
+        "value": 2.5,
+        "symbol": "?",
+        "chinese": "議"
+      },
+      "good_for": [
+        "burial",
+        "travel",
+        "business"
+      ],
+      "bad_for": [
+        "construction",
+        "marriage",
+        "moving"
+      ],
+      "description_chinese": "甲子自死之金，五行陰忌之日。壬子木打寶瓶，終是北方沐浴之地，不宜起造、婚姻、入宅、開張等事。戊子、丙子、庚子三日，水土生人用之大吉。內有黃羅、紫檀、天皇、地皇、金銀寶藏、財庫貯、聯珠眾星蓋照，主六十日、一百二十日內得大財、貴人接引、職祿、謀事大吉，旺六畜、益財產、亦宜安葬。",
+      "description_english": "Jia Zi is Self-Death Metal, Five Element Yin Avoidance Day. Ren Zi wood strikes treasure vase, ultimately is northern bathing place - not suitable for construction, marriage, moving in, opening business. Wu Zi, Bing Zi, Geng Zi - these three days are greatly auspicious for Water and Earth element people. Contains Yellow Spiral, Purple Sandalwood, Heavenly Emperor, Earthly Emperor, Gold & Silver Treasure, Fortune Treasury Storage, Pearl Chain stars all shining. Within 60-120 days will gain great wealth, noble people will guide, official positions, great fortune in planning. Thriving livestock, increasing property, also suitable for burial.",
+      "forbidden": null,
+      "consult": {
+        "promoted": true,
+        "original_rating": {
+          "id": "inauspicious",
+          "value": 2,
+          "symbol": "▲",
+          "chinese": "凶"
+        },
+        "reason": "Good for: burial, travel, business"
+      }
+    },
+    {
+      "day": 8,
+      "weekday": 0,
+      "day_stem": "Gui",
+      "day_branch": "Chou",
+      "day_stem_chinese": "癸",
+      "day_branch_chinese": "丑",
+      "pillar": "Gui Chou",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 1,
+      "chinese_month_name": "正月",
+      "moon_phase": {
+        "emoji": "🌖",
+        "english": "Waning Gibbous",
+        "chinese": "亏凸月",
+        "lunar_day": 21
+      },
+      "officer": {
+        "id": "Bi",
+        "chinese": "閉",
+        "english": "Close"
+      },
+      "rating": {
+        "id": "inauspicious",
+        "value": 2,
+        "symbol": "▲",
+        "chinese": "凶"
+      },
+      "good_for": [],
+      "bad_for": [
+        "marriage",
+        "construction",
+        "buying_livestock"
+      ],
+      "description_chinese": "不利婚姻、起造，防虎蛇傷、騾馬踢、戒惡疾貧病，大凶。",
+      "description_english": "Not favorable for marriage or construction. Beware of injury from tigers and snakes, kicks from mules and horses, avoid terrible illness and poverty - greatly inauspicious.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 9,
+      "weekday": 1,
+      "day_stem": "Jia",
+      "day_branch": "Yin",
+      "day_stem_chinese": "甲",
+      "day_branch_chinese": "寅",
+      "pillar": "Jia Yin",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 1,
+      "chinese_month_name": "正月",
+      "moon_phase": {
+        "emoji": "🌗",
+        "english": "Last Quarter",
+        "chinese": "下弦月",
+        "lunar_day": 22
+      },
+      "officer": {
+        "id": "Jian",
+        "chinese": "建",
+        "english": "Establish"
+      },
+      "rating": {
+        "id": "inauspicious",
+        "value": 2,
+        "symbol": "▲",
+        "chinese": "凶"
+      },
+      "good_for": [],
+      "bad_for": [
+        "construction",
+        "marriage",
+        "contracts",
+        "important_activities"
+      ],
+      "description_chinese": "往亡日。不利起造、結婚姻、納采，主家長病、招官司犯之主六十日、一百二十日內損小口，一年內見重喪，百事不宜。",
+      "description_english": "Emptiness Day (往亡日). Not ideal for construction, marriage, or contracts. Those who use this day will face illness in elders, lawsuits. Within 60-120 days children may be harmed. Within a year, there may be double mourning. All activities should be avoided.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 10,
+      "weekday": 2,
+      "day_stem": "Yi",
+      "day_branch": "Mao",
+      "day_stem_chinese": "乙",
+      "day_branch_chinese": "卯",
+      "pillar": "Yi Mao",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 1,
+      "chinese_month_name": "正月",
+      "moon_phase": {
+        "emoji": "🌗",
+        "english": "Last Quarter",
+        "chinese": "下弦月",
+        "lunar_day": 23
+      },
+      "officer": {
+        "id": "Chu",
+        "chinese": "除",
+        "english": "Remove"
+      },
+      "rating": {
+        "id": "inauspicious",
+        "value": 2,
+        "symbol": "▲",
+        "chinese": "凶"
+      },
+      "good_for": [],
+      "bad_for": [
+        "renovation",
+        "marriage",
+        "construction"
+      ],
+      "description_chinese": "不宜起造、婚姻，犯之主六十日內損家長、招官司。三五年內見凶冷退，主兄弟不義、各業分散、惡人相逢、生離死別。",
+      "description_english": "Not suitable for renovation or marriage. Those who use it will see harm to elders and lawsuits within 60 days. Within 3-5 years there will be misfortune and decline, brothers will be disloyal, businesses scatter, meeting with evil people, and separation in life or death.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 11,
+      "weekday": 3,
+      "day_stem": "Bing",
+      "day_branch": "Chen",
+      "day_stem_chinese": "丙",
+      "day_branch_chinese": "辰",
+      "pillar": "Bing Chen",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 1,
+      "chinese_month_name": "正月",
+      "moon_phase": {
+        "emoji": "🌘",
+        "english": "Waning Crescent",
+        "chinese": "残月",
+        "lunar_day": 24
+      },
+      "officer": {
+        "id": "Man",
+        "chinese": "滿",
+        "english": "Full"
+      },
+      "rating": {
+        "id": "inauspicious",
+        "value": 2,
+        "symbol": "▲",
+        "chinese": "凶"
+      },
+      "good_for": [],
+      "bad_for": [
+        "most_activities",
+        "construction",
+        "marriage",
+        "business"
+      ],
+      "description_chinese": "天富、天賊、天羅星臨。甲辰雖有氣，與戊辰同，熬集中宮，百事皆忌，犯之主殺人、退財，大凶。餘辰日亦不吉。",
+      "description_english": "Heavenly Fortune, Heavenly Thief, and Heavenly Spiral stars arrive. Jia Chen and Wu Chen have negative Qi concentrated in Central Palace - all activities forbidden. Those who violate this may face killing, loss of wealth - greatly inauspicious. Other Chen days are also unfavorable.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 12,
+      "weekday": 4,
+      "day_stem": "Ding",
+      "day_branch": "Si",
+      "day_stem_chinese": "丁",
+      "day_branch_chinese": "巳",
+      "pillar": "Ding Si",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 1,
+      "chinese_month_name": "正月",
+      "moon_phase": {
+        "emoji": "🌘",
+        "english": "Waning Crescent",
+        "chinese": "残月",
+        "lunar_day": 25
+      },
+      "officer": {
+        "id": "Ping",
+        "chinese": "平",
+        "english": "Balance"
+      },
+      "rating": {
+        "id": "inauspicious",
+        "value": 2,
+        "symbol": "▲",
+        "chinese": "凶"
+      },
+      "good_for": [],
+      "bad_for": [
+        "marriage",
+        "business",
+        "legal_matters"
+      ],
+      "description_chinese": "小紅砂，朱雀、勾絞、到州星臨，犯之主招官司、損家長、宅女媳婦。三、五年內重重不利、破財，大凶。田蠶不收、産死、自縊、被惡人處刑。",
+      "description_english": "Lesser Red Embrace, Red Phoenix, Grappling Hook, and Arriving States stars. Those who use this day face lawsuits, harm to elders, damage to women of the household. Within 3-5 years there will be repeated misfortune, loss of wealth - greatly inauspicious. Farms will not produce, stillbirths, suicides, and punishment by evil people.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 13,
+      "weekday": 5,
+      "day_stem": "Wu",
+      "day_branch": "Wu",
+      "day_stem_chinese": "戊",
+      "day_branch_chinese": "午",
+      "pillar": "Wu Wu",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 1,
+      "chinese_month_name": "正月",
+      "moon_phase": {
+        "emoji": "🌘",
+        "english": "Waning Crescent",
+        "chinese": "残月",
+        "lunar_day": 26
+      },
+      "officer": {
+        "id": "Ding",
+        "chinese": "定",
+        "english": "Stable"
+      },
+      "rating": {
+        "id": "auspicious",
+        "value": 4,
+        "symbol": "✓",
+        "chinese": "吉"
+      },
+      "good_for": [
+        "renovation",
+        "burial",
+        "moving",
+        "business",
+        "travel",
+        "marriage"
+      ],
+      "bad_for": [],
+      "description_chinese": "黃砂日，有黃羅、紫檀、天皇、地皇、金銀庫樓、田塘、月財庫、貯星，諸吉星蓋照，宜起造、安葬、移徙、開張、出行、婚姻，主六十日、一百二十日內進橫財、田產，或因附寄成家，大作大發、小作小發，主田蠶大收穫，金銀滿庫。",
+      "description_english": "Yellow Embrace Day with Yellow Spiral, Purple Sandalwood, Heavenly Emperor, Earthly Emperor, Gold & Silver Treasury, Field Pond, Monthly Fortune Treasury, Storage stars - all auspicious stars shine upon it. Suitable for construction, burial, moving, opening business, travel, marriage. Within 60-120 days will gain unexpected wealth and property. Great undertakings bring great prosperity, small undertakings bring small prosperity. Fields and silkworms yield great harvest, gold and silver fill the treasury.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 14,
+      "weekday": 6,
+      "day_stem": "Ji",
+      "day_branch": "Wei",
+      "day_stem_chinese": "己",
+      "day_branch_chinese": "未",
+      "pillar": "Ji Wei",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 1,
+      "chinese_month_name": "正月",
+      "moon_phase": {
+        "emoji": "🌘",
+        "english": "Waning Crescent",
+        "chinese": "残月",
+        "lunar_day": 27
+      },
+      "officer": {
+        "id": "Zhi",
+        "chinese": "執",
+        "english": "Initiate"
+      },
+      "rating": {
+        "id": "inauspicious",
+        "value": 2,
+        "symbol": "▲",
+        "chinese": "凶"
+      },
+      "good_for": [],
+      "bad_for": [
+        "moving",
+        "marriage",
+        "business",
+        "construction"
+      ],
+      "description_chinese": "天賊、朱雀、勾絞星臨。六十日、一百二十日內損六畜、傷騾馬、成惡疾。乙未熬入中宮，更忌起造、婚姻、開張、築策亭事。",
+      "description_english": "Heavenly Thief, Red Phoenix, and Grappling Hook stars arrive. Within 60-120 days will harm livestock, injure mules and horses, contract terrible illness. Yi Wei has negative Qi in Central Palace - especially avoid construction, marriage, opening business, building pavilions.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 15,
+      "weekday": 0,
+      "day_stem": "Geng",
+      "day_branch": "Shen",
+      "day_stem_chinese": "庚",
+      "day_branch_chinese": "申",
+      "pillar": "Geng Shen",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 1,
+      "chinese_month_name": "正月",
+      "moon_phase": {
+        "emoji": "🌘",
+        "english": "Waning Crescent",
+        "chinese": "残月",
+        "lunar_day": 28
+      },
+      "officer": {
+        "id": "Po",
+        "chinese": "破",
+        "english": "Destruction"
+      },
+      "rating": {
+        "id": "dire",
+        "value": 1,
+        "symbol": "✗",
+        "chinese": "大凶"
+      },
+      "good_for": [],
+      "bad_for": [
+        "legal_matters",
+        "business",
+        "marriage",
+        "important_activities"
+      ],
+      "description_chinese": "遇朱雀、勾絞星，主招官司、口舌、退牲財，三、五年內見寡婦、醜事。庚申正四廢，更凶。",
+      "description_english": "Encounters Red Phoenix and Grappling Hook stars, causing lawsuits, disputes, loss of livestock and wealth. Within 3-5 years will see widows and scandals. Geng Shen is Four Abandonment Day - even more inauspicious.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 16,
+      "weekday": 1,
+      "day_stem": "Xin",
+      "day_branch": "You",
+      "day_stem_chinese": "辛",
+      "day_branch_chinese": "酉",
+      "pillar": "Xin You",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 1,
+      "chinese_month_name": "正月",
+      "moon_phase": {
+        "emoji": "🌘",
+        "english": "Waning Crescent",
+        "chinese": "残月",
+        "lunar_day": 29
+      },
+      "officer": {
+        "id": "Wei",
+        "chinese": "危",
+        "english": "Danger"
+      },
+      "rating": {
+        "id": "dire",
+        "value": 1,
+        "symbol": "✗",
+        "chinese": "大凶"
+      },
+      "good_for": [
+        "burial",
+        "travel",
+        "debt_collection",
+        "meeting_officials"
+      ],
+      "bad_for": [
+        "construction",
+        "marriage"
+      ],
+      "description_chinese": "辛酉正四廢，不宜用事。惟丁酉有天德福星蓋照，宜安葬、出行、開張、星蓋吉。只不宜起造、婚姻、嫁娶等事，乃比和之日也。餘酉日均不可用。",
+      "description_english": "Xin You is Four Abandonment Day - unsuitable for activities. Only Ding You has Heavenly Virtue and Prosperity stars shining upon it, suitable for burial, travel, opening business - the stars are auspicious. Just not suitable for construction, marriage, or wedding matters - this is a Harmonizing Day. Other You days cannot be used.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 17,
+      "weekday": 2,
+      "day_stem": "Ren",
+      "day_branch": "Xu",
+      "day_stem_chinese": "壬",
+      "day_branch_chinese": "戌",
+      "pillar": "Ren Xu",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 1,
+      "chinese_month_name": "正月",
+      "moon_phase": {
+        "emoji": "🌑",
+        "english": "New Moon",
+        "chinese": "新月",
+        "lunar_day": 1
+      },
+      "officer": {
+        "id": "Cheng",
+        "chinese": "成",
+        "english": "Success"
+      },
+      "rating": {
+        "id": "dire",
+        "value": 1,
+        "symbol": "✗",
+        "chinese": "大凶"
+      },
+      "good_for": [],
+      "bad_for": [
+        "construction",
+        "marriage",
+        "moving",
+        "important_activities"
+      ],
+      "description_chinese": "天喜、地網星同臨，不宜犯之。主家長病、人口不義、冷退。丙戌、戊戌、庚戌、壬戌，熬集中宮，犯之主首殺人、兄弟不義、死別生離，尤忌起造、婚姻、入宅、修作。",
+      "description_english": "Sky Happiness and Earthly Net stars arrive together - should not be violated. Causes elders' illness, disloyal people, decline and withdrawal. Bing Xu, Wu Xu, Geng Xu, Ren Xu have negative Qi concentrated in Central Palace - those who violate face leading to killing, disloyal brothers, separation in death or life. Especially avoid construction, marriage, moving in, renovation.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 18,
+      "weekday": 3,
+      "day_stem": "Gui",
+      "day_branch": "Hai",
+      "day_stem_chinese": "癸",
+      "day_branch_chinese": "亥",
+      "pillar": "Gui Hai",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 1,
+      "chinese_month_name": "正月",
+      "moon_phase": {
+        "emoji": "🌒",
+        "english": "Waxing Crescent",
+        "chinese": "蛾眉月",
+        "lunar_day": 2
+      },
+      "officer": {
+        "id": "Shou",
+        "chinese": "收",
+        "english": "Receive"
+      },
+      "rating": {
+        "id": "inauspicious",
+        "value": 2,
+        "symbol": "▲",
+        "chinese": "凶"
+      },
+      "good_for": [],
+      "bad_for": [
+        "important_activities",
+        "construction",
+        "marriage"
+      ],
+      "description_chinese": "有勾絞不宜用事。犯之損家長、害子孫。六十日、一百二十日內主南方白衣刑剋、男女多災，大凶。惟平日地支與月建陰陽合德者次吉。",
+      "description_english": "Has Grappling Hook star - not suitable for activities. Those who violate will harm elders and grandchildren. Within 60-120 days there will be punishment from white-clothed people from the south, many disasters for men and women - greatly inauspicious. Only days where earthly branch has Yin-Yang harmonious virtue with monthly establishment are secondarily auspicious.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 19,
+      "weekday": 4,
+      "day_stem": "Jia",
+      "day_branch": "Zi",
+      "day_stem_chinese": "甲",
+      "day_branch_chinese": "子",
+      "pillar": "Jia Zi",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 1,
+      "chinese_month_name": "正月",
+      "moon_phase": {
+        "emoji": "🌒",
+        "english": "Waxing Crescent",
+        "chinese": "蛾眉月",
+        "lunar_day": 3
+      },
+      "officer": {
+        "id": "Kai",
+        "chinese": "開",
+        "english": "Open"
+      },
+      "rating": {
+        "id": "consult",
+        "value": 2.5,
+        "symbol": "?",
+        "chinese": "議"
+      },
+      "good_for": [
+        "burial",
+        "travel",
+        "business"
+      ],
+      "bad_for": [
+        "construction",
+        "marriage",
+        "moving"
+      ],
+      "description_chinese": "甲子自死之金，五行陰忌之日。壬子木打寶瓶，終是北方沐浴之地，不宜起造、婚姻、入宅、開張等事。戊子、丙子、庚子三日，水土生人用之大吉。內有黃羅、紫檀、天皇、地皇、金銀寶藏、財庫貯、聯珠眾星蓋照，主六十日、一百二十日內得大財、貴人接引、職祿、謀事大吉，旺六畜、益財產、亦宜安葬。",
+      "description_english": "Jia Zi is Self-Death Metal, Five Element Yin Avoidance Day. Ren Zi wood strikes treasure vase, ultimately is northern bathing place - not suitable for construction, marriage, moving in, opening business. Wu Zi, Bing Zi, Geng Zi - these three days are greatly auspicious for Water and Earth element people. Contains Yellow Spiral, Purple Sandalwood, Heavenly Emperor, Earthly Emperor, Gold & Silver Treasure, Fortune Treasury Storage, Pearl Chain stars all shining. Within 60-120 days will gain great wealth, noble people will guide, official positions, great fortune in planning. Thriving livestock, increasing property, also suitable for burial.",
+      "forbidden": null,
+      "consult": {
+        "promoted": true,
+        "original_rating": {
+          "id": "inauspicious",
+          "value": 2,
+          "symbol": "▲",
+          "chinese": "凶"
+        },
+        "reason": "Good for: burial, travel, business"
+      }
+    },
+    {
+      "day": 20,
+      "weekday": 5,
+      "day_stem": "Yi",
+      "day_branch": "Chou",
+      "day_stem_chinese": "乙",
+      "day_branch_chinese": "丑",
+      "pillar": "Yi Chou",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 1,
+      "chinese_month_name": "正月",
+      "moon_phase": {
+        "emoji": "🌒",
+        "english": "Waxing Crescent",
+        "chinese": "蛾眉月",
+        "lunar_day": 4
+      },
+      "officer": {
+        "id": "Bi",
+        "chinese": "閉",
+        "english": "Close"
+      },
+      "rating": {
+        "id": "inauspicious",
+        "value": 2,
+        "symbol": "▲",
+        "chinese": "凶"
+      },
+      "good_for": [],
+      "bad_for": [
+        "marriage",
+        "construction",
+        "buying_livestock"
+      ],
+      "description_chinese": "不利婚姻、起造，防虎蛇傷、騾馬踢、戒惡疾貧病，大凶。",
+      "description_english": "Not favorable for marriage or construction. Beware of injury from tigers and snakes, kicks from mules and horses, avoid terrible illness and poverty - greatly inauspicious.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 21,
+      "weekday": 6,
+      "day_stem": "Bing",
+      "day_branch": "Yin",
+      "day_stem_chinese": "丙",
+      "day_branch_chinese": "寅",
+      "pillar": "Bing Yin",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 1,
+      "chinese_month_name": "正月",
+      "moon_phase": {
+        "emoji": "🌒",
+        "english": "Waxing Crescent",
+        "chinese": "蛾眉月",
+        "lunar_day": 5
+      },
+      "officer": {
+        "id": "Jian",
+        "chinese": "建",
+        "english": "Establish"
+      },
+      "rating": {
+        "id": "inauspicious",
+        "value": 2,
+        "symbol": "▲",
+        "chinese": "凶"
+      },
+      "good_for": [],
+      "bad_for": [
+        "construction",
+        "marriage",
+        "contracts",
+        "important_activities"
+      ],
+      "description_chinese": "往亡日。不利起造、結婚姻、納采，主家長病、招官司犯之主六十日、一百二十日內損小口，一年內見重喪，百事不宜。",
+      "description_english": "Emptiness Day (往亡日). Not ideal for construction, marriage, or contracts. Those who use this day will face illness in elders, lawsuits. Within 60-120 days children may be harmed. Within a year, there may be double mourning. All activities should be avoided.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 22,
+      "weekday": 0,
+      "day_stem": "Ding",
+      "day_branch": "Mao",
+      "day_stem_chinese": "丁",
+      "day_branch_chinese": "卯",
+      "pillar": "Ding Mao",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 1,
+      "chinese_month_name": "正月",
+      "moon_phase": {
+        "emoji": "🌒",
+        "english": "Waxing Crescent",
+        "chinese": "蛾眉月",
+        "lunar_day": 6
+      },
+      "officer": {
+        "id": "Chu",
+        "chinese": "除",
+        "english": "Remove"
+      },
+      "rating": {
+        "id": "inauspicious",
+        "value": 2,
+        "symbol": "▲",
+        "chinese": "凶"
+      },
+      "good_for": [],
+      "bad_for": [
+        "renovation",
+        "marriage",
+        "construction"
+      ],
+      "description_chinese": "不宜起造、婚姻，犯之主六十日內損家長、招官司。三五年內見凶冷退，主兄弟不義、各業分散、惡人相逢、生離死別。",
+      "description_english": "Not suitable for renovation or marriage. Those who use it will see harm to elders and lawsuits within 60 days. Within 3-5 years there will be misfortune and decline, brothers will be disloyal, businesses scatter, meeting with evil people, and separation in life or death.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 23,
+      "weekday": 1,
+      "day_stem": "Wu",
+      "day_branch": "Chen",
+      "day_stem_chinese": "戊",
+      "day_branch_chinese": "辰",
+      "pillar": "Wu Chen",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 1,
+      "chinese_month_name": "正月",
+      "moon_phase": {
+        "emoji": "🌓",
+        "english": "First Quarter",
+        "chinese": "上弦月",
+        "lunar_day": 7
+      },
+      "officer": {
+        "id": "Man",
+        "chinese": "滿",
+        "english": "Full"
+      },
+      "rating": {
+        "id": "dire",
+        "value": 1,
+        "symbol": "✗",
+        "chinese": "大凶"
+      },
+      "good_for": [],
+      "bad_for": [
+        "most_activities",
+        "construction",
+        "marriage",
+        "business"
+      ],
+      "description_chinese": "天富、天賊、天羅星臨。甲辰雖有氣，與戊辰同，熬集中宮，百事皆忌，犯之主殺人、退財，大凶。餘辰日亦不吉。",
+      "description_english": "Heavenly Fortune, Heavenly Thief, and Heavenly Spiral stars arrive. Jia Chen and Wu Chen have negative Qi concentrated in Central Palace - all activities forbidden. Those who violate this may face killing, loss of wealth - greatly inauspicious. Other Chen days are also unfavorable.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 24,
+      "weekday": 2,
+      "day_stem": "Ji",
+      "day_branch": "Si",
+      "day_stem_chinese": "己",
+      "day_branch_chinese": "巳",
+      "pillar": "Ji Si",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 1,
+      "chinese_month_name": "正月",
+      "moon_phase": {
+        "emoji": "🌓",
+        "english": "First Quarter",
+        "chinese": "上弦月",
+        "lunar_day": 8
+      },
+      "officer": {
+        "id": "Ping",
+        "chinese": "平",
+        "english": "Balance"
+      },
+      "rating": {
+        "id": "inauspicious",
+        "value": 2,
+        "symbol": "▲",
+        "chinese": "凶"
+      },
+      "good_for": [],
+      "bad_for": [
+        "marriage",
+        "business",
+        "legal_matters"
+      ],
+      "description_chinese": "小紅砂，朱雀、勾絞、到州星臨，犯之主招官司、損家長、宅女媳婦。三、五年內重重不利、破財，大凶。田蠶不收、産死、自縊、被惡人處刑。",
+      "description_english": "Lesser Red Embrace, Red Phoenix, Grappling Hook, and Arriving States stars. Those who use this day face lawsuits, harm to elders, damage to women of the household. Within 3-5 years there will be repeated misfortune, loss of wealth - greatly inauspicious. Farms will not produce, stillbirths, suicides, and punishment by evil people.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 25,
+      "weekday": 3,
+      "day_stem": "Geng",
+      "day_branch": "Wu",
+      "day_stem_chinese": "庚",
+      "day_branch_chinese": "午",
+      "pillar": "Geng Wu",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 1,
+      "chinese_month_name": "正月",
+      "moon_phase": {
+        "emoji": "🌔",
+        "english": "Waxing Gibbous",
+        "chinese": "盈凸月",
+        "lunar_day": 9
+      },
+      "officer": {
+        "id": "Ding",
+        "chinese": "定",
+        "english": "Stable"
+      },
+      "rating": {
+        "id": "auspicious",
+        "value": 4,
+        "symbol": "✓",
+        "chinese": "吉"
+      },
+      "good_for": [
+        "renovation",
+        "burial",
+        "moving",
+        "business",
+        "travel",
+        "marriage"
+      ],
+      "bad_for": [],
+      "description_chinese": "黃砂日，有黃羅、紫檀、天皇、地皇、金銀庫樓、田塘、月財庫、貯星，諸吉星蓋照，宜起造、安葬、移徙、開張、出行、婚姻，主六十日、一百二十日內進橫財、田產，或因附寄成家，大作大發、小作小發，主田蠶大收穫，金銀滿庫。",
+      "description_english": "Yellow Embrace Day with Yellow Spiral, Purple Sandalwood, Heavenly Emperor, Earthly Emperor, Gold & Silver Treasury, Field Pond, Monthly Fortune Treasury, Storage stars - all auspicious stars shine upon it. Suitable for construction, burial, moving, opening business, travel, marriage. Within 60-120 days will gain unexpected wealth and property. Great undertakings bring great prosperity, small undertakings bring small prosperity. Fields and silkworms yield great harvest, gold and silver fill the treasury.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 26,
+      "weekday": 4,
+      "day_stem": "Xin",
+      "day_branch": "Wei",
+      "day_stem_chinese": "辛",
+      "day_branch_chinese": "未",
+      "pillar": "Xin Wei",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 1,
+      "chinese_month_name": "正月",
+      "moon_phase": {
+        "emoji": "🌔",
+        "english": "Waxing Gibbous",
+        "chinese": "盈凸月",
+        "lunar_day": 10
+      },
+      "officer": {
+        "id": "Zhi",
+        "chinese": "執",
+        "english": "Initiate"
+      },
+      "rating": {
+        "id": "inauspicious",
+        "value": 2,
+        "symbol": "▲",
+        "chinese": "凶"
+      },
+      "good_for": [],
+      "bad_for": [
+        "moving",
+        "marriage",
+        "business",
+        "construction"
+      ],
+      "description_chinese": "天賊、朱雀、勾絞星臨。六十日、一百二十日內損六畜、傷騾馬、成惡疾。乙未熬入中宮，更忌起造、婚姻、開張、築策亭事。",
+      "description_english": "Heavenly Thief, Red Phoenix, and Grappling Hook stars arrive. Within 60-120 days will harm livestock, injure mules and horses, contract terrible illness. Yi Wei has negative Qi in Central Palace - especially avoid construction, marriage, opening business, building pavilions.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 27,
+      "weekday": 5,
+      "day_stem": "Ren",
+      "day_branch": "Shen",
+      "day_stem_chinese": "壬",
+      "day_branch_chinese": "申",
+      "pillar": "Ren Shen",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 1,
+      "chinese_month_name": "正月",
+      "moon_phase": {
+        "emoji": "🌔",
+        "english": "Waxing Gibbous",
+        "chinese": "盈凸月",
+        "lunar_day": 11
+      },
+      "officer": {
+        "id": "Po",
+        "chinese": "破",
+        "english": "Destruction"
+      },
+      "rating": {
+        "id": "inauspicious",
+        "value": 2,
+        "symbol": "▲",
+        "chinese": "凶"
+      },
+      "good_for": [],
+      "bad_for": [
+        "legal_matters",
+        "business",
+        "marriage",
+        "important_activities"
+      ],
+      "description_chinese": "遇朱雀、勾絞星，主招官司、口舌、退牲財，三、五年內見寡婦、醜事。庚申正四廢，更凶。",
+      "description_english": "Encounters Red Phoenix and Grappling Hook stars, causing lawsuits, disputes, loss of livestock and wealth. Within 3-5 years will see widows and scandals. Geng Shen is Four Abandonment Day - even more inauspicious.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 28,
+      "weekday": 6,
+      "day_stem": "Gui",
+      "day_branch": "You",
+      "day_stem_chinese": "癸",
+      "day_branch_chinese": "酉",
+      "pillar": "Gui You",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 1,
+      "chinese_month_name": "正月",
+      "moon_phase": {
+        "emoji": "🌔",
+        "english": "Waxing Gibbous",
+        "chinese": "盈凸月",
+        "lunar_day": 12
+      },
+      "officer": {
+        "id": "Wei",
+        "chinese": "危",
+        "english": "Danger"
+      },
+      "rating": {
+        "id": "consult",
+        "value": 2.5,
+        "symbol": "?",
+        "chinese": "議"
+      },
+      "good_for": [
+        "burial",
+        "travel",
+        "debt_collection",
+        "meeting_officials"
+      ],
+      "bad_for": [
+        "construction",
+        "marriage"
+      ],
+      "description_chinese": "辛酉正四廢，不宜用事。惟丁酉有天德福星蓋照，宜安葬、出行、開張、星蓋吉。只不宜起造、婚姻、嫁娶等事，乃比和之日也。餘酉日均不可用。",
+      "description_english": "Xin You is Four Abandonment Day - unsuitable for activities. Only Ding You has Heavenly Virtue and Prosperity stars shining upon it, suitable for burial, travel, opening business - the stars are auspicious. Just not suitable for construction, marriage, or wedding matters - this is a Harmonizing Day. Other You days cannot be used.",
+      "forbidden": null,
+      "consult": {
+        "promoted": true,
+        "original_rating": {
+          "id": "inauspicious",
+          "value": 2,
+          "symbol": "▲",
+          "chinese": "凶"
+        },
+        "reason": "Good for: burial, travel, debt collection, meeting officials"
+      }
+    }
+  ],
+  "chinese_months_spanned": [
+    {
+      "month": 12,
+      "chinese": "十二月",
+      "branch": "Chou",
+      "stem": "Ji",
+      "stem_chinese": "己",
+      "branch_id": "Chou",
+      "branch_chinese": "丑"
+    },
+    {
+      "month": 1,
+      "chinese": "正月",
+      "branch": "Yin",
+      "stem": "Geng",
+      "stem_chinese": "庚",
+      "branch_id": "Yin",
+      "branch_chinese": "寅"
+    }
+  ],
+  "chinese_years_spanned": [
+    {
+      "stem": "Yi",
+      "stem_chinese": "乙",
+      "branch": "Si",
+      "branch_chinese": "巳"
+    },
+    {
+      "stem": "Bing",
+      "stem_chinese": "丙",
+      "branch": "Wu",
+      "branch_chinese": "午"
+    }
+  ]
+}

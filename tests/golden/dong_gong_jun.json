@@ -1,0 +1,1423 @@
+{
+  "year": 2026,
+  "month": 6,
+  "first_day_weekday": 1,
+  "days_in_month": 30,
+  "days": [
+    {
+      "day": 1,
+      "weekday": 1,
+      "day_stem": "Bing",
+      "day_branch": "Wu",
+      "day_stem_chinese": "丙",
+      "day_branch_chinese": "午",
+      "pillar": "Bing Wu",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 4,
+      "chinese_month_name": "四月",
+      "moon_phase": {
+        "emoji": "🌖",
+        "english": "Waning Gibbous",
+        "chinese": "亏凸月",
+        "lunar_day": 16
+      },
+      "officer": {
+        "id": "Chu",
+        "chinese": "除",
+        "english": "Remove"
+      },
+      "rating": {
+        "id": "consult",
+        "value": 2.5,
+        "symbol": "?",
+        "chinese": "議"
+      },
+      "good_for": [
+        "renovation",
+        "marriage",
+        "business",
+        "travel",
+        "moving",
+        "education"
+      ],
+      "bad_for": [],
+      "description_chinese": "黃砂。庚午月德，惟甲午、壬午，有黃羅、紫檀、天皇、地皇星蓋照，宜修造、婚姻、開張、出行、入宅等事。六十日、一百二十日內增田地、進人口、生貴子，大旺。丙午、戊午，天地轉煞，用之凶。",
+      "description_english": "Yellow Embrace Star. Jia Wu, Geng Wu (Monthly Virtue), Ren Wu excellent with auspicious stars. Good for renovation, marriage, business, travel, moving. Benefits within 60-120 days. Bing Wu and Wu Wu have Heaven/Earth Drilling Sha - avoid.",
+      "forbidden": null,
+      "consult": {
+        "promoted": true,
+        "original_rating": {
+          "id": "inauspicious",
+          "value": 2,
+          "symbol": "▲",
+          "chinese": "凶"
+        },
+        "reason": "Good for: renovation, marriage, business, travel, moving, education"
+      }
+    },
+    {
+      "day": 2,
+      "weekday": 2,
+      "day_stem": "Ding",
+      "day_branch": "Wei",
+      "day_stem_chinese": "丁",
+      "day_branch_chinese": "未",
+      "pillar": "Ding Wei",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 4,
+      "chinese_month_name": "四月",
+      "moon_phase": {
+        "emoji": "🌖",
+        "english": "Waning Gibbous",
+        "chinese": "亏凸月",
+        "lunar_day": 17
+      },
+      "officer": {
+        "id": "Man",
+        "chinese": "滿",
+        "english": "Full"
+      },
+      "rating": {
+        "id": "consult",
+        "value": 2.5,
+        "symbol": "?",
+        "chinese": "議"
+      },
+      "good_for": [
+        "fixing_structures",
+        "burial"
+      ],
+      "bad_for": [
+        "marriage",
+        "construction"
+      ],
+      "description_chinese": "天富、天賊。辛未有天、月二德，己未有火星，均次吉，宜定礎、造架、埋葬，但婚姻、起造二事不載又修造，曆云是日白虎入中宮，用之非不利，須查是年月日，如有吉星與命宮相合方可。",
+      "description_english": "Sky Pledge and Sky Thief stars. Xin Wei has Heavenly/Monthly Virtue. Ji Wei has Fire Star - both secondarily auspicious. Good for fixing structures or burial. Unsuitable for marriage and construction. Other Wei days have White Tiger.",
+      "forbidden": null,
+      "consult": {
+        "promoted": true,
+        "original_rating": {
+          "id": "inauspicious",
+          "value": 2,
+          "symbol": "▲",
+          "chinese": "凶"
+        },
+        "reason": "Good for: fixing structures, burial"
+      }
+    },
+    {
+      "day": 3,
+      "weekday": 3,
+      "day_stem": "Wu",
+      "day_branch": "Shen",
+      "day_stem_chinese": "戊",
+      "day_branch_chinese": "申",
+      "pillar": "Wu Shen",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 4,
+      "chinese_month_name": "四月",
+      "moon_phase": {
+        "emoji": "🌖",
+        "english": "Waning Gibbous",
+        "chinese": "亏凸月",
+        "lunar_day": 18
+      },
+      "officer": {
+        "id": "Ping",
+        "chinese": "平",
+        "english": "Balance"
+      },
+      "rating": {
+        "id": "inauspicious",
+        "value": 2,
+        "symbol": "▲",
+        "chinese": "凶"
+      },
+      "good_for": [],
+      "bad_for": [
+        "renovation",
+        "travel",
+        "burial",
+        "marriage",
+        "moving"
+      ],
+      "description_chinese": "朱雀、勾絞星臨，不利起造、出行、安葬、婚姻、入宅，主招官司、口舌、小口生災。甲申、庚申，熬入中宮，更凶，必主小人牽連、禍事、破財、生子醜怪、有水火災厄。",
+      "description_english": "Red Phoenix and Grappling Hook stars. Unsuitable for renovation, travel, burial, marriage, moving. Causes legal issues, disputes, harm to children. Jia Shen and Geng Shen worst - petty people, accidents, wealth loss, birth defects, fire/water hazards.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 4,
+      "weekday": 4,
+      "day_stem": "Ji",
+      "day_branch": "You",
+      "day_stem_chinese": "己",
+      "day_branch_chinese": "酉",
+      "pillar": "Ji You",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 4,
+      "chinese_month_name": "四月",
+      "moon_phase": {
+        "emoji": "🌖",
+        "english": "Waning Gibbous",
+        "chinese": "亏凸月",
+        "lunar_day": 19
+      },
+      "officer": {
+        "id": "Ding",
+        "chinese": "定",
+        "english": "Stable"
+      },
+      "rating": {
+        "id": "consult",
+        "value": 2.5,
+        "symbol": "?",
+        "chinese": "議"
+      },
+      "good_for": [
+        "minor_activities"
+      ],
+      "bad_for": [
+        "groundbreaking",
+        "burial",
+        "marriage",
+        "moving",
+        "renovation"
+      ],
+      "description_chinese": "雖有九土鬼，不宜動土、安葬，若小小營為在四月，酉為次吉之日。如婚姻、入宅、修造，斷不可用，主凶。",
+      "description_english": "Nine Earth Ghost Star dominates. Unsuitable for groundbreaking or burial. Minor activities may reap minor gains. Not for major activities like marriage, moving, or renovation.",
+      "forbidden": null,
+      "consult": {
+        "promoted": true,
+        "original_rating": {
+          "id": "inauspicious",
+          "value": 2,
+          "symbol": "▲",
+          "chinese": "凶"
+        },
+        "reason": "Good for: minor activities"
+      }
+    },
+    {
+      "day": 5,
+      "weekday": 5,
+      "day_stem": "Geng",
+      "day_branch": "Xu",
+      "day_stem_chinese": "庚",
+      "day_branch_chinese": "戌",
+      "pillar": "Geng Xu",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 5,
+      "chinese_month_name": "五月",
+      "moon_phase": {
+        "emoji": "🌖",
+        "english": "Waning Gibbous",
+        "chinese": "亏凸月",
+        "lunar_day": 20
+      },
+      "officer": {
+        "id": "Ding",
+        "chinese": "定",
+        "english": "Stable"
+      },
+      "rating": {
+        "id": "excellent",
+        "value": 5,
+        "symbol": "★",
+        "chinese": "大吉"
+      },
+      "good_for": [
+        "renovation",
+        "groundbreaking",
+        "moving",
+        "business",
+        "marriage",
+        "burial"
+      ],
+      "bad_for": [],
+      "description_chinese": "甲戌、戊戌、庚戌，有黃羅、紫檀、天皇、地皇、金銀、寶藏、田塘、庫珠、聚祿、駕馬、御聖遊頑星蓋照，大吉。如起造、興工、動土、入宅、開張、婚姻、埋葬諸事，加官進爵、生貴子、益棟財。惟丙戌、壬戌二日，熬入中宮，雖有吉星相解，終難受益。",
+      "description_english": "Jia/Wu/Geng Xu excellent with many auspicious stars. Good for renovation, groundbreaking, moving, business, marriage, burial. Brings promotions, noble children, wealth. Bing Xu and Ren Xu have Sha Qi - benefits reduced.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 6,
+      "weekday": 6,
+      "day_stem": "Xin",
+      "day_branch": "Hai",
+      "day_stem_chinese": "辛",
+      "day_branch_chinese": "亥",
+      "pillar": "Xin Hai",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 5,
+      "chinese_month_name": "五月",
+      "moon_phase": {
+        "emoji": "🌖",
+        "english": "Waning Gibbous",
+        "chinese": "亏凸月",
+        "lunar_day": 21
+      },
+      "officer": {
+        "id": "Zhi",
+        "chinese": "執",
+        "english": "Initiate"
+      },
+      "rating": {
+        "id": "consult",
+        "value": 2.5,
+        "symbol": "?",
+        "chinese": "議"
+      },
+      "good_for": [
+        "simple_renovation"
+      ],
+      "bad_for": [],
+      "description_chinese": "乙亥可小修，為次吉。丁亥、己亥又次吉。辛亥，陰府決遣之日。癸亥，六甲窮日，又正四廢，大凶。",
+      "description_english": "Yi Hai auspicious for simple renovation. Ding Hai and Ji Hai are fair. Xin Hai is Yin Qi Day. Gui Hai is Six Jia Weakness Day and Four Direct Day - dire, avoid all activities.",
+      "forbidden": null,
+      "consult": {
+        "promoted": true,
+        "original_rating": {
+          "id": "inauspicious",
+          "value": 2,
+          "symbol": "▲",
+          "chinese": "凶"
+        },
+        "reason": "Good for: simple renovation"
+      }
+    },
+    {
+      "day": 7,
+      "weekday": 0,
+      "day_stem": "Ren",
+      "day_branch": "Zi",
+      "day_stem_chinese": "壬",
+      "day_branch_chinese": "子",
+      "pillar": "Ren Zi",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 5,
+      "chinese_month_name": "五月",
+      "moon_phase": {
+        "emoji": "🌗",
+        "english": "Last Quarter",
+        "chinese": "下弦月",
+        "lunar_day": 22
+      },
+      "officer": {
+        "id": "Po",
+        "chinese": "破",
+        "english": "Destruction"
+      },
+      "rating": {
+        "id": "dire",
+        "value": 1,
+        "symbol": "✗",
+        "chinese": "大凶"
+      },
+      "good_for": [],
+      "bad_for": [
+        "marriage",
+        "renovation",
+        "burial",
+        "moving"
+      ],
+      "description_chinese": "天賊，不宜嫁親、造作、安葬、入宅等事，犯之招官司、損六畜、田產不收，大凶。壬子，正四廢，更凶，此日百事不利，犯之受死。",
+      "description_english": "Heavenly Thief star. Unsuitable for marriage, renovation, burial, moving. Causes legal issues, livestock harm, property loss. Ren Zi is Four Direct Day - worst, avoid all activities.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 8,
+      "weekday": 1,
+      "day_stem": "Gui",
+      "day_branch": "Chou",
+      "day_stem_chinese": "癸",
+      "day_branch_chinese": "丑",
+      "pillar": "Gui Chou",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 5,
+      "chinese_month_name": "五月",
+      "moon_phase": {
+        "emoji": "🌗",
+        "english": "Last Quarter",
+        "chinese": "下弦月",
+        "lunar_day": 23
+      },
+      "officer": {
+        "id": "Wei",
+        "chinese": "危",
+        "english": "Danger"
+      },
+      "rating": {
+        "id": "dire",
+        "value": 1,
+        "symbol": "✗",
+        "chinese": "大凶"
+      },
+      "good_for": [],
+      "bad_for": [
+        "marriage",
+        "renovation",
+        "moving"
+      ],
+      "description_chinese": "丁丑、癸丑不宜嫁親、造作、安葬、入宅，犯之田產不收、財物失脫、虎咬蛇傷，多凶。餘丑亦不吉，損六畜、招官司，諸事不宜。",
+      "description_english": "Ding Chou and Gui Chou are dire - unsuitable for marriage, renovation, moving. Causes property loss, tiger/snake attacks. Other Chou days also inauspicious - damage to livestock, legal issues.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 9,
+      "weekday": 2,
+      "day_stem": "Jia",
+      "day_branch": "Yin",
+      "day_stem_chinese": "甲",
+      "day_branch_chinese": "寅",
+      "pillar": "Jia Yin",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 5,
+      "chinese_month_name": "五月",
+      "moon_phase": {
+        "emoji": "🌘",
+        "english": "Waning Crescent",
+        "chinese": "残月",
+        "lunar_day": 24
+      },
+      "officer": {
+        "id": "Cheng",
+        "chinese": "成",
+        "english": "Success"
+      },
+      "rating": {
+        "id": "excellent",
+        "value": 5,
+        "symbol": "★",
+        "chinese": "大吉"
+      },
+      "good_for": [
+        "groundbreaking",
+        "construction",
+        "moving",
+        "business",
+        "conception"
+      ],
+      "bad_for": [],
+      "description_chinese": "黃砂、天喜，丙寅天、月二德，庚寅、戊寅、甲寅，有黃羅、紫檀、天皇、地皇、金銀庫樓、玉堂、寶藏、吉星相照，興工動土、定礎搪架、入宅、開張，六十日一百二十日內益財增喜，家門從此富盛，世道愈見安康，大吉也。是月壬寅雖有吉星相照，內中稍有煞星相處，次吉。",
+      "description_english": "Yellow Embrace and Sky Happiness. Bing Yin has Heavenly/Monthly Virtue. Jia/Wu/Geng Yin have many auspicious stars - excellent for groundbreaking, construction, moving, business, conception. Benefits within 60-120 days. Ren Yin has some Sha Qi - secondarily auspicious.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 10,
+      "weekday": 3,
+      "day_stem": "Yi",
+      "day_branch": "Mao",
+      "day_stem_chinese": "乙",
+      "day_branch_chinese": "卯",
+      "pillar": "Yi Mao",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 5,
+      "chinese_month_name": "五月",
+      "moon_phase": {
+        "emoji": "🌘",
+        "english": "Waning Crescent",
+        "chinese": "残月",
+        "lunar_day": 25
+      },
+      "officer": {
+        "id": "Shou",
+        "chinese": "收",
+        "english": "Receive"
+      },
+      "rating": {
+        "id": "inauspicious",
+        "value": 2,
+        "symbol": "▲",
+        "chinese": "凶"
+      },
+      "good_for": [],
+      "bad_for": [
+        "all_activities"
+      ],
+      "description_chinese": "往亡，有朱雀、勾絞，小人刑害、禍患纏綿、官司、口舌、損六畜，百事不宜，大凶。",
+      "description_english": "Emptiness Day with Red Phoenix and Grappling Hook. Causes petty people interference, legal problems, disputes, harm to pets. Avoid all activities.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 11,
+      "weekday": 4,
+      "day_stem": "Bing",
+      "day_branch": "Chen",
+      "day_stem_chinese": "丙",
+      "day_branch_chinese": "辰",
+      "pillar": "Bing Chen",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 5,
+      "chinese_month_name": "五月",
+      "moon_phase": {
+        "emoji": "🌘",
+        "english": "Waning Crescent",
+        "chinese": "残月",
+        "lunar_day": 26
+      },
+      "officer": {
+        "id": "Kai",
+        "chinese": "開",
+        "english": "Open"
+      },
+      "rating": {
+        "id": "excellent",
+        "value": 5,
+        "symbol": "★",
+        "chinese": "大吉"
+      },
+      "good_for": [
+        "all_activities"
+      ],
+      "bad_for": [],
+      "description_chinese": "天成、丙辰，有月德；庚辰、壬辰，有黃羅、紫檀吉星蓋照，用之增田產、六畜興旺、生貴子，百事大吉。惟戊辰、甲辰，熬入中宮，大凶。",
+      "description_english": "Heavenly Success star. Bing Chen has Monthly Virtue. Geng Chen and Ren Chen have Yellow Spiral and Purple Sandalwood - excellent for all activities, brings property, livestock prosperity, noble children. Jia Chen and Wu Chen have Sha Qi - avoid.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 12,
+      "weekday": 5,
+      "day_stem": "Ding",
+      "day_branch": "Si",
+      "day_stem_chinese": "丁",
+      "day_branch_chinese": "巳",
+      "pillar": "Ding Si",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 5,
+      "chinese_month_name": "五月",
+      "moon_phase": {
+        "emoji": "🌘",
+        "english": "Waning Crescent",
+        "chinese": "残月",
+        "lunar_day": 27
+      },
+      "officer": {
+        "id": "Bi",
+        "chinese": "閉",
+        "english": "Close"
+      },
+      "rating": {
+        "id": "consult",
+        "value": 2.5,
+        "symbol": "?",
+        "chinese": "議"
+      },
+      "good_for": [
+        "renovation",
+        "groundbreaking",
+        "moving",
+        "marriage",
+        "business",
+        "travel"
+      ],
+      "bad_for": [],
+      "description_chinese": "乙巳、辛巳，有黃羅、紫檀星蓋照，興工作、動土、修造、池塘、倉庫、牛羊欄圈、入宅、婚姻、開張、出行、大益家門，子孫昌盛、田產倍收、人口安康，大吉。餘巳不言。",
+      "description_english": "Yi Si and Xin Si have Yellow Spiral and Purple Sandalwood - auspicious for renovation, groundbreaking, pond excavation, moving, marriage, business, travel. Brings offspring prosperity, wealth increase, health. Other Si days unsuitable.",
+      "forbidden": null,
+      "consult": {
+        "promoted": true,
+        "original_rating": {
+          "id": "inauspicious",
+          "value": 2,
+          "symbol": "▲",
+          "chinese": "凶"
+        },
+        "reason": "Good for: renovation, groundbreaking, moving, marriage, business, travel"
+      }
+    },
+    {
+      "day": 13,
+      "weekday": 6,
+      "day_stem": "Wu",
+      "day_branch": "Wu",
+      "day_stem_chinese": "戊",
+      "day_branch_chinese": "午",
+      "pillar": "Wu Wu",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 5,
+      "chinese_month_name": "五月",
+      "moon_phase": {
+        "emoji": "🌘",
+        "english": "Waning Crescent",
+        "chinese": "残月",
+        "lunar_day": 28
+      },
+      "officer": {
+        "id": "Jian",
+        "chinese": "建",
+        "english": "Establish"
+      },
+      "rating": {
+        "id": "inauspicious",
+        "value": 2,
+        "symbol": "▲",
+        "chinese": "凶"
+      },
+      "good_for": [
+        "burial"
+      ],
+      "bad_for": [
+        "most_activities"
+      ],
+      "description_chinese": "甲午天赦，雖是轉煞，埋葬用之次吉。餘午日埋葬亦不利。若別事用，主招官司、口舌、孤寡、窮病，蓋五月逢午，皆係天地轉煞也。",
+      "description_english": "All Wu (Horse) days affected by Heaven and Earth Drilling Sha. Only Jia Wu has Heavenly Pardon - slightly favorable for burial. Other Wu days cause legal problems, gossip, loneliness, sickness.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 14,
+      "weekday": 0,
+      "day_stem": "Ji",
+      "day_branch": "Wei",
+      "day_stem_chinese": "己",
+      "day_branch_chinese": "未",
+      "pillar": "Ji Wei",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 5,
+      "chinese_month_name": "五月",
+      "moon_phase": {
+        "emoji": "🌘",
+        "english": "Waning Crescent",
+        "chinese": "残月",
+        "lunar_day": 29
+      },
+      "officer": {
+        "id": "Chu",
+        "chinese": "除",
+        "english": "Remove"
+      },
+      "rating": {
+        "id": "fair",
+        "value": 3,
+        "symbol": "●",
+        "chinese": "平"
+      },
+      "good_for": [
+        "minor_activities"
+      ],
+      "bad_for": [
+        "marriage",
+        "business",
+        "moving",
+        "renovation"
+      ],
+      "description_chinese": "惟乙未最為不利，如嫁親、開張、入宅、修造，主迸人口、生疾病、損財。其餘未日，小作可用，乃次吉之日也。",
+      "description_english": "Yi Wei is dire - unsuitable for marriage, business, moving, renovation. Causes illness and wealth loss. Other Wei days are fair and moderately usable.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 15,
+      "weekday": 1,
+      "day_stem": "Geng",
+      "day_branch": "Shen",
+      "day_stem_chinese": "庚",
+      "day_branch_chinese": "申",
+      "pillar": "Geng Shen",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 5,
+      "chinese_month_name": "五月",
+      "moon_phase": {
+        "emoji": "🌑",
+        "english": "New Moon",
+        "chinese": "新月",
+        "lunar_day": 1
+      },
+      "officer": {
+        "id": "Man",
+        "chinese": "滿",
+        "english": "Full"
+      },
+      "rating": {
+        "id": "fair",
+        "value": 3,
+        "symbol": "●",
+        "chinese": "平"
+      },
+      "good_for": [
+        "burial",
+        "marriage",
+        "moving",
+        "business",
+        "travel"
+      ],
+      "bad_for": [
+        "groundbreaking"
+      ],
+      "description_chinese": "天富、天喜，甲申、丙申、戊申，宜安葬、起造、婚姻、入宅、開張、出行次吉。不宜動土。庚申只宜安葬，不宜修造、入宅。壬申西沉之日，五行無氣，不可用。",
+      "description_english": "Heavenly Fortune and Sky Happiness present. Jia/Bing/Wu Shen good for burial, marriage, moving, business, travel - not groundbreaking. Geng Shen only for burial. Ren Shen has weak Qi - avoid.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 16,
+      "weekday": 2,
+      "day_stem": "Xin",
+      "day_branch": "You",
+      "day_stem_chinese": "辛",
+      "day_branch_chinese": "酉",
+      "pillar": "Xin You",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 5,
+      "chinese_month_name": "五月",
+      "moon_phase": {
+        "emoji": "🌒",
+        "english": "Waxing Crescent",
+        "chinese": "蛾眉月",
+        "lunar_day": 2
+      },
+      "officer": {
+        "id": "Ping",
+        "chinese": "平",
+        "english": "Balance"
+      },
+      "rating": {
+        "id": "inauspicious",
+        "value": 2,
+        "symbol": "▲",
+        "chinese": "凶"
+      },
+      "good_for": [],
+      "bad_for": [
+        "all_activities"
+      ],
+      "description_chinese": "小紅砂，有朱雀、勾絞、到州星，招官司、損長幼、家下伶仃、百事不宜，犯之大凶。",
+      "description_english": "Lesser Red Embrace with Red Phoenix and Grappling Hook stars. Causes legal issues, harms eldest and youngest in household. Highly inauspicious - families will not grow or expand.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 17,
+      "weekday": 3,
+      "day_stem": "Ren",
+      "day_branch": "Xu",
+      "day_stem_chinese": "壬",
+      "day_branch_chinese": "戌",
+      "pillar": "Ren Xu",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 5,
+      "chinese_month_name": "五月",
+      "moon_phase": {
+        "emoji": "🌒",
+        "english": "Waxing Crescent",
+        "chinese": "蛾眉月",
+        "lunar_day": 3
+      },
+      "officer": {
+        "id": "Ding",
+        "chinese": "定",
+        "english": "Stable"
+      },
+      "rating": {
+        "id": "consult",
+        "value": 2.5,
+        "symbol": "?",
+        "chinese": "議"
+      },
+      "good_for": [
+        "renovation",
+        "groundbreaking",
+        "moving",
+        "business",
+        "marriage",
+        "burial"
+      ],
+      "bad_for": [],
+      "description_chinese": "甲戌、戊戌、庚戌，有黃羅、紫檀、天皇、地皇、金銀、寶藏、田塘、庫珠、聚祿、駕馬、御聖遊頑星蓋照，大吉。如起造、興工、動土、入宅、開張、婚姻、埋葬諸事，加官進爵、生貴子、益棟財。惟丙戌、壬戌二日，熬入中宮，雖有吉星相解，終難受益。",
+      "description_english": "Jia/Wu/Geng Xu excellent with many auspicious stars. Good for renovation, groundbreaking, moving, business, marriage, burial. Brings promotions, noble children, wealth. Bing Xu and Ren Xu have Sha Qi - benefits reduced.",
+      "forbidden": null,
+      "consult": {
+        "promoted": true,
+        "original_rating": {
+          "id": "inauspicious",
+          "value": 2,
+          "symbol": "▲",
+          "chinese": "凶"
+        },
+        "reason": "Good for: renovation, groundbreaking, moving, business, marriage, burial"
+      }
+    },
+    {
+      "day": 18,
+      "weekday": 4,
+      "day_stem": "Gui",
+      "day_branch": "Hai",
+      "day_stem_chinese": "癸",
+      "day_branch_chinese": "亥",
+      "pillar": "Gui Hai",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 5,
+      "chinese_month_name": "五月",
+      "moon_phase": {
+        "emoji": "🌒",
+        "english": "Waxing Crescent",
+        "chinese": "蛾眉月",
+        "lunar_day": 4
+      },
+      "officer": {
+        "id": "Zhi",
+        "chinese": "執",
+        "english": "Initiate"
+      },
+      "rating": {
+        "id": "dire",
+        "value": 1,
+        "symbol": "✗",
+        "chinese": "大凶"
+      },
+      "good_for": [
+        "simple_renovation"
+      ],
+      "bad_for": [],
+      "description_chinese": "乙亥可小修，為次吉。丁亥、己亥又次吉。辛亥，陰府決遣之日。癸亥，六甲窮日，又正四廢，大凶。",
+      "description_english": "Yi Hai auspicious for simple renovation. Ding Hai and Ji Hai are fair. Xin Hai is Yin Qi Day. Gui Hai is Six Jia Weakness Day and Four Direct Day - dire, avoid all activities.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 19,
+      "weekday": 5,
+      "day_stem": "Jia",
+      "day_branch": "Zi",
+      "day_stem_chinese": "甲",
+      "day_branch_chinese": "子",
+      "pillar": "Jia Zi",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 5,
+      "chinese_month_name": "五月",
+      "moon_phase": {
+        "emoji": "🌒",
+        "english": "Waxing Crescent",
+        "chinese": "蛾眉月",
+        "lunar_day": 5
+      },
+      "officer": {
+        "id": "Po",
+        "chinese": "破",
+        "english": "Destruction"
+      },
+      "rating": {
+        "id": "inauspicious",
+        "value": 2,
+        "symbol": "▲",
+        "chinese": "凶"
+      },
+      "good_for": [],
+      "bad_for": [
+        "marriage",
+        "renovation",
+        "burial",
+        "moving"
+      ],
+      "description_chinese": "天賊，不宜嫁親、造作、安葬、入宅等事，犯之招官司、損六畜、田產不收，大凶。壬子，正四廢，更凶，此日百事不利，犯之受死。",
+      "description_english": "Heavenly Thief star. Unsuitable for marriage, renovation, burial, moving. Causes legal issues, livestock harm, property loss. Ren Zi is Four Direct Day - worst, avoid all activities.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 20,
+      "weekday": 6,
+      "day_stem": "Yi",
+      "day_branch": "Chou",
+      "day_stem_chinese": "乙",
+      "day_branch_chinese": "丑",
+      "pillar": "Yi Chou",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 5,
+      "chinese_month_name": "五月",
+      "moon_phase": {
+        "emoji": "🌒",
+        "english": "Waxing Crescent",
+        "chinese": "蛾眉月",
+        "lunar_day": 6
+      },
+      "officer": {
+        "id": "Wei",
+        "chinese": "危",
+        "english": "Danger"
+      },
+      "rating": {
+        "id": "inauspicious",
+        "value": 2,
+        "symbol": "▲",
+        "chinese": "凶"
+      },
+      "good_for": [],
+      "bad_for": [
+        "marriage",
+        "renovation",
+        "moving"
+      ],
+      "description_chinese": "丁丑、癸丑不宜嫁親、造作、安葬、入宅，犯之田產不收、財物失脫、虎咬蛇傷，多凶。餘丑亦不吉，損六畜、招官司，諸事不宜。",
+      "description_english": "Ding Chou and Gui Chou are dire - unsuitable for marriage, renovation, moving. Causes property loss, tiger/snake attacks. Other Chou days also inauspicious - damage to livestock, legal issues.",
+      "forbidden": {
+        "type": "four_separation",
+        "chinese": "四離",
+        "english": "Four Separation",
+        "solar_term_id": "xia_zhi",
+        "solar_term_chinese": "夏至",
+        "solar_term_english": "Xia Zhi",
+        "forbidden_start_hour": 16.4,
+        "forbidden_end_hour": 24
+      },
+      "consult": null
+    },
+    {
+      "day": 21,
+      "weekday": 0,
+      "day_stem": "Bing",
+      "day_branch": "Yin",
+      "day_stem_chinese": "丙",
+      "day_branch_chinese": "寅",
+      "pillar": "Bing Yin",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 5,
+      "chinese_month_name": "五月",
+      "moon_phase": {
+        "emoji": "🌓",
+        "english": "First Quarter",
+        "chinese": "上弦月",
+        "lunar_day": 7
+      },
+      "officer": {
+        "id": "Cheng",
+        "chinese": "成",
+        "english": "Success"
+      },
+      "rating": {
+        "id": "excellent",
+        "value": 5,
+        "symbol": "★",
+        "chinese": "大吉"
+      },
+      "good_for": [
+        "groundbreaking",
+        "construction",
+        "moving",
+        "business",
+        "conception"
+      ],
+      "bad_for": [],
+      "description_chinese": "黃砂、天喜，丙寅天、月二德，庚寅、戊寅、甲寅，有黃羅、紫檀、天皇、地皇、金銀庫樓、玉堂、寶藏、吉星相照，興工動土、定礎搪架、入宅、開張，六十日一百二十日內益財增喜，家門從此富盛，世道愈見安康，大吉也。是月壬寅雖有吉星相照，內中稍有煞星相處，次吉。",
+      "description_english": "Yellow Embrace and Sky Happiness. Bing Yin has Heavenly/Monthly Virtue. Jia/Wu/Geng Yin have many auspicious stars - excellent for groundbreaking, construction, moving, business, conception. Benefits within 60-120 days. Ren Yin has some Sha Qi - secondarily auspicious.",
+      "forbidden": {
+        "type": "four_separation",
+        "chinese": "四離",
+        "english": "Four Separation",
+        "solar_term_id": "xia_zhi",
+        "solar_term_chinese": "夏至",
+        "solar_term_english": "Xia Zhi",
+        "forbidden_start_hour": 0,
+        "forbidden_end_hour": 16.4
+      },
+      "consult": null
+    },
+    {
+      "day": 22,
+      "weekday": 1,
+      "day_stem": "Ding",
+      "day_branch": "Mao",
+      "day_stem_chinese": "丁",
+      "day_branch_chinese": "卯",
+      "pillar": "Ding Mao",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 5,
+      "chinese_month_name": "五月",
+      "moon_phase": {
+        "emoji": "🌓",
+        "english": "First Quarter",
+        "chinese": "上弦月",
+        "lunar_day": 8
+      },
+      "officer": {
+        "id": "Shou",
+        "chinese": "收",
+        "english": "Receive"
+      },
+      "rating": {
+        "id": "inauspicious",
+        "value": 2,
+        "symbol": "▲",
+        "chinese": "凶"
+      },
+      "good_for": [],
+      "bad_for": [
+        "all_activities"
+      ],
+      "description_chinese": "往亡，有朱雀、勾絞，小人刑害、禍患纏綿、官司、口舌、損六畜，百事不宜，大凶。",
+      "description_english": "Emptiness Day with Red Phoenix and Grappling Hook. Causes petty people interference, legal problems, disputes, harm to pets. Avoid all activities.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 23,
+      "weekday": 2,
+      "day_stem": "Wu",
+      "day_branch": "Chen",
+      "day_stem_chinese": "戊",
+      "day_branch_chinese": "辰",
+      "pillar": "Wu Chen",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 5,
+      "chinese_month_name": "五月",
+      "moon_phase": {
+        "emoji": "🌔",
+        "english": "Waxing Gibbous",
+        "chinese": "盈凸月",
+        "lunar_day": 9
+      },
+      "officer": {
+        "id": "Kai",
+        "chinese": "開",
+        "english": "Open"
+      },
+      "rating": {
+        "id": "consult",
+        "value": 2.5,
+        "symbol": "?",
+        "chinese": "議"
+      },
+      "good_for": [
+        "all_activities"
+      ],
+      "bad_for": [],
+      "description_chinese": "天成、丙辰，有月德；庚辰、壬辰，有黃羅、紫檀吉星蓋照，用之增田產、六畜興旺、生貴子，百事大吉。惟戊辰、甲辰，熬入中宮，大凶。",
+      "description_english": "Heavenly Success star. Bing Chen has Monthly Virtue. Geng Chen and Ren Chen have Yellow Spiral and Purple Sandalwood - excellent for all activities, brings property, livestock prosperity, noble children. Jia Chen and Wu Chen have Sha Qi - avoid.",
+      "forbidden": null,
+      "consult": {
+        "promoted": true,
+        "original_rating": {
+          "id": "inauspicious",
+          "value": 2,
+          "symbol": "▲",
+          "chinese": "凶"
+        },
+        "reason": "Good for: all activities"
+      }
+    },
+    {
+      "day": 24,
+      "weekday": 3,
+      "day_stem": "Ji",
+      "day_branch": "Si",
+      "day_stem_chinese": "己",
+      "day_branch_chinese": "巳",
+      "pillar": "Ji Si",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 5,
+      "chinese_month_name": "五月",
+      "moon_phase": {
+        "emoji": "🌔",
+        "english": "Waxing Gibbous",
+        "chinese": "盈凸月",
+        "lunar_day": 10
+      },
+      "officer": {
+        "id": "Bi",
+        "chinese": "閉",
+        "english": "Close"
+      },
+      "rating": {
+        "id": "consult",
+        "value": 2.5,
+        "symbol": "?",
+        "chinese": "議"
+      },
+      "good_for": [
+        "renovation",
+        "groundbreaking",
+        "moving",
+        "marriage",
+        "business",
+        "travel"
+      ],
+      "bad_for": [],
+      "description_chinese": "乙巳、辛巳，有黃羅、紫檀星蓋照，興工作、動土、修造、池塘、倉庫、牛羊欄圈、入宅、婚姻、開張、出行、大益家門，子孫昌盛、田產倍收、人口安康，大吉。餘巳不言。",
+      "description_english": "Yi Si and Xin Si have Yellow Spiral and Purple Sandalwood - auspicious for renovation, groundbreaking, pond excavation, moving, marriage, business, travel. Brings offspring prosperity, wealth increase, health. Other Si days unsuitable.",
+      "forbidden": null,
+      "consult": {
+        "promoted": true,
+        "original_rating": {
+          "id": "inauspicious",
+          "value": 2,
+          "symbol": "▲",
+          "chinese": "凶"
+        },
+        "reason": "Good for: renovation, groundbreaking, moving, marriage, business, travel"
+      }
+    },
+    {
+      "day": 25,
+      "weekday": 4,
+      "day_stem": "Geng",
+      "day_branch": "Wu",
+      "day_stem_chinese": "庚",
+      "day_branch_chinese": "午",
+      "pillar": "Geng Wu",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 5,
+      "chinese_month_name": "五月",
+      "moon_phase": {
+        "emoji": "🌔",
+        "english": "Waxing Gibbous",
+        "chinese": "盈凸月",
+        "lunar_day": 11
+      },
+      "officer": {
+        "id": "Jian",
+        "chinese": "建",
+        "english": "Establish"
+      },
+      "rating": {
+        "id": "inauspicious",
+        "value": 2,
+        "symbol": "▲",
+        "chinese": "凶"
+      },
+      "good_for": [
+        "burial"
+      ],
+      "bad_for": [
+        "most_activities"
+      ],
+      "description_chinese": "甲午天赦，雖是轉煞，埋葬用之次吉。餘午日埋葬亦不利。若別事用，主招官司、口舌、孤寡、窮病，蓋五月逢午，皆係天地轉煞也。",
+      "description_english": "All Wu (Horse) days affected by Heaven and Earth Drilling Sha. Only Jia Wu has Heavenly Pardon - slightly favorable for burial. Other Wu days cause legal problems, gossip, loneliness, sickness.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 26,
+      "weekday": 5,
+      "day_stem": "Xin",
+      "day_branch": "Wei",
+      "day_stem_chinese": "辛",
+      "day_branch_chinese": "未",
+      "pillar": "Xin Wei",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 5,
+      "chinese_month_name": "五月",
+      "moon_phase": {
+        "emoji": "🌔",
+        "english": "Waxing Gibbous",
+        "chinese": "盈凸月",
+        "lunar_day": 12
+      },
+      "officer": {
+        "id": "Chu",
+        "chinese": "除",
+        "english": "Remove"
+      },
+      "rating": {
+        "id": "fair",
+        "value": 3,
+        "symbol": "●",
+        "chinese": "平"
+      },
+      "good_for": [
+        "minor_activities"
+      ],
+      "bad_for": [
+        "marriage",
+        "business",
+        "moving",
+        "renovation"
+      ],
+      "description_chinese": "惟乙未最為不利，如嫁親、開張、入宅、修造，主迸人口、生疾病、損財。其餘未日，小作可用，乃次吉之日也。",
+      "description_english": "Yi Wei is dire - unsuitable for marriage, business, moving, renovation. Causes illness and wealth loss. Other Wei days are fair and moderately usable.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 27,
+      "weekday": 6,
+      "day_stem": "Ren",
+      "day_branch": "Shen",
+      "day_stem_chinese": "壬",
+      "day_branch_chinese": "申",
+      "pillar": "Ren Shen",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 5,
+      "chinese_month_name": "五月",
+      "moon_phase": {
+        "emoji": "🌔",
+        "english": "Waxing Gibbous",
+        "chinese": "盈凸月",
+        "lunar_day": 13
+      },
+      "officer": {
+        "id": "Man",
+        "chinese": "滿",
+        "english": "Full"
+      },
+      "rating": {
+        "id": "consult",
+        "value": 2.5,
+        "symbol": "?",
+        "chinese": "議"
+      },
+      "good_for": [
+        "burial",
+        "marriage",
+        "moving",
+        "business",
+        "travel"
+      ],
+      "bad_for": [
+        "groundbreaking"
+      ],
+      "description_chinese": "天富、天喜，甲申、丙申、戊申，宜安葬、起造、婚姻、入宅、開張、出行次吉。不宜動土。庚申只宜安葬，不宜修造、入宅。壬申西沉之日，五行無氣，不可用。",
+      "description_english": "Heavenly Fortune and Sky Happiness present. Jia/Bing/Wu Shen good for burial, marriage, moving, business, travel - not groundbreaking. Geng Shen only for burial. Ren Shen has weak Qi - avoid.",
+      "forbidden": null,
+      "consult": {
+        "promoted": true,
+        "original_rating": {
+          "id": "inauspicious",
+          "value": 2,
+          "symbol": "▲",
+          "chinese": "凶"
+        },
+        "reason": "Good for: burial, marriage, moving, business, travel"
+      }
+    },
+    {
+      "day": 28,
+      "weekday": 0,
+      "day_stem": "Gui",
+      "day_branch": "You",
+      "day_stem_chinese": "癸",
+      "day_branch_chinese": "酉",
+      "pillar": "Gui You",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 5,
+      "chinese_month_name": "五月",
+      "moon_phase": {
+        "emoji": "🌔",
+        "english": "Waxing Gibbous",
+        "chinese": "盈凸月",
+        "lunar_day": 14
+      },
+      "officer": {
+        "id": "Ping",
+        "chinese": "平",
+        "english": "Balance"
+      },
+      "rating": {
+        "id": "inauspicious",
+        "value": 2,
+        "symbol": "▲",
+        "chinese": "凶"
+      },
+      "good_for": [],
+      "bad_for": [
+        "all_activities"
+      ],
+      "description_chinese": "小紅砂，有朱雀、勾絞、到州星，招官司、損長幼、家下伶仃、百事不宜，犯之大凶。",
+      "description_english": "Lesser Red Embrace with Red Phoenix and Grappling Hook stars. Causes legal issues, harms eldest and youngest in household. Highly inauspicious - families will not grow or expand.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 29,
+      "weekday": 1,
+      "day_stem": "Jia",
+      "day_branch": "Xu",
+      "day_stem_chinese": "甲",
+      "day_branch_chinese": "戌",
+      "pillar": "Jia Xu",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 5,
+      "chinese_month_name": "五月",
+      "moon_phase": {
+        "emoji": "🌕",
+        "english": "Full Moon",
+        "chinese": "满月",
+        "lunar_day": 15
+      },
+      "officer": {
+        "id": "Ding",
+        "chinese": "定",
+        "english": "Stable"
+      },
+      "rating": {
+        "id": "excellent",
+        "value": 5,
+        "symbol": "★",
+        "chinese": "大吉"
+      },
+      "good_for": [
+        "renovation",
+        "groundbreaking",
+        "moving",
+        "business",
+        "marriage",
+        "burial"
+      ],
+      "bad_for": [],
+      "description_chinese": "甲戌、戊戌、庚戌，有黃羅、紫檀、天皇、地皇、金銀、寶藏、田塘、庫珠、聚祿、駕馬、御聖遊頑星蓋照，大吉。如起造、興工、動土、入宅、開張、婚姻、埋葬諸事，加官進爵、生貴子、益棟財。惟丙戌、壬戌二日，熬入中宮，雖有吉星相解，終難受益。",
+      "description_english": "Jia/Wu/Geng Xu excellent with many auspicious stars. Good for renovation, groundbreaking, moving, business, marriage, burial. Brings promotions, noble children, wealth. Bing Xu and Ren Xu have Sha Qi - benefits reduced.",
+      "forbidden": null,
+      "consult": null
+    },
+    {
+      "day": 30,
+      "weekday": 2,
+      "day_stem": "Yi",
+      "day_branch": "Hai",
+      "day_stem_chinese": "乙",
+      "day_branch_chinese": "亥",
+      "pillar": "Yi Hai",
+      "year_stem": "Bing",
+      "year_branch": "Wu",
+      "year_stem_chinese": "丙",
+      "year_branch_chinese": "午",
+      "chinese_month": 5,
+      "chinese_month_name": "五月",
+      "moon_phase": {
+        "emoji": "🌖",
+        "english": "Waning Gibbous",
+        "chinese": "亏凸月",
+        "lunar_day": 16
+      },
+      "officer": {
+        "id": "Zhi",
+        "chinese": "執",
+        "english": "Initiate"
+      },
+      "rating": {
+        "id": "auspicious",
+        "value": 4,
+        "symbol": "✓",
+        "chinese": "吉"
+      },
+      "good_for": [
+        "simple_renovation"
+      ],
+      "bad_for": [],
+      "description_chinese": "乙亥可小修，為次吉。丁亥、己亥又次吉。辛亥，陰府決遣之日。癸亥，六甲窮日，又正四廢，大凶。",
+      "description_english": "Yi Hai auspicious for simple renovation. Ding Hai and Ji Hai are fair. Xin Hai is Yin Qi Day. Gui Hai is Six Jia Weakness Day and Four Direct Day - dire, avoid all activities.",
+      "forbidden": null,
+      "consult": null
+    }
+  ],
+  "chinese_months_spanned": [
+    {
+      "month": 4,
+      "chinese": "四月",
+      "branch": "Si",
+      "stem": "Gui",
+      "stem_chinese": "癸",
+      "branch_id": "Si",
+      "branch_chinese": "巳"
+    },
+    {
+      "month": 5,
+      "chinese": "五月",
+      "branch": "Wu",
+      "stem": "Jia",
+      "stem_chinese": "甲",
+      "branch_id": "Wu",
+      "branch_chinese": "午"
+    }
+  ],
+  "chinese_years_spanned": [
+    {
+      "stem": "Bing",
+      "stem_chinese": "丙",
+      "branch": "Wu",
+      "branch_chinese": "午"
+    }
+  ]
+}
