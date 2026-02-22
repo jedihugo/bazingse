@@ -8,11 +8,6 @@ import 'server-only';
 
 import { STEMS, BRANCHES, type StemName, type BranchName, type BranchData, type Element } from './core';
 import { ELEMENT_CYCLES } from './derived';
-import {
-  BASE_SCORES,
-  generateSingleScoring,
-  generateAsymmetricScoring,
-} from './scoring';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -31,7 +26,6 @@ export interface PunishmentEntry {
   readonly element_relationship?: string;
   readonly element?: Element;
   readonly nature?: string;
-  readonly scoring: Record<string, number> | { victim: Record<string, number>; controller: Record<string, number> };
   readonly description: string;
 }
 
@@ -39,7 +33,6 @@ export interface HarmEntry {
   readonly branches: readonly string[];
   readonly controller: string;
   readonly controlled: string;
-  readonly scoring: { victim: Record<string, number>; controller: Record<string, number> };
 }
 
 export interface ClashEntry {
@@ -47,7 +40,6 @@ export interface ClashEntry {
   readonly type: "same" | "opposite";
   readonly controller?: string;
   readonly controlled?: string;
-  readonly scoring: Record<string, number> | { victim: Record<string, number>; controller: Record<string, number> };
 }
 
 export interface DestructionEntry {
@@ -55,46 +47,12 @@ export interface DestructionEntry {
   readonly type: "same" | "opposite";
   readonly controller?: string;
   readonly controlled?: string;
-  readonly scoring: Record<string, number> | { victim: Record<string, number>; controller: Record<string, number> };
 }
 
 export interface StemConflictEntry {
   readonly controller: string;
   readonly controlled: string;
-  readonly scoring: { victim: Record<string, number>; controller: Record<string, number> };
 }
-
-// ---------------------------------------------------------------------------
-// SCORING CONFIGURATIONS
-// ---------------------------------------------------------------------------
-
-const _CLASHES_OPPOSITE_SCORING = generateAsymmetricScoring(
-  BASE_SCORES.CLASHES_OPPOSITE.damage, "two_branch", 0.618,
-);
-const _CLASHES_SAME_SCORING = generateSingleScoring(
-  BASE_SCORES.CLASHES_SAME.damage, "two_branch",
-);
-const _STEM_CONFLICTS_SCORING = generateAsymmetricScoring(
-  BASE_SCORES.STEM_CONFLICTS.damage, "two_branch", 0.618,
-);
-const _PUNISHMENTS_3NODE_SCORING = generateSingleScoring(
-  BASE_SCORES.PUNISHMENTS_3NODE.damage, "two_branch",
-);
-const _PUNISHMENTS_2NODE_SCORING = generateAsymmetricScoring(
-  BASE_SCORES.PUNISHMENTS_2NODE.damage, "two_branch", 0.618,
-);
-const _PUNISHMENTS_SELF_SCORING = generateSingleScoring(
-  BASE_SCORES.PUNISHMENTS_2NODE.damage, "two_branch",
-);
-const _HARMS_SCORING = generateAsymmetricScoring(
-  BASE_SCORES.HARMS.damage, "two_branch", 0.618,
-);
-const _DESTRUCTION_OPPOSITE_SCORING = generateAsymmetricScoring(
-  BASE_SCORES.DESTRUCTION_OPPOSITE.damage, "two_branch", 0.618,
-);
-const _DESTRUCTION_SAME_SCORING = generateSingleScoring(
-  BASE_SCORES.DESTRUCTION_SAME.damage, "two_branch",
-);
 
 // ---------------------------------------------------------------------------
 // PUNISHMENTS (刑)
@@ -163,7 +121,6 @@ for (const [groupKey, group] of Object.entries(_punishmentGroups)) {
         english_name: "Bullying Punishment",
         severity: "severe",
         element_conflict: true,
-        scoring: _PUNISHMENTS_3NODE_SCORING,
         description: "Three powerful branches in mutual conflict (恃勢之刑)",
       };
     } else if (punType === "wu_li") {
@@ -175,7 +132,6 @@ for (const [groupKey, group] of Object.entries(_punishmentGroups)) {
         english_name: "Rudeness Punishment",
         severity: "moderate",
         element_conflict: false,
-        scoring: _PUNISHMENTS_3NODE_SCORING,
         description: "Earth branches showing disrespect to each other (無禮之刑)",
       };
     }
@@ -192,7 +148,6 @@ for (const [groupKey, group] of Object.entries(_punishmentGroups)) {
       controller,
       controlled,
       element_relationship: "productive",
-      scoring: _PUNISHMENTS_2NODE_SCORING,
       description: "Beneficiary punishes benefactor - betrayal (持恩之刑)",
     };
   }
@@ -212,7 +167,6 @@ for (const branchId of _selfPunishments) {
     severity: "self",
     element: branch.element,
     nature,
-    scoring: _PUNISHMENTS_SELF_SCORING,
     description: `${branch.animal}'s nature punishes itself (${branchId}自刑)`,
   };
 }
@@ -255,7 +209,6 @@ for (const branchId of Object.keys(BRANCHES) as BranchName[]) {
         branches: pair,
         controller,
         controlled,
-        scoring: _HARMS_SCORING,
       };
     }
   }
@@ -284,7 +237,6 @@ for (const branchId of Object.keys(BRANCHES) as BranchName[]) {
         _clashes[key] = {
           branches: pair,
           type: "same",
-          scoring: _CLASHES_SAME_SCORING,
         };
       } else {
         let controller: string;
@@ -301,7 +253,6 @@ for (const branchId of Object.keys(BRANCHES) as BranchName[]) {
           type: "opposite",
           controller,
           controlled,
-          scoring: _CLASHES_OPPOSITE_SCORING,
         };
       }
     }
@@ -331,7 +282,6 @@ for (const branchId of Object.keys(BRANCHES) as BranchName[]) {
         _destruction[key] = {
           branches: pair,
           type: "same",
-          scoring: _DESTRUCTION_SAME_SCORING,
         };
       } else {
         let controller: string;
@@ -348,7 +298,6 @@ for (const branchId of Object.keys(BRANCHES) as BranchName[]) {
           type: "opposite",
           controller,
           controlled,
-          scoring: _DESTRUCTION_OPPOSITE_SCORING,
         };
       }
     }
@@ -374,7 +323,6 @@ for (const stemId of Object.keys(STEMS) as StemName[]) {
       _stemConflicts[key] = {
         controller: stemId,
         controlled,
-        scoring: _STEM_CONFLICTS_SCORING,
       };
     }
   }

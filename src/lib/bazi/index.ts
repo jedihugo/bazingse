@@ -15,10 +15,6 @@ export * from './derived';
 // Chart construction
 export * from './chart';
 
-// Scoring
-export * from './scoring';
-export * from './dynamic-scoring';
-
 // Seasonal
 export * from './seasonal';
 

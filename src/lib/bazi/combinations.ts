@@ -8,7 +8,6 @@ import 'server-only';
 
 import { STEMS, BRANCHES, type StemName, type BranchName, type Element } from './core';
 import { ELEMENT_POLARITY_TO_STEM } from './derived';
-import { BASE_SCORES, DISTANCE_MULTIPLIERS, generateScoring } from './scoring';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -17,7 +16,6 @@ import { BASE_SCORES, DISTANCE_MULTIPLIERS, generateScoring } from './scoring';
 export interface BranchCombination {
   readonly branches: readonly string[];
   readonly element: Element;
-  readonly scoring: Record<string, Record<string, number>>;
 }
 
 export interface HalfMeetingEntry {
@@ -25,14 +23,12 @@ export interface HalfMeetingEntry {
   readonly element: Element;
   readonly missing: string;
   readonly blocked_by: readonly string[];
-  readonly scoring: Record<string, Record<string, number>>;
 }
 
 export interface ArchedCombinationEntry {
   readonly branches: readonly string[];
   readonly element: Element;
   readonly missing: string;
-  readonly scoring: { detected: Record<string, number> };
 }
 
 export interface StemCombinationEntry {
@@ -43,19 +39,12 @@ export interface StemCombinationEntry {
     readonly element: Element;
     readonly location: "eb";
   };
-  readonly scoring: Record<string, Record<string, number>>;
   readonly meaning: Record<string, never>;
 }
 
 // ---------------------------------------------------------------------------
 // THREE MEETINGS (三會 - Seasonal Directional Combos)
 // ---------------------------------------------------------------------------
-
-const _THREE_MEETINGS_SCORING = generateScoring(
-  BASE_SCORES.THREE_MEETINGS.combined,
-  BASE_SCORES.THREE_MEETINGS.transformed,
-  "three_branch",
-);
 
 const _seasonCombosSeen = new Set<string>();
 const _threeMeetings: Record<string, BranchCombination> = {};
@@ -69,7 +58,6 @@ for (const branchId of Object.keys(BRANCHES) as BranchName[]) {
       _threeMeetings[key] = {
         branches: [seasonCombo[0], seasonCombo[1], seasonCombo[2]],
         element: seasonCombo[3],
-        scoring: _THREE_MEETINGS_SCORING,
       };
     }
   }
@@ -79,12 +67,6 @@ export const THREE_MEETINGS: Readonly<Record<string, BranchCombination>> = _thre
 // ---------------------------------------------------------------------------
 // THREE COMBINATIONS (三合 - Triangular Combos)
 // ---------------------------------------------------------------------------
-
-const _THREE_COMBINATIONS_SCORING = generateScoring(
-  BASE_SCORES.THREE_COMBINATIONS.combined,
-  BASE_SCORES.THREE_COMBINATIONS.transformed,
-  "three_branch",
-);
 
 const _threeCombosSeen = new Set<string>();
 const _threeCombinations: Record<string, BranchCombination> = {};
@@ -98,7 +80,6 @@ for (const branchId of Object.keys(BRANCHES) as BranchName[]) {
       _threeCombinations[key] = {
         branches: [threeCombo[0], threeCombo[1], threeCombo[2]],
         element: threeCombo[3],
-        scoring: _THREE_COMBINATIONS_SCORING,
       };
     }
   }
@@ -109,12 +90,6 @@ export const THREE_COMBINATIONS: Readonly<Record<string, BranchCombination>> = _
 // HALF MEETINGS (半會) - Requires Earth (storage) branch to be present
 // ---------------------------------------------------------------------------
 
-const _HALF_MEETINGS_SCORING = generateScoring(
-  BASE_SCORES.HALF_MEETINGS.combined,
-  BASE_SCORES.HALF_MEETINGS.transformed,
-  "two_branch",
-);
-
 export const HALF_MEETINGS: Readonly<Record<string, HalfMeetingEntry>> = {
   // Winter/Water - Hai-Zi-Chou, Earth=Chou
   "Hai-Chou": {
@@ -122,7 +97,7 @@ export const HALF_MEETINGS: Readonly<Record<string, HalfMeetingEntry>> = {
     element: "Water",
     missing: "Zi",
     blocked_by: [],
-    scoring: _HALF_MEETINGS_SCORING,
+
   },
   // Spring/Wood - Yin-Mao-Chen, Earth=Chen
   "Yin-Chen": {
@@ -130,14 +105,14 @@ export const HALF_MEETINGS: Readonly<Record<string, HalfMeetingEntry>> = {
     element: "Wood",
     missing: "Mao",
     blocked_by: [],
-    scoring: _HALF_MEETINGS_SCORING,
+
   },
   "Mao-Chen": {
     branches: ["Mao", "Chen"],
     element: "Wood",
     missing: "Yin",
     blocked_by: [],
-    scoring: _HALF_MEETINGS_SCORING,
+
   },
   // Summer/Fire - Si-Wu-Wei, Earth=Wei
   "Si-Wei": {
@@ -145,7 +120,7 @@ export const HALF_MEETINGS: Readonly<Record<string, HalfMeetingEntry>> = {
     element: "Fire",
     missing: "Wu",
     blocked_by: [],
-    scoring: _HALF_MEETINGS_SCORING,
+
   },
   // Autumn/Metal - Shen-You-Xu, Earth=Xu
   "Shen-Xu": {
@@ -153,26 +128,20 @@ export const HALF_MEETINGS: Readonly<Record<string, HalfMeetingEntry>> = {
     element: "Metal",
     missing: "You",
     blocked_by: [],
-    scoring: _HALF_MEETINGS_SCORING,
+
   },
   "You-Xu": {
     branches: ["You", "Xu"],
     element: "Metal",
     missing: "Shen",
     blocked_by: [],
-    scoring: _HALF_MEETINGS_SCORING,
+
   },
 };
 
 // ---------------------------------------------------------------------------
 // SIX HARMONIES (六合 - Pair Combinations)
 // ---------------------------------------------------------------------------
-
-const _SIX_HARMONIES_SCORING = generateScoring(
-  BASE_SCORES.SIX_HARMONIES.combined,
-  BASE_SCORES.SIX_HARMONIES.transformed,
-  "two_branch",
-);
 
 const _harmoniesSeen = new Set<string>();
 const _sixHarmonies: Record<string, BranchCombination> = {};
@@ -189,7 +158,6 @@ for (const branchId of Object.keys(BRANCHES) as BranchName[]) {
       _sixHarmonies[key] = {
         branches: pair,
         element: harmonyElement,
-        scoring: _SIX_HARMONIES_SCORING,
       };
     }
   }
@@ -199,15 +167,6 @@ export const SIX_HARMONIES: Readonly<Record<string, BranchCombination>> = _sixHa
 // ---------------------------------------------------------------------------
 // ARCHED COMBINATIONS (拱合) - Any 2 of 3 branches from THREE_COMBINATIONS
 // ---------------------------------------------------------------------------
-
-const _ARCHED_COMBINATIONS_SCORING = {
-  detected: {
-    "1": BASE_SCORES.ARCHED_COMBINATIONS.combined,
-    "2": Math.round(BASE_SCORES.ARCHED_COMBINATIONS.combined * DISTANCE_MULTIPLIERS.two_branch["2"]),
-    "3": Math.round(BASE_SCORES.ARCHED_COMBINATIONS.combined * DISTANCE_MULTIPLIERS.two_branch["3"]),
-    "4": Math.round(BASE_SCORES.ARCHED_COMBINATIONS.combined * DISTANCE_MULTIPLIERS.two_branch["4"]),
-  },
-};
 
 const _archedCombinations: Record<string, ArchedCombinationEntry> = {};
 for (const comboKey of Object.keys(_threeCombinations)) {
@@ -228,7 +187,6 @@ for (const comboKey of Object.keys(_threeCombinations)) {
         branches: pairBranches,
         element,
         missing,
-        scoring: _ARCHED_COMBINATIONS_SCORING,
       };
     }
   }
@@ -238,12 +196,6 @@ export const ARCHED_COMBINATIONS: Readonly<Record<string, ArchedCombinationEntry
 // ---------------------------------------------------------------------------
 // STEM COMBINATIONS (天干五合)
 // ---------------------------------------------------------------------------
-
-const _STEM_COMBINATIONS_SCORING = generateScoring(
-  BASE_SCORES.STEM_COMBINATIONS.combined,
-  BASE_SCORES.STEM_COMBINATIONS.transformed,
-  "two_branch",
-);
 
 const _stemCombosSeen = new Set<string>();
 const _stemCombinations: Record<string, StemCombinationEntry> = {};
@@ -266,7 +218,6 @@ for (const stemId of Object.keys(STEMS) as StemName[]) {
           element: comboElement,
           location: "eb",
         },
-        scoring: _STEM_COMBINATIONS_SCORING,
         meaning: {} as Record<string, never>,
       };
     }
