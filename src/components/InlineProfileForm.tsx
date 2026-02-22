@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { ChatForm, GuidedDateInput, GuidedTimeInput, GenderSelector } from './chat-form';
+import { GuidedDateInput, GuidedTimeInput, GenderSelector } from './chat-form';
 import { createProfile, type ProfileCreate } from '@/lib/api';
 import { useT } from './LanguageProvider';
 import { ACTIONS, PROFILE_FORM } from '@/lib/t';
@@ -125,139 +125,124 @@ export default function InlineProfileForm({
     // User can press Enter to submit
   }, []);
 
+  // Keyboard handling for the form wrapper
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    // Enter to submit (only if not in a textarea)
+    if (e.key === 'Enter' && !e.shiftKey) {
+      const target = e.target as HTMLElement;
+      if (target.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        if (isValid && !isSubmitting) {
+          handleSubmit();
+        }
+      }
+    }
+
+    // Escape to cancel
+    if (e.key === 'Escape' && onCancel) {
+      e.preventDefault();
+      onCancel();
+    }
+  }, [isValid, isSubmitting, handleSubmit, onCancel]);
+
   return (
-    <ChatForm
-      title={t(PROFILE_FORM.create_title)}
-      onSubmit={handleSubmit}
-      onCancel={onCancel}
-      submitLabel={tCompact(ACTIONS.create)}
-      cancelLabel={tCompact(ACTIONS.cancel)}
-      isValid={isValid}
-      error={error}
-      className={className}
-    >
-      {/* Name Field */}
-      <div className="chat-field">
-        <div className="chat-field-label-row">
-          <span className="chat-field-label">
-            {t(PROFILE_FORM.name)}:<span className="chat-field-required">*</span>
-          </span>
-          <span className="chat-field-cursor chat-field-cursor-active">{'>'}</span>
-        </div>
-        <div className="chat-field-input">
-          <input
-            ref={nameRef}
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            onKeyDown={handleNameKeyDown}
-            placeholder={t(PROFILE_FORM.enter_name)}
-            className="tui-input w-full"
-            disabled={isSubmitting}
-            autoComplete="off"
-          />
-        </div>
-      </div>
-
-      {/* Birth Date Field */}
-      <div className="chat-field">
-        <div className="chat-field-label-row">
-          <span className="chat-field-label">
-            {t(PROFILE_FORM.birth_date)}:<span className="chat-field-required">*</span>
-          </span>
-          <span className="chat-field-cursor">{'>'}</span>
-        </div>
-        <div className="chat-field-input">
-          <GuidedDateInput
-            year={year}
-            month={month}
-            day={day}
-            onYearChange={setYear}
-            onMonthChange={setMonth}
-            onDayChange={setDay}
-            onComplete={handleDateComplete}
-            disabled={isSubmitting}
-            hasError={year !== '' && month !== '' && day !== '' && !isValidDate()}
-            yearRef={yearRef}
-          />
-        </div>
-        {year !== '' && month !== '' && day !== '' && !isValidDate() && (
-          <div className="chat-field-hint chat-field-hint-error">
-            {t(PROFILE_FORM.invalid_date)}
-          </div>
+    <div className={`tui-frame ${className}`} onKeyDown={handleKeyDown}>
+      <div className="tui-frame-title">{t(PROFILE_FORM.create_title)}</div>
+      <table className="tui-table-form">
+        <tbody>
+          <tr>
+            <td>{t(PROFILE_FORM.name)}*</td>
+            <td>
+              <input
+                ref={nameRef}
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                onKeyDown={handleNameKeyDown}
+                placeholder={t(PROFILE_FORM.enter_name)}
+                disabled={isSubmitting}
+                autoComplete="off"
+              />
+            </td>
+          </tr>
+          <tr>
+            <td>{t(PROFILE_FORM.birth_date)}*</td>
+            <td>
+              <GuidedDateInput
+                year={year}
+                month={month}
+                day={day}
+                onYearChange={setYear}
+                onMonthChange={setMonth}
+                onDayChange={setDay}
+                onComplete={handleDateComplete}
+                disabled={isSubmitting}
+                hasError={year !== '' && month !== '' && day !== '' && !isValidDate()}
+                yearRef={yearRef}
+              />
+              {year !== '' && month !== '' && day !== '' && !isValidDate() && (
+                <div className="tui-form-error">{t(PROFILE_FORM.invalid_date)}</div>
+              )}
+            </td>
+          </tr>
+          <tr>
+            <td>{t(PROFILE_FORM.birth_time)}</td>
+            <td>
+              <GuidedTimeInput
+                hour={hour}
+                minute={minute}
+                onHourChange={setHour}
+                onMinuteChange={setMinute}
+                onComplete={handleTimeComplete}
+                disabled={isSubmitting}
+                showUnknownToggle={true}
+                isUnknown={unknownTime}
+                onUnknownChange={setUnknownTime}
+                hourRef={hourRef}
+              />
+            </td>
+          </tr>
+          <tr>
+            <td>{t(PROFILE_FORM.gender)}*</td>
+            <td>
+              <GenderSelector
+                value={gender}
+                onChange={setGender}
+                disabled={isSubmitting}
+              />
+            </td>
+          </tr>
+          <tr>
+            <td>{t(PROFILE_FORM.whatsapp)}</td>
+            <td>
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="e.g. 628123456789"
+                disabled={isSubmitting}
+                autoComplete="tel"
+              />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      {error && <div className="tui-form-error" role="alert">{error}</div>}
+      <div className="tui-form-actions">
+        {onCancel && (
+          <button type="button" onClick={onCancel} className="tui-btn" disabled={isSubmitting}>
+            {tCompact(ACTIONS.cancel)}
+          </button>
         )}
+        <button
+          type="button"
+          onClick={handleSubmit}
+          className="tui-btn"
+          disabled={!isValid || isSubmitting}
+        >
+          {isSubmitting ? '...' : tCompact(ACTIONS.create)}
+        </button>
       </div>
-
-      {/* Birth Time Field */}
-      <div className="chat-field">
-        <div className="chat-field-label-row">
-          <span className="chat-field-label">
-            {t(PROFILE_FORM.birth_time)}:
-            <span className="tui-text-muted" style={{ fontSize: '0.625rem', marginLeft: '0.25rem' }}>
-              {t(PROFILE_FORM.optional)}
-            </span>
-          </span>
-          <span className="chat-field-cursor">{'>'}</span>
-        </div>
-        <div className="chat-field-input">
-          <GuidedTimeInput
-            hour={hour}
-            minute={minute}
-            onHourChange={setHour}
-            onMinuteChange={setMinute}
-            onComplete={handleTimeComplete}
-            disabled={isSubmitting}
-            showUnknownToggle={true}
-            isUnknown={unknownTime}
-            onUnknownChange={setUnknownTime}
-            hourRef={hourRef}
-          />
-        </div>
-      </div>
-
-      {/* Gender Field */}
-      <div className="chat-field">
-        <div className="chat-field-label-row">
-          <span className="chat-field-label">
-            {t(PROFILE_FORM.gender)}:<span className="chat-field-required">*</span>
-          </span>
-          <span className="chat-field-cursor">{'>'}</span>
-        </div>
-        <div className="chat-field-input">
-          <GenderSelector
-            value={gender}
-            onChange={setGender}
-            disabled={isSubmitting}
-          />
-        </div>
-        <div className="chat-field-hint">
-          {t(PROFILE_FORM.press_m_or_f)}
-        </div>
-      </div>
-
-      {/* WhatsApp Field */}
-      <div className="chat-field">
-        <div className="chat-field-label-row">
-          <span className="chat-field-label">
-            {t(PROFILE_FORM.whatsapp)}:
-            <span className="tui-text-muted" style={{ fontSize: '0.625rem', marginLeft: '0.25rem' }}>
-              {t(PROFILE_FORM.optional)}
-            </span>
-          </span>
-          <span className="chat-field-cursor">{'>'}</span>
-        </div>
-        <div className="chat-field-input">
-          <input
-            type="tel"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="e.g. 628123456789"
-            className="tui-input w-full"
-            disabled={isSubmitting}
-            autoComplete="tel"
-          />
-        </div>
-      </div>
-    </ChatForm>
+    </div>
   );
 }

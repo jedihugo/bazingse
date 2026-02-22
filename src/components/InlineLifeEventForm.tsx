@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { ChatForm, GuidedYearInput } from './chat-form';
 import { createLifeEvent, type LifeEventCreate, type LifeEvent } from '@/lib/api';
 import { useT } from './LanguageProvider';
 import { ACTIONS, EVENT_FORM, LOCATION, PROFILE_FORM } from '@/lib/t';
@@ -140,7 +139,7 @@ export default function InlineLifeEventForm({
   }, []);
 
   // Handle backspace for navigation
-  const handleKeyDown = useCallback((
+  const handleFieldKeyDown = useCallback((
     e: React.KeyboardEvent<HTMLInputElement>,
     currentRef: React.RefObject<HTMLInputElement | null>,
     prevRef?: React.RefObject<HTMLInputElement | null>
@@ -151,170 +150,165 @@ export default function InlineLifeEventForm({
     }
   }, []);
 
+  // Keyboard handling for the form wrapper
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    // Enter to submit (only if not in a textarea)
+    if (e.key === 'Enter' && !e.shiftKey) {
+      const target = e.target as HTMLElement;
+      if (target.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        if (isValid && !isDuplicate && !isSubmitting) {
+          handleSubmit();
+        }
+      }
+    }
+
+    // Escape to cancel
+    if (e.key === 'Escape' && onCancel) {
+      e.preventDefault();
+      onCancel();
+    }
+  }, [isValid, isDuplicate, isSubmitting, handleSubmit, onCancel]);
+
   return (
-    <ChatForm
-      title={t(EVENT_FORM.add_title)}
-      onSubmit={handleSubmit}
-      onCancel={onCancel}
-      submitLabel={tCompact(ACTIONS.add)}
-      cancelLabel={tCompact(ACTIONS.cancel)}
-      isValid={isValid && !isDuplicate}
-      error={error}
-      className={className}
-    >
-      {/* Date Fields - Year / Month / Day */}
-      <div className="chat-field">
-        <div className="chat-field-label-row">
-          <span className="chat-field-label">
-            {t(EVENT_FORM.date)}:<span className="chat-field-required">*</span>
-          </span>
-          <span className="chat-field-cursor chat-field-cursor-active">{'>'}</span>
-        </div>
-        <div className="chat-field-input">
-          <div className="guided-date-input">
-            {/* Year */}
-            <input
-              ref={yearRef}
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              value={year}
-              onChange={(e) => {
-                const value = e.target.value;
-                if (!/^\d*$/.test(value) || value.length > 4) return;
-                setYear(value);
-                if (value.length === 4) {
-                  const num = parseInt(value, 10);
-                  if (num >= 1900 && num <= 2100) {
-                    handleYearComplete();
-                  }
-                }
-              }}
-              placeholder="YYYY"
-              disabled={isSubmitting}
-              className="guided-input-segment guided-input-year tui-input"
-              style={!isValidYear && year !== '' ? { borderColor: 'var(--tui-error)' } : {}}
-              aria-label="Year"
-              autoComplete="off"
-            />
-            <span className="guided-input-separator">/</span>
-
-            {/* Month */}
-            <input
-              ref={monthRef}
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              value={month}
-              onChange={handleMonthChange}
-              onKeyDown={(e) => handleKeyDown(e, monthRef, yearRef)}
-              placeholder="MM"
-              disabled={isSubmitting}
-              className="guided-input-segment guided-input-month tui-input"
-              aria-label="Month (optional)"
-              autoComplete="off"
-            />
-            <span className="guided-input-separator">/</span>
-
-            {/* Day */}
-            <input
-              ref={dayRef}
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              value={day}
-              onChange={handleDayChange}
-              onKeyDown={(e) => handleKeyDown(e, dayRef, monthRef)}
-              placeholder="DD"
-              disabled={isSubmitting || !monthNum}
-              className="guided-input-segment guided-input-day tui-input"
-              style={!monthNum ? { opacity: 0.5 } : {}}
-              aria-label="Day (optional)"
-              autoComplete="off"
-            />
-          </div>
-        </div>
-        <div className="chat-field-hint">
-          {t(EVENT_FORM.year_required)}
-        </div>
-      </div>
-
-      {/* Location Field */}
-      <div className="chat-field">
-        <div className="chat-field-label-row">
-          <span className="chat-field-label">
-            {t(EVENT_FORM.location)}:
-            <span className="tui-text-muted" style={{ fontSize: '0.625rem', marginLeft: '0.25rem' }}>
-              {t(PROFILE_FORM.optional)}
-            </span>
-          </span>
-          <span className="chat-field-cursor">{'>'}</span>
-        </div>
-        <div className="chat-field-input">
-          <input
-            ref={locationRef}
-            type="text"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            placeholder={t(EVENT_FORM.where_happened)}
-            className="tui-input w-full"
-            maxLength={200}
-            disabled={isSubmitting}
-            autoComplete="off"
-          />
-        </div>
-        {/* Abroad toggle - only shown when location is filled */}
-        {location.trim() && (
-          <div className="mt-1">
-            <button
-              type="button"
-              onClick={() => setIsAbroad(!isAbroad)}
-              disabled={isSubmitting}
-              className="inline-flex items-center gap-1 px-1.5 py-0.5 text-xs transition-colors"
-              style={{
-                color: isAbroad ? 'var(--tui-water)' : 'var(--tui-fg-muted)',
-                background: isAbroad ? 'color-mix(in srgb, var(--tui-water) 15%, var(--tui-bg))' : 'transparent',
-                border: `1px solid ${isAbroad ? 'var(--tui-water)' : 'var(--tui-border)'}`,
-              }}
-              title={t(LOCATION.abroad_hint)}
-            >
-              <span style={{ fontFamily: 'monospace' }}>{isAbroad ? '[x]' : '[_]'}</span>
-              <span>{tCompact(LOCATION.abroad)}</span>
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* Notes Field */}
-      <div className="chat-field">
-        <div className="chat-field-label-row">
-          <span className="chat-field-label">
-            {t(EVENT_FORM.notes)}:
-            <span className="tui-text-muted" style={{ fontSize: '0.625rem', marginLeft: '0.25rem' }}>
-              {t(PROFILE_FORM.optional)}
-            </span>
-          </span>
-          <span className="chat-field-cursor">{'>'}</span>
-        </div>
-        <div className="chat-field-input">
-          <textarea
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder={t(EVENT_FORM.what_happened)}
-            className="tui-input w-full resize-none"
-            rows={2}
-            maxLength={10000}
-            disabled={isSubmitting}
-          />
-        </div>
-      </div>
-
-      {/* Duplicate warning */}
+    <div className={`tui-frame ${className}`} onKeyDown={handleKeyDown}>
+      <div className="tui-frame-title">{t(EVENT_FORM.add_title)}</div>
+      <table className="tui-table-form">
+        <tbody>
+          <tr>
+            <td>{t(EVENT_FORM.date)}*</td>
+            <td>
+              <div className="guided-date-input">
+                <input
+                  ref={yearRef}
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  value={year}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (!/^\d*$/.test(value) || value.length > 4) return;
+                    setYear(value);
+                    if (value.length === 4) {
+                      const num = parseInt(value, 10);
+                      if (num >= 1900 && num <= 2100) {
+                        handleYearComplete();
+                      }
+                    }
+                  }}
+                  placeholder="YYYY"
+                  disabled={isSubmitting}
+                  className="guided-input-segment guided-input-year tui-input"
+                  style={!isValidYear && year !== '' ? { borderColor: 'var(--tui-error)' } : {}}
+                  aria-label="Year"
+                  autoComplete="off"
+                />
+                <span className="guided-input-separator">/</span>
+                <input
+                  ref={monthRef}
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  value={month}
+                  onChange={handleMonthChange}
+                  onKeyDown={(e) => handleFieldKeyDown(e, monthRef, yearRef)}
+                  placeholder="MM"
+                  disabled={isSubmitting}
+                  className="guided-input-segment guided-input-month tui-input"
+                  aria-label="Month (optional)"
+                  autoComplete="off"
+                />
+                <span className="guided-input-separator">/</span>
+                <input
+                  ref={dayRef}
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  value={day}
+                  onChange={handleDayChange}
+                  onKeyDown={(e) => handleFieldKeyDown(e, dayRef, monthRef)}
+                  placeholder="DD"
+                  disabled={isSubmitting || !monthNum}
+                  className="guided-input-segment guided-input-day tui-input"
+                  style={!monthNum ? { opacity: 0.5 } : {}}
+                  aria-label="Day (optional)"
+                  autoComplete="off"
+                />
+              </div>
+              <div style={{ fontSize: '0.625rem', color: 'var(--tui-fg-muted)', marginTop: '0.125rem' }}>
+                {t(EVENT_FORM.year_required)}
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>{t(EVENT_FORM.location)}</td>
+            <td>
+              <input
+                ref={locationRef}
+                type="text"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder={t(EVENT_FORM.where_happened)}
+                maxLength={200}
+                disabled={isSubmitting}
+                autoComplete="off"
+              />
+              {location.trim() && (
+                <div style={{ marginTop: '0.25rem' }}>
+                  <button
+                    type="button"
+                    onClick={() => setIsAbroad(!isAbroad)}
+                    disabled={isSubmitting}
+                    className="inline-flex items-center gap-1 px-1.5 py-0.5 text-xs transition-colors"
+                    style={{
+                      color: isAbroad ? 'var(--tui-water)' : 'var(--tui-fg-muted)',
+                      background: isAbroad ? 'color-mix(in srgb, var(--tui-water) 15%, var(--tui-bg))' : 'transparent',
+                      border: `1px solid ${isAbroad ? 'var(--tui-water)' : 'var(--tui-border)'}`,
+                    }}
+                    title={t(LOCATION.abroad_hint)}
+                  >
+                    <span style={{ fontFamily: 'monospace' }}>{isAbroad ? '[x]' : '[_]'}</span>
+                    <span>{tCompact(LOCATION.abroad)}</span>
+                  </button>
+                </div>
+              )}
+            </td>
+          </tr>
+          <tr>
+            <td>{t(EVENT_FORM.notes)}</td>
+            <td>
+              <textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder={t(EVENT_FORM.what_happened)}
+                className="resize-none"
+                rows={2}
+                maxLength={10000}
+                disabled={isSubmitting}
+              />
+            </td>
+          </tr>
+        </tbody>
+      </table>
       {isDuplicate && (
-        <div className="chat-form-error" role="alert">
-          {t(EVENT_FORM.duplicate)}
-        </div>
+        <div className="tui-form-error" role="alert">{t(EVENT_FORM.duplicate)}</div>
       )}
-    </ChatForm>
+      {error && <div className="tui-form-error" role="alert">{error}</div>}
+      <div className="tui-form-actions">
+        {onCancel && (
+          <button type="button" onClick={onCancel} className="tui-btn" disabled={isSubmitting}>
+            {tCompact(ACTIONS.cancel)}
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={handleSubmit}
+          className="tui-btn"
+          disabled={!isValid || isDuplicate || isSubmitting}
+        >
+          {isSubmitting ? '...' : tCompact(ACTIONS.add)}
+        </button>
+      </div>
+    </div>
   );
 }
