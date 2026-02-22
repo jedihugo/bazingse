@@ -34,7 +34,7 @@ import {
   SEASONAL_MULTIPLIERS,
   getStep7Gap,
 } from './tables';
-import type { PillarPosition, ControlRelation } from './tables';
+import type { PillarPosition, ControlRelation, SeasonalState } from './tables';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -1497,19 +1497,41 @@ export function step5HsNegative(state: WuxingState): WuxingState {
 export function step6Seasonal(state: WuxingState): WuxingState {
   const season = state.season;
 
+  // Track adjustments by element for logging
+  const elementNodes = new Map<Element, string[]>();
+
   // Apply to all primary nodes
   for (const node of state.nodes) {
-    const seasonalState = SEASONAL_MATRIX[season][node.element];
+    const seasonalState: SeasonalState = SEASONAL_MATRIX[season][node.element];
     const multiplier = SEASONAL_MULTIPLIERS[seasonalState];
     node.points = node.points * multiplier;
     node.seasonalMultiplier = multiplier;
+
+    if (!elementNodes.has(node.element)) {
+      elementNodes.set(node.element, []);
+    }
+    elementNodes.get(node.element)!.push(node.id);
   }
 
   // Apply to all bonus nodes
   for (const bonus of state.bonusNodes) {
-    const seasonalState = SEASONAL_MATRIX[season][bonus.element];
+    const seasonalState: SeasonalState = SEASONAL_MATRIX[season][bonus.element];
     const multiplier = SEASONAL_MULTIPLIERS[seasonalState];
     bonus.points = bonus.points * multiplier;
+  }
+
+  // Log one entry per element
+  for (const [element, nodeIds] of elementNodes) {
+    const seasonalState: SeasonalState = SEASONAL_MATRIX[season][element];
+    const multiplier = SEASONAL_MULTIPLIERS[seasonalState];
+    state.interactions.push({
+      step: 6,
+      type: 'SEASONAL',
+      resultElement: element,
+      nodes: nodeIds,
+      details: `${element} ${seasonalState} ×${multiplier}`,
+      logOnly: multiplier === 1.0,
+    });
   }
 
   return state;

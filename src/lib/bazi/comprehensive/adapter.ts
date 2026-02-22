@@ -1031,6 +1031,7 @@ const WUXING_CHINESE_NAMES: Record<string, string> = {
   DESTRUCTION: "破",
   STEM_CLASH: "天干四冲",
   NATURAL_FLOW: "自然流转",
+  SEASONAL: "令调",
 };
 
 /** English labels for wuxing interaction types */
@@ -1051,6 +1052,7 @@ const WUXING_ENGLISH_NAMES: Record<string, string> = {
   DESTRUCTION: "Destruction",
   STEM_CLASH: "Stem Clash",
   NATURAL_FLOW: "Natural Flow",
+  SEASONAL: "Seasonal Adjustment",
 };
 
 /** Icon keys matching NarrativeCard's ICON_MAP */
@@ -1071,6 +1073,7 @@ const WUXING_ICON_MAP: Record<string, string> = {
   DESTRUCTION: "destruction",
   STEM_CLASH: "stem_conflict",
   NATURAL_FLOW: "flow",
+  SEASONAL: "season",
 };
 
 /** Determine polarity from step number */
@@ -1272,14 +1275,16 @@ function buildNarrativeAnalysis(
     }
   }
 
-  // --- Shen Sha cards ---
+  // --- Shen Sha cards (SEPARATE from wuxing interactions) ---
+  const shenShaCards: Array<Record<string, unknown>> = [];
+  let shenSeq = 0;
   for (const s of shenSha) {
     if (!s.present) continue;
-    seq += 1;
+    shenSeq += 1;
     const polarity = s.nature === "auspicious" ? "positive" : s.nature === "inauspicious" ? "negative" : "neutral";
-    cards.push({
-      seq,
-      id: `shensha_${seq}`,
+    shenShaCards.push({
+      seq: shenSeq,
+      id: `shensha_${shenSeq}`,
       category: "shen_sha",
       type: s.name_english ? s.name_english.toLowerCase().replace(/ /g, "_") : "star",
       icon: "flow",
@@ -1293,7 +1298,7 @@ function buildNarrativeAnalysis(
       palaces: s.palace ? [s.palace] : [],
       pillar_refs: s.palace ? [_palaceToPillarRef(s.palace)] : [],
       severity: s.severity,
-      priority: 8,  // After all wuxing steps (1-7), shen sha comes last
+      priority: 1,
     });
   }
 
@@ -1310,12 +1315,13 @@ function buildNarrativeAnalysis(
   }
 
   return {
-    all_chronological: cards,
+    all_chronological: cards,  // wuxing only (no shen sha)
+    shen_sha_cards: shenShaCards,  // separate section
     narratives: cards.slice(0, 15),
     narratives_by_category: {
       wuxing: cards.filter(c => c.category === "wuxing"),
       interaction: cards.filter(c => c.category === "interaction"),
-      shen_sha: cards.filter(c => c.category === "shen_sha"),
+      shen_sha: shenShaCards,
     },
     element_context: {
       daymaster: chart.day_master,

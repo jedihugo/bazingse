@@ -184,6 +184,7 @@ export const CHART = {
   birth:              { en: 'Birth',                    id: 'Kelahiran',               zh: '出生', py: 'chūshēng' },
   ten_year:           { en: '10Y',                      id: '10Th',                    zh: '大運', py: 'dà yùn' },
   interaction_analysis: { en: 'Interaction Analysis (Advanced)', id: 'Analisis Interaksi (Lanjutan)', zh: '交互分析（進階）', py: 'jiāohù fēnxī (jìnjiē)' },
+  shen_sha_section:   { en: 'Shen Sha Stars (Advanced)',  id: 'Bintang Shen Sha (Lanjutan)', zh: '神煞星（進階）', py: 'shénshà xīng (jìnjiē)' },
   indicators:         { en: 'Indicators',               id: 'Indikator',               zh: '指標', py: 'zhǐbiāo' },
   guidance:           { en: 'Guidance',                  id: 'Panduan',                 zh: '指導', py: 'zhǐdǎo' },
   add_notes:          { en: 'Add notes about this period...', id: 'Tambahkan catatan tentang periode ini...', zh: '添加此時期的備註...', py: 'tiānjiā cǐ shíqī de bèizhù' },

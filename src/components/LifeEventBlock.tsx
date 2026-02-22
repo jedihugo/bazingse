@@ -5,6 +5,7 @@ import BaZiChart from './BaZiChart';
 import ElementAnalysis from './ElementAnalysis';
 import WealthStorageDisplay from './WealthStorageDisplay';
 import NarrativeDisplay from './NarrativeDisplay';
+import NarrativeCard from './NarrativeCard';
 import ClientSummaryDisplay from './ClientSummaryDisplay';
 import { type LifeEvent, updateLifeEvent } from '@/lib/api';
 import { useT } from './LanguageProvider';
@@ -357,6 +358,31 @@ export default function LifeEventBlock({
                   {t(CHART.interaction_analysis)}
                 </summary>
                 <NarrativeDisplay chartData={chartData} />
+              </details>
+            )}
+
+            {/* Shen Sha Stars (separate section) */}
+            {isNatal && chartData?.narrative_analysis?.shen_sha_cards?.length > 0 && (
+              <details className="mt-3">
+                <summary className="text-xs font-semibold tui-text-dim cursor-pointer p-2 tui-bg-alt tui-border">
+                  {t(CHART.shen_sha_section)}
+                </summary>
+                <div className="narrative-panel">
+                  <div className="narrative-panel-inner">
+                    <div className="space-y-1.5">
+                      {chartData.narrative_analysis.shen_sha_cards.map((entry: any) => (
+                        <NarrativeCard
+                          key={`shensha-${entry.seq}`}
+                          narrative={entry}
+                          mappings={chartData?.mappings}
+                        />
+                      ))}
+                    </div>
+                    <div className="mt-2 text-[9px] tui-text-dim font-mono text-right">
+                      {chartData.narrative_analysis.shen_sha_cards.length} stars
+                    </div>
+                  </div>
+                </div>
               </details>
             )}
 
