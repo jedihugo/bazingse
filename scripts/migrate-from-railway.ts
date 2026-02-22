@@ -1,14 +1,15 @@
 /**
- * Migration script: Fetch all profiles from Railway API and write to Vercel KV.
+ * Migration script: Fetch all profiles from Railway API and write to Vercel Blob.
  *
  * Usage:
- *   KV_REST_API_URL=... KV_REST_API_TOKEN=... npx tsx scripts/migrate-from-railway.ts
+ *   BLOB_READ_WRITE_TOKEN=... npx tsx scripts/migrate-from-railway.ts
  *
  * Environment variables:
- *   RAILWAY_API_URL  — Railway backend URL (default: https://bazingse-production.up.railway.app)
- *   KV_REST_API_URL  — Vercel KV REST URL (required)
- *   KV_REST_API_TOKEN — Vercel KV REST token (required)
+ *   RAILWAY_API_URL       — Railway backend URL (default: https://bazingse-production.up.railway.app)
+ *   BLOB_READ_WRITE_TOKEN — Vercel Blob read/write token (required)
  */
+
+import { put } from '@vercel/blob';
 
 interface LifeEvent {
   id: string;
@@ -49,31 +50,24 @@ interface ProfileIndexEntry {
 
 const RAILWAY_API_URL =
   process.env.RAILWAY_API_URL ?? 'https://bazingse-production.up.railway.app';
-const KV_REST_API_URL = process.env.KV_REST_API_URL;
-const KV_REST_API_TOKEN = process.env.KV_REST_API_TOKEN;
+const BLOB_TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
 
-if (!KV_REST_API_URL || !KV_REST_API_TOKEN) {
-  console.error('Missing required env: KV_REST_API_URL and KV_REST_API_TOKEN');
+if (!BLOB_TOKEN) {
+  console.error('Missing required env: BLOB_READ_WRITE_TOKEN');
   process.exit(1);
 }
 
 // ---------------------------------------------------------------------------
-// KV helpers (direct REST calls — no @vercel/kv import outside Next.js)
+// Blob helper
 // ---------------------------------------------------------------------------
 
-async function kvSet(key: string, value: unknown): Promise<void> {
-  const res = await fetch(`${KV_REST_API_URL}`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${KV_REST_API_TOKEN}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(['SET', key, JSON.stringify(value)]),
+async function writeBlob(pathname: string, data: unknown): Promise<void> {
+  await put(pathname, JSON.stringify(data), {
+    access: 'public',
+    addRandomSuffix: false,
+    contentType: 'application/json',
+    token: BLOB_TOKEN,
   });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`KV SET failed for ${key}: ${res.status} ${text}`);
-  }
 }
 
 // ---------------------------------------------------------------------------
@@ -91,21 +85,17 @@ async function main() {
   const profiles: Profile[] = await res.json();
   console.log(`Fetched ${profiles.length} profiles from Railway.`);
 
-  // Build index
   const index: ProfileIndexEntry[] = [];
 
   for (const profile of profiles) {
-    // Ensure life_events is an array
     if (!profile.life_events) {
       profile.life_events = [];
     }
 
-    // Write full profile to KV
-    const key = `profile:${profile.id}`;
-    await kvSet(key, profile);
-    console.log(`  Written: ${key} (${profile.name})`);
+    const path = `profiles/${profile.id}.json`;
+    await writeBlob(path, profile);
+    console.log(`  Written: ${path} (${profile.name})`);
 
-    // Add to index
     index.push({
       id: profile.id,
       name: profile.name,
@@ -119,9 +109,8 @@ async function main() {
     });
   }
 
-  // Write index
-  await kvSet('profiles:index', index);
-  console.log(`\nWritten profiles:index with ${index.length} entries.`);
+  await writeBlob('profiles/_index.json', index);
+  console.log(`\nWritten profiles/_index.json with ${index.length} entries.`);
   console.log('Migration complete!');
 }
 

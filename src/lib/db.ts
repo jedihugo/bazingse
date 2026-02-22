@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { kv } from '@vercel/kv';
+import { put, list, del } from '@vercel/blob';
 import { randomUUID } from 'crypto';
 import type {
   Profile,
@@ -12,14 +12,14 @@ import type {
 } from './api';
 
 // ---------------------------------------------------------------------------
-// Key helpers
+// Blob path helpers
 // ---------------------------------------------------------------------------
 
-const PROFILES_INDEX = 'profiles:index';
-const profileKey = (id: string) => `profile:${id}`;
+const INDEX_PATH = 'profiles/_index.json';
+const profilePath = (id: string) => `profiles/${id}.json`;
 
 // ---------------------------------------------------------------------------
-// Index entry — lightweight shape stored in the list index
+// Index entry — lightweight shape stored in the index blob
 // ---------------------------------------------------------------------------
 
 interface ProfileIndexEntry {
@@ -49,6 +49,41 @@ function toIndexEntry(p: Profile): ProfileIndexEntry {
 }
 
 // ---------------------------------------------------------------------------
+// Blob I/O helpers
+// ---------------------------------------------------------------------------
+
+/** Find a blob's public URL by exact pathname. */
+async function getBlobUrl(pathname: string): Promise<string | null> {
+  const { blobs } = await list({ prefix: pathname, limit: 1 });
+  if (blobs.length === 0 || blobs[0].pathname !== pathname) return null;
+  return blobs[0].url;
+}
+
+/** Read and parse a JSON blob by pathname. */
+async function readBlob<T>(pathname: string): Promise<T | null> {
+  const url = await getBlobUrl(pathname);
+  if (!url) return null;
+  const res = await fetch(url, { cache: 'no-store' });
+  if (!res.ok) return null;
+  return res.json() as Promise<T>;
+}
+
+/** Write a JSON blob (creates or overwrites). */
+async function writeBlob(pathname: string, data: unknown): Promise<void> {
+  await put(pathname, JSON.stringify(data), {
+    access: 'public',
+    addRandomSuffix: false,
+    contentType: 'application/json',
+  });
+}
+
+/** Delete a blob by pathname. */
+async function deleteBlobByPath(pathname: string): Promise<void> {
+  const url = await getBlobUrl(pathname);
+  if (url) await del(url);
+}
+
+// ---------------------------------------------------------------------------
 // Profile CRUD
 // ---------------------------------------------------------------------------
 
@@ -57,15 +92,14 @@ export async function getProfiles(
   skip = 0,
   limit = 100,
 ): Promise<Profile[]> {
-  const index = await kv.get<ProfileIndexEntry[]>(PROFILES_INDEX);
+  const index = await readBlob<ProfileIndexEntry[]>(INDEX_PATH);
   if (!index) return [];
 
   const page = index.slice(skip, skip + limit);
 
-  // Fetch full profiles so life_events are included
   const profiles = await Promise.all(
     page.map(async (entry) => {
-      const full = await kv.get<Profile>(profileKey(entry.id));
+      const full = await readBlob<Profile>(profilePath(entry.id));
       return full ?? { ...entry, life_events: [] };
     }),
   );
@@ -75,7 +109,7 @@ export async function getProfiles(
 
 /** Get a single profile by ID (full, with life_events). */
 export async function getProfile(id: string): Promise<Profile | null> {
-  return kv.get<Profile>(profileKey(id));
+  return readBlob<Profile>(profilePath(id));
 }
 
 /** Create a new profile. Returns the created profile. */
@@ -94,13 +128,11 @@ export async function createProfile(data: ProfileCreate): Promise<Profile> {
     updated_at: now,
   };
 
-  // Write full profile
-  await kv.set(profileKey(profile.id), profile);
+  await writeBlob(profilePath(profile.id), profile);
 
-  // Append to index
-  const index = (await kv.get<ProfileIndexEntry[]>(PROFILES_INDEX)) ?? [];
+  const index = (await readBlob<ProfileIndexEntry[]>(INDEX_PATH)) ?? [];
   index.push(toIndexEntry(profile));
-  await kv.set(PROFILES_INDEX, index);
+  await writeBlob(INDEX_PATH, index);
 
   return profile;
 }
@@ -110,12 +142,11 @@ export async function updateProfile(
   id: string,
   data: ProfileUpdate,
 ): Promise<Profile | null> {
-  const profile = await kv.get<Profile>(profileKey(id));
+  const profile = await readBlob<Profile>(profilePath(id));
   if (!profile) return null;
 
   const now = new Date().toISOString();
 
-  // Apply only the fields that were provided
   if (data.name !== undefined) profile.name = data.name;
   if (data.birth_date !== undefined) profile.birth_date = data.birth_date;
   if (data.birth_time !== undefined) profile.birth_time = data.birth_time ?? null;
@@ -124,14 +155,13 @@ export async function updateProfile(
   if (data.phone !== undefined) profile.phone = data.phone ?? null;
   profile.updated_at = now;
 
-  await kv.set(profileKey(id), profile);
+  await writeBlob(profilePath(id), profile);
 
-  // Update index entry
-  const index = (await kv.get<ProfileIndexEntry[]>(PROFILES_INDEX)) ?? [];
+  const index = (await readBlob<ProfileIndexEntry[]>(INDEX_PATH)) ?? [];
   const idx = index.findIndex((e) => e.id === id);
   if (idx !== -1) {
     index[idx] = toIndexEntry(profile);
-    await kv.set(PROFILES_INDEX, index);
+    await writeBlob(INDEX_PATH, index);
   }
 
   return profile;
@@ -139,15 +169,14 @@ export async function updateProfile(
 
 /** Delete a profile. Returns true if deleted, false if not found. */
 export async function deleteProfile(id: string): Promise<boolean> {
-  const profile = await kv.get<Profile>(profileKey(id));
+  const profile = await readBlob<Profile>(profilePath(id));
   if (!profile) return false;
 
-  await kv.del(profileKey(id));
+  await deleteBlobByPath(profilePath(id));
 
-  // Remove from index
-  const index = (await kv.get<ProfileIndexEntry[]>(PROFILES_INDEX)) ?? [];
+  const index = (await readBlob<ProfileIndexEntry[]>(INDEX_PATH)) ?? [];
   const filtered = index.filter((e) => e.id !== id);
-  await kv.set(PROFILES_INDEX, filtered);
+  await writeBlob(INDEX_PATH, filtered);
 
   return true;
 }
@@ -156,12 +185,12 @@ export async function deleteProfile(id: string): Promise<boolean> {
 // Life Event CRUD
 // ---------------------------------------------------------------------------
 
-/** Add a life event to a profile. Returns the created event, or null if profile not found. */
+/** Add a life event to a profile. */
 export async function addLifeEvent(
   profileId: string,
   data: LifeEventCreate,
 ): Promise<LifeEvent | null> {
-  const profile = await kv.get<Profile>(profileKey(profileId));
+  const profile = await readBlob<Profile>(profilePath(profileId));
   if (!profile) return null;
 
   const now = new Date().toISOString();
@@ -177,24 +206,22 @@ export async function addLifeEvent(
     updated_at: now,
   };
 
-  if (!profile.life_events) {
-    profile.life_events = [];
-  }
+  if (!profile.life_events) profile.life_events = [];
   profile.life_events.push(event);
   profile.updated_at = now;
 
-  await kv.set(profileKey(profileId), profile);
+  await writeBlob(profilePath(profileId), profile);
 
   return event;
 }
 
-/** Update a life event. Returns updated event, or null if not found. */
+/** Update a life event. */
 export async function updateLifeEvent(
   profileId: string,
   eventId: string,
   data: LifeEventUpdate,
 ): Promise<LifeEvent | null> {
-  const profile = await kv.get<Profile>(profileKey(profileId));
+  const profile = await readBlob<Profile>(profilePath(profileId));
   if (!profile || !profile.life_events) return null;
 
   const idx = profile.life_events.findIndex((e) => e.id === eventId);
@@ -214,36 +241,36 @@ export async function updateLifeEvent(
   profile.life_events[idx] = event;
   profile.updated_at = now;
 
-  await kv.set(profileKey(profileId), profile);
+  await writeBlob(profilePath(profileId), profile);
 
   return event;
 }
 
-/** Delete a life event. Returns true if deleted, false if not found. */
+/** Delete a life event. */
 export async function deleteLifeEvent(
   profileId: string,
   eventId: string,
 ): Promise<boolean> {
-  const profile = await kv.get<Profile>(profileKey(profileId));
+  const profile = await readBlob<Profile>(profilePath(profileId));
   if (!profile || !profile.life_events) return false;
 
   const before = profile.life_events.length;
   profile.life_events = profile.life_events.filter((e) => e.id !== eventId);
 
-  if (profile.life_events.length === before) return false; // not found
+  if (profile.life_events.length === before) return false;
 
   profile.updated_at = new Date().toISOString();
-  await kv.set(profileKey(profileId), profile);
+  await writeBlob(profilePath(profileId), profile);
 
   return true;
 }
 
-/** Get a single life event. Returns null if not found. */
+/** Get a single life event. */
 export async function getLifeEvent(
   profileId: string,
   eventId: string,
 ): Promise<LifeEvent | null> {
-  const profile = await kv.get<Profile>(profileKey(profileId));
+  const profile = await readBlob<Profile>(profilePath(profileId));
   if (!profile || !profile.life_events) return null;
 
   return profile.life_events.find((e) => e.id === eventId) ?? null;
