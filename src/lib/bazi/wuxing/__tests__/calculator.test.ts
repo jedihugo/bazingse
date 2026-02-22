@@ -400,16 +400,30 @@ describe('calculateWuxingUpToStep', () => {
     expect(ypHs1.points).not.toBe(ypHs0.points);
   });
 
-  it('step=7 returns state with Steps 1-2 applied (steps 3-7 still stubs)', () => {
-    const s2 = calculateWuxingUpToStep(INPUT, 2);
+  it('step=6 applies seasonal multipliers (points differ from step=5)', () => {
+    const s5 = calculateWuxingUpToStep(INPUT, 5);
+    const s6 = calculateWuxingUpToStep(INPUT, 6);
+
+    // Step 6 applies seasonal multipliers, so at least some nodes should differ
+    let anyDifferent = false;
+    for (let i = 0; i < s5.nodes.length; i++) {
+      if (s5.nodes[i].points !== s6.nodes[i].points) {
+        anyDifferent = true;
+        break;
+      }
+    }
+    expect(anyDifferent).toBe(true);
+  });
+
+  it('step=7 returns same state as step=6 (step 7 is still a stub)', () => {
+    const s6 = calculateWuxingUpToStep(INPUT, 6);
     const s7 = calculateWuxingUpToStep(INPUT, 7);
 
-    // Steps 3-7 are still stubs, so step=2 and step=7 produce same node points
-    for (let i = 0; i < s2.nodes.length; i++) {
-      expect(s2.nodes[i].points).toBe(s7.nodes[i].points);
+    // Step 7 is still a stub, so step=6 and step=7 produce same node points
+    for (let i = 0; i < s6.nodes.length; i++) {
+      expect(s6.nodes[i].points).toBe(s7.nodes[i].points);
     }
-    // Bonus nodes should also match
-    expect(s2.bonusNodes.length).toBe(s7.bonusNodes.length);
+    expect(s6.bonusNodes.length).toBe(s7.bonusNodes.length);
   });
 });
 
@@ -418,12 +432,8 @@ describe('calculateWuxingUpToStep', () => {
 // =============================================================================
 
 describe('step stubs', () => {
-  it('remaining stubs (steps 3-7) return the same state object', () => {
+  it('remaining stub (step 7) returns the same state object', () => {
     const state = initializeState(INPUT);
-    expect(step3HsPositive(state)).toBe(state);
-    expect(step4EbNegative(state)).toBe(state);
-    expect(step5HsNegative(state)).toBe(state);
-    expect(step6Seasonal(state)).toBe(state);
     expect(step7NaturalFlow(state)).toBe(state);
   });
 

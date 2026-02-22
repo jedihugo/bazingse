@@ -3,7 +3,7 @@
 // =============================================================================
 // Deterministic point-based Wu Xing (Five Element) calculator.
 // Chains steps 0-9 to produce a WuxingResult from pillar inputs.
-// Steps 3-7 are stubs — they pass state through unchanged for now.
+// Step 7 is a stub — it passes state through unchanged for now.
 // =============================================================================
 
 import type { Element, StemName, BranchName } from '../core';
@@ -27,6 +27,11 @@ import {
   DESTRUCTIONS_TABLE,
   SIX_HARMS_TABLE,
   PUNISHMENTS_TABLE,
+  STEM_COMBOS_TABLE,
+  STEM_CLASHES_TABLE,
+  NEGATIVE_RATES,
+  SEASONAL_MATRIX,
+  SEASONAL_MULTIPLIERS,
 } from './tables';
 import type { PillarPosition, ControlRelation } from './tables';
 
@@ -306,7 +311,7 @@ export function initializeState(input: WuxingInput): WuxingState {
 }
 
 // ---------------------------------------------------------------------------
-// Steps 3-7: Stubs (pass through unchanged)
+// Step 1: HS↔EB Pillar Pair Interactions
 // ---------------------------------------------------------------------------
 
 /**
@@ -882,23 +887,613 @@ function _cartesian(
   }
 }
 
-/** Step 3: HS positive interactions — 天干合 (stub) */
+// ---------------------------------------------------------------------------
+// Step 3: HS Positive Interactions — 天干五合 (Stem Combinations)
+// ---------------------------------------------------------------------------
+
+/**
+ * Step 3: Scan all visible HS pairs across different pillars for the five
+ * stem combinations from STEM_COMBOS_TABLE.
+ *
+ * Formula:
+ *   basis = min(HS₁.points, HS₂.points)
+ *   combo_pts_per_node = basis × 0.30 × gap_multiplier
+ *   transform_pts = combo_pts_per_node × 2.5 (if transformation condition met)
+ *
+ * Transformation condition: An EB's main qi anywhere in the chart has the
+ * same element as the combo's produced element.
+ *
+ * Processing order: pillar priority. For each pillar's HS, find valid combos
+ * with other pillars' HSs not yet processed.
+ */
 export function step3HsPositive(state: WuxingState): WuxingState {
+  const PILLARS: PillarPosition[] = ['YP', 'MP', 'DP', 'HP'];
+
+  // Collect EB main qi elements for transformation check
+  const ebMainQiElements = new Set<Element>();
+  for (const pos of PILLARS) {
+    const ebNode = state.nodes.find(n => n.id === `${pos}.EB`)!;
+    ebMainQiElements.add(ebNode.element);
+  }
+
+  // Build stem key helper (alphabetically sorted)
+  function stemKey(a: StemName, b: StemName): string {
+    return [a, b].sort().join('-');
+  }
+
+  // Track which HS nodes have already been processed (consumed by a combo)
+  const processedHs = new Set<string>();
+
+  // Process in pillar priority order
+  for (const pillarA of state.pillarPriority) {
+    const hsA = state.nodes.find(n => n.id === `${pillarA}.HS`)!;
+    if (processedHs.has(hsA.id)) continue;
+
+    // Find combo partner from remaining pillars (in priority order)
+    for (const pillarB of state.pillarPriority) {
+      if (pillarB === pillarA) continue;
+      const hsB = state.nodes.find(n => n.id === `${pillarB}.HS`)!;
+      if (processedHs.has(hsB.id)) continue;
+
+      const key = stemKey(hsA.stem, hsB.stem);
+      const comboData = STEM_COMBOS_TABLE[key];
+      if (!comboData) continue;
+
+      // Found a combo
+      const basis = Math.min(hsA.points, hsB.points);
+      const gap = PILLAR_GAP[pillarA][pillarB];
+      const gapMult = gapMultiplier(gap);
+
+      let comboPtsPerNode = basis * COMBO_RATES.STEM_COMBOS * gapMult;
+
+      // Transformation: check if any EB main qi matches combo element
+      const transformed = ebMainQiElements.has(comboData.element);
+      if (transformed) {
+        comboPtsPerNode *= TRANSFORMATION_MULTIPLIER;
+      }
+
+      // Create bonus nodes for each participating HS
+      state.bonusNodes.push({
+        id: `${pillarA}.HS+${comboData.element}_STEM_COMBOS`,
+        sourceNode: hsA.id,
+        pillar: pillarA,
+        element: comboData.element,
+        polarity: hsA.polarity,
+        points: comboPtsPerNode,
+        source: 'STEM_COMBOS',
+      });
+
+      state.bonusNodes.push({
+        id: `${pillarB}.HS+${comboData.element}_STEM_COMBOS`,
+        sourceNode: hsB.id,
+        pillar: pillarB,
+        element: comboData.element,
+        polarity: hsB.polarity,
+        points: comboPtsPerNode,
+        source: 'STEM_COMBOS',
+      });
+
+      // Log
+      state.interactions.push({
+        step: 3,
+        type: 'STEM_COMBOS',
+        nodeA: hsA.id,
+        nodeB: hsB.id,
+        nodes: [hsA.id, hsB.id],
+        resultElement: comboData.element,
+        transformed,
+        gapMultiplier: gapMult,
+        basis,
+        details: `STEM_COMBOS: ${hsA.stem}+${hsB.stem} → ${comboData.element}${transformed ? ' (transformed ×2.5)' : ''}, basis=${basis.toFixed(1)}, gap×${gapMult}`,
+      });
+
+      // Mark both HS as processed
+      processedHs.add(hsA.id);
+      processedHs.add(hsB.id);
+      break; // This HS is consumed, move to next pillar
+    }
+  }
+
   return state;
 }
 
-/** Step 4: EB negative interactions — 六冲/刑/六害/破 (stub) */
+// ---------------------------------------------------------------------------
+// Step 4: EB Negative Interactions — 六冲/三刑/六害/破
+// ---------------------------------------------------------------------------
+
+/**
+ * Step 4: Process negative EB interactions in strength order:
+ * 六冲 (Six Clashes) → 三刑 (Punishments) → 六害 (Six Harms) → 破 (Destructions)
+ *
+ * Uses the attention map built in Step 2's pre-scan.
+ * EBs are NOT consumed — they can participate in multiple negative interactions.
+ * Three-Branch Priority nullifications from Step 2 are respected.
+ */
 export function step4EbNegative(state: WuxingState): WuxingState {
+  const PILLARS: PillarPosition[] = ['YP', 'MP', 'DP', 'HP'];
+
+  // Collect branch -> pillar mapping
+  const branchToPillars = new Map<BranchName, PillarPosition[]>();
+  for (const pos of PILLARS) {
+    const pillar = _resolvedPillar(state, pos);
+    const branch = pillar.branch;
+    const existing = branchToPillars.get(branch) ?? [];
+    existing.push(pos);
+    branchToPillars.set(branch, existing);
+  }
+
+  const chartBranches = new Set(branchToPillars.keys());
+
+  /**
+   * Helper: compute attention share for a node in a specific interaction type.
+   */
+  function attentionShare(nodeId: string, interactionWeight: number): number {
+    const entries = state.attentionMap.get(nodeId) ?? [];
+    const totalWeight = entries.reduce((sum, a) => sum + a.weight, 0);
+    if (totalWeight <= 0) return 1;
+    return interactionWeight / totalWeight;
+  }
+
+  /**
+   * Helper: apply asymmetric damage to attacker and victim EB nodes.
+   */
+  function applyDamage(
+    attackerNodeId: string,
+    victimNodeId: string,
+    rates: { attackerLoss: number; victimLoss: number },
+    gapMult: number,
+    attackerAttShare: number,
+    victimAttShare: number,
+  ): { attackerLoss: number; victimLoss: number; basis: number } {
+    const attackerNode = state.nodes.find(n => n.id === attackerNodeId)!;
+    const victimNode = state.nodes.find(n => n.id === victimNodeId)!;
+    const basis = Math.min(attackerNode.points, victimNode.points);
+
+    const aLoss = basis * rates.attackerLoss * gapMult * attackerAttShare;
+    const vLoss = basis * rates.victimLoss * gapMult * victimAttShare;
+
+    attackerNode.points = Math.max(0, attackerNode.points - aLoss);
+    victimNode.points = Math.max(0, victimNode.points - vLoss);
+
+    return { attackerLoss: aLoss, victimLoss: vLoss, basis };
+  }
+
+  // -----------------------------------------------------------------------
+  // 1. 六冲 Six Clashes (strongest negative)
+  // -----------------------------------------------------------------------
+  for (const [key, data] of Object.entries(SIX_CLASHES_TABLE)) {
+    const branches = key.split('-') as BranchName[];
+    if (!branches.every(b => chartBranches.has(b))) continue;
+
+    const pillarCombos = _allPillarCombinations(branches, branchToPillars);
+    // Sort by pillar priority
+    pillarCombos.sort((a, b) => {
+      const aIdx = Math.min(...a.map(p => state.pillarPriority.indexOf(p)));
+      const bIdx = Math.min(...b.map(p => state.pillarPriority.indexOf(p)));
+      return aIdx - bIdx;
+    });
+
+    for (const pillars of pillarCombos) {
+      if (pillars[0] === pillars[1]) continue;
+
+      if (data.type === 'same') {
+        // Same-element clash: log only, no point change
+        state.interactions.push({
+          step: 4,
+          type: 'SIX_CLASH',
+          nodes: pillars.map(p => `${p}.EB`),
+          branches: [...branches],
+          logOnly: true,
+          details: `SIX_CLASH (same-element): ${branches.join('-')} at ${pillars.join(',')} — log only`,
+        });
+      } else {
+        // Control clash: asymmetric damage
+        // Determine which pillar has the attacker branch and which has the victim
+        const attackerBranch = data.attacker!;
+        const victimBranch = data.victim!;
+        const attackerPillar = pillars[branches.indexOf(attackerBranch)];
+        const victimPillar = pillars[branches.indexOf(victimBranch)];
+
+        const attackerNodeId = `${attackerPillar}.EB`;
+        const victimNodeId = `${victimPillar}.EB`;
+        const gap = PILLAR_GAP[attackerPillar][victimPillar];
+        const gapMult = gapMultiplier(gap);
+
+        const aShare = attentionShare(attackerNodeId, ATTENTION_WEIGHTS.SIX_CLASH);
+        const vShare = attentionShare(victimNodeId, ATTENTION_WEIGHTS.SIX_CLASH);
+
+        const result = applyDamage(
+          attackerNodeId, victimNodeId,
+          NEGATIVE_RATES.SIX_CLASH, gapMult,
+          aShare, vShare,
+        );
+
+        state.interactions.push({
+          step: 4,
+          type: 'SIX_CLASH',
+          nodes: [attackerNodeId, victimNodeId],
+          branches: [...branches],
+          attacker: `${attackerBranch}(${attackerPillar})`,
+          victim: `${victimBranch}(${victimPillar})`,
+          basis: result.basis,
+          gapMultiplier: gapMult,
+          details: `SIX_CLASH: ${attackerBranch}(${attackerPillar}) → ${victimBranch}(${victimPillar}), basis=${result.basis.toFixed(1)}, gap×${gapMult}`,
+        });
+      }
+    }
+  }
+
+  // -----------------------------------------------------------------------
+  // 2. 三刑 Punishments
+  // -----------------------------------------------------------------------
+  for (const [_key, data] of Object.entries(PUNISHMENTS_TABLE)) {
+    if (data.type === 'self') {
+      // Self-punishments: log only if the branch appears in chart
+      const branch = _key.split('-')[0] as BranchName;
+      if (!chartBranches.has(branch)) continue;
+      const branchPillars = branchToPillars.get(branch) ?? [];
+      // Need 2+ of the same branch for self-punishment
+      if (branchPillars.length < 2) continue;
+      state.interactions.push({
+        step: 4,
+        type: 'PUNISHMENT_SELF',
+        branches: [branch, branch],
+        logOnly: true,
+        details: `PUNISHMENT_SELF: ${branch} at ${branchPillars.join(',')} — log only`,
+      });
+      continue;
+    }
+
+    if (data.type === 'wu_li' && data.requiresAll) {
+      // Ungrateful (Chou-Wei-Xu): requires all 3, all Earth -> log only
+      const branches = data.branches!;
+      if (!branches.every(b => chartBranches.has(b))) continue;
+
+      const pillarCombos = _allPillarCombinations(branches, branchToPillars);
+      for (const pillars of pillarCombos) {
+        state.interactions.push({
+          step: 4,
+          type: 'PUNISHMENT_WU_LI',
+          nodes: pillars.map(p => `${p}.EB`),
+          branches: [...branches],
+          logOnly: true,
+          details: `PUNISHMENT_WU_LI: ${branches.join('-')} at ${pillars.join(',')} — all Earth, log only`,
+        });
+      }
+      continue;
+    }
+
+    if (data.type === 'shi' && data.pairs) {
+      // Bullying (Yin-Si-Shen): each PAIR calculated separately. 2 of 3 triggers.
+      for (const pairDef of data.pairs) {
+        const pairBranches = pairDef.pair;
+        if (!pairBranches.every(b => chartBranches.has(b))) continue;
+
+        const pillarCombos = _allPillarCombinations(pairBranches, branchToPillars);
+        // Sort by pillar priority
+        pillarCombos.sort((a, b) => {
+          const aIdx = Math.min(...a.map(p => state.pillarPriority.indexOf(p)));
+          const bIdx = Math.min(...b.map(p => state.pillarPriority.indexOf(p)));
+          return aIdx - bIdx;
+        });
+
+        for (const pillars of pillarCombos) {
+          if (pillars[0] === pillars[1]) continue;
+
+          const attackerBranch = pairDef.attacker;
+          const victimBranch = pairDef.victim;
+          const attackerPillar = pillars[pairBranches.indexOf(attackerBranch)];
+          const victimPillar = pillars[pairBranches.indexOf(victimBranch)];
+
+          const attackerNodeId = `${attackerPillar}.EB`;
+          const victimNodeId = `${victimPillar}.EB`;
+          const gap = PILLAR_GAP[attackerPillar][victimPillar];
+          const gapMult = gapMultiplier(gap);
+
+          const aShare = attentionShare(attackerNodeId, ATTENTION_WEIGHTS.PUNISHMENT_FULL);
+          const vShare = attentionShare(victimNodeId, ATTENTION_WEIGHTS.PUNISHMENT_FULL);
+
+          const result = applyDamage(
+            attackerNodeId, victimNodeId,
+            NEGATIVE_RATES.PUNISHMENT, gapMult,
+            aShare, vShare,
+          );
+
+          state.interactions.push({
+            step: 4,
+            type: 'PUNISHMENT_SHI',
+            nodes: [attackerNodeId, victimNodeId],
+            branches: [...pairBranches],
+            attacker: `${attackerBranch}(${attackerPillar})`,
+            victim: `${victimBranch}(${victimPillar})`,
+            basis: result.basis,
+            gapMultiplier: gapMult,
+            details: `PUNISHMENT_SHI: ${attackerBranch}(${attackerPillar}) → ${victimBranch}(${victimPillar}), basis=${result.basis.toFixed(1)}, gap×${gapMult}`,
+          });
+        }
+      }
+      continue;
+    }
+
+    if (data.type === 'en' && data.attacker && data.victim) {
+      // Rude (Zi-Mao): pair punishment
+      const attackerBranch = data.attacker;
+      const victimBranch = data.victim;
+      if (!chartBranches.has(attackerBranch) || !chartBranches.has(victimBranch)) continue;
+
+      const pillarCombos = _allPillarCombinations(
+        [attackerBranch, victimBranch],
+        branchToPillars,
+      );
+
+      pillarCombos.sort((a, b) => {
+        const aIdx = Math.min(...a.map(p => state.pillarPriority.indexOf(p)));
+        const bIdx = Math.min(...b.map(p => state.pillarPriority.indexOf(p)));
+        return aIdx - bIdx;
+      });
+
+      for (const pillars of pillarCombos) {
+        if (pillars[0] === pillars[1]) continue;
+
+        const attackerPillar = pillars[0]; // first is attacker branch
+        const victimPillar = pillars[1]; // second is victim branch
+
+        const attackerNodeId = `${attackerPillar}.EB`;
+        const victimNodeId = `${victimPillar}.EB`;
+        const gap = PILLAR_GAP[attackerPillar][victimPillar];
+        const gapMult = gapMultiplier(gap);
+
+        const aShare = attentionShare(attackerNodeId, ATTENTION_WEIGHTS.PUNISHMENT_FULL);
+        const vShare = attentionShare(victimNodeId, ATTENTION_WEIGHTS.PUNISHMENT_FULL);
+
+        const result = applyDamage(
+          attackerNodeId, victimNodeId,
+          NEGATIVE_RATES.PUNISHMENT, gapMult,
+          aShare, vShare,
+        );
+
+        state.interactions.push({
+          step: 4,
+          type: 'PUNISHMENT_EN',
+          nodes: [attackerNodeId, victimNodeId],
+          branches: [attackerBranch, victimBranch],
+          attacker: `${attackerBranch}(${attackerPillar})`,
+          victim: `${victimBranch}(${victimPillar})`,
+          basis: result.basis,
+          gapMultiplier: gapMult,
+          details: `PUNISHMENT_EN: ${attackerBranch}(${attackerPillar}) → ${victimBranch}(${victimPillar}), basis=${result.basis.toFixed(1)}, gap×${gapMult}`,
+        });
+      }
+    }
+  }
+
+  // -----------------------------------------------------------------------
+  // 3. 六害 Six Harms (ADJACENT ONLY — gap 0)
+  // -----------------------------------------------------------------------
+  for (const [key, data] of Object.entries(SIX_HARMS_TABLE)) {
+    const branches = key.split('-') as BranchName[];
+    if (!branches.every(b => chartBranches.has(b))) continue;
+
+    const pillarCombos = _allPillarCombinations(branches, branchToPillars);
+    pillarCombos.sort((a, b) => {
+      const aIdx = Math.min(...a.map(p => state.pillarPriority.indexOf(p)));
+      const bIdx = Math.min(...b.map(p => state.pillarPriority.indexOf(p)));
+      return aIdx - bIdx;
+    });
+
+    for (const pillars of pillarCombos) {
+      if (pillars[0] === pillars[1]) continue;
+      const gap = PILLAR_GAP[pillars[0]][pillars[1]];
+      if (gap !== 0) continue; // Only adjacent
+
+      const attackerBranch = data.attacker;
+      const victimBranch = data.victim;
+      const attackerPillar = pillars[branches.indexOf(attackerBranch)];
+      const victimPillar = pillars[branches.indexOf(victimBranch)];
+
+      const attackerNodeId = `${attackerPillar}.EB`;
+      const victimNodeId = `${victimPillar}.EB`;
+      const gapMult = gapMultiplier(0); // Always 1.0
+
+      const aShare = attentionShare(attackerNodeId, ATTENTION_WEIGHTS.SIX_HARM);
+      const vShare = attentionShare(victimNodeId, ATTENTION_WEIGHTS.SIX_HARM);
+
+      const result = applyDamage(
+        attackerNodeId, victimNodeId,
+        NEGATIVE_RATES.SIX_HARM, gapMult,
+        aShare, vShare,
+      );
+
+      state.interactions.push({
+        step: 4,
+        type: 'SIX_HARM',
+        nodes: [attackerNodeId, victimNodeId],
+        branches: [...branches],
+        attacker: `${attackerBranch}(${attackerPillar})`,
+        victim: `${victimBranch}(${victimPillar})`,
+        basis: result.basis,
+        gapMultiplier: gapMult,
+        details: `SIX_HARM: ${attackerBranch}(${attackerPillar}) → ${victimBranch}(${victimPillar}), basis=${result.basis.toFixed(1)}, gap×${gapMult}`,
+      });
+    }
+  }
+
+  // -----------------------------------------------------------------------
+  // 4. 破 Destructions (weakest negative)
+  // -----------------------------------------------------------------------
+  for (const [key, data] of Object.entries(DESTRUCTIONS_TABLE)) {
+    const branches = key.split('-') as BranchName[];
+    if (!branches.every(b => chartBranches.has(b))) continue;
+
+    const pillarCombos = _allPillarCombinations(branches, branchToPillars);
+    pillarCombos.sort((a, b) => {
+      const aIdx = Math.min(...a.map(p => state.pillarPriority.indexOf(p)));
+      const bIdx = Math.min(...b.map(p => state.pillarPriority.indexOf(p)));
+      return aIdx - bIdx;
+    });
+
+    for (const pillars of pillarCombos) {
+      if (pillars[0] === pillars[1]) continue;
+
+      if (data.type === 'same') {
+        // Same-element destruction: log only
+        state.interactions.push({
+          step: 4,
+          type: 'DESTRUCTION',
+          nodes: pillars.map(p => `${p}.EB`),
+          branches: [...branches],
+          logOnly: true,
+          details: `DESTRUCTION (same-element): ${branches.join('-')} at ${pillars.join(',')} — log only`,
+        });
+      } else {
+        // Different-element destruction
+        const attackerBranch = data.attacker!;
+        const victimBranch = data.victim!;
+        const attackerPillar = pillars[branches.indexOf(attackerBranch)];
+        const victimPillar = pillars[branches.indexOf(victimBranch)];
+
+        const attackerNodeId = `${attackerPillar}.EB`;
+        const victimNodeId = `${victimPillar}.EB`;
+        const gap = PILLAR_GAP[attackerPillar][victimPillar];
+        const gapMult = gapMultiplier(gap);
+
+        const aShare = attentionShare(attackerNodeId, ATTENTION_WEIGHTS.DESTRUCTION);
+        const vShare = attentionShare(victimNodeId, ATTENTION_WEIGHTS.DESTRUCTION);
+
+        const result = applyDamage(
+          attackerNodeId, victimNodeId,
+          NEGATIVE_RATES.DESTRUCTION, gapMult,
+          aShare, vShare,
+        );
+
+        state.interactions.push({
+          step: 4,
+          type: 'DESTRUCTION',
+          nodes: [attackerNodeId, victimNodeId],
+          branches: [...branches],
+          attacker: `${attackerBranch}(${attackerPillar})`,
+          victim: `${victimBranch}(${victimPillar})`,
+          basis: result.basis,
+          gapMultiplier: gapMult,
+          details: `DESTRUCTION: ${attackerBranch}(${attackerPillar}) → ${victimBranch}(${victimPillar}), basis=${result.basis.toFixed(1)}, gap×${gapMult}`,
+        });
+      }
+    }
+  }
+
   return state;
 }
 
-/** Step 5: HS negative interactions — 天干冲 (stub) */
+// ---------------------------------------------------------------------------
+// Step 5: HS Negative Interactions — 天干四冲 (Stem Clashes)
+// ---------------------------------------------------------------------------
+
+/**
+ * Step 5: Scan visible HS pairs across different pillars for 4 stem clashes.
+ *
+ * Formula:
+ *   basis = min(HS₁.points, HS₂.points)
+ *   controller loses: basis × 0.25 × gap_multiplier
+ *   controlled loses: basis × 0.50 × gap_multiplier
+ *
+ * No attention spread for HS clashes.
+ */
 export function step5HsNegative(state: WuxingState): WuxingState {
+  const PILLARS: PillarPosition[] = ['YP', 'MP', 'DP', 'HP'];
+
+  // Build stem key helper (alphabetically sorted)
+  function stemKey(a: StemName, b: StemName): string {
+    return [a, b].sort().join('-');
+  }
+
+  // Check all HS pairs (process in pillar priority order)
+  const processedPairs = new Set<string>();
+
+  for (const pillarA of state.pillarPriority) {
+    const hsA = state.nodes.find(n => n.id === `${pillarA}.HS`)!;
+
+    for (const pillarB of state.pillarPriority) {
+      if (pillarB === pillarA) continue;
+
+      // Avoid processing same pair twice
+      const pairKey = [pillarA, pillarB].sort().join('-');
+      if (processedPairs.has(pairKey)) continue;
+
+      const hsB = state.nodes.find(n => n.id === `${pillarB}.HS`)!;
+      const key = stemKey(hsA.stem, hsB.stem);
+      const clashData = STEM_CLASHES_TABLE[key];
+      if (!clashData) continue;
+
+      processedPairs.add(pairKey);
+
+      // Determine controller and controlled
+      const controllerStem = clashData.controller;
+      const controlledStem = clashData.controlled;
+      const controllerNode = hsA.stem === controllerStem ? hsA : hsB;
+      const controlledNode = hsA.stem === controlledStem ? hsA : hsB;
+      const controllerPillar = controllerNode === hsA ? pillarA : pillarB;
+      const controlledPillar = controlledNode === hsA ? pillarA : pillarB;
+
+      const basis = Math.min(controllerNode.points, controlledNode.points);
+      const gap = PILLAR_GAP[controllerPillar][controlledPillar];
+      const gapMult = gapMultiplier(gap);
+
+      const controllerLoss = basis * NEGATIVE_RATES.STEM_CLASH.attackerLoss * gapMult;
+      const controlledLoss = basis * NEGATIVE_RATES.STEM_CLASH.victimLoss * gapMult;
+
+      controllerNode.points = Math.max(0, controllerNode.points - controllerLoss);
+      controlledNode.points = Math.max(0, controlledNode.points - controlledLoss);
+
+      state.interactions.push({
+        step: 5,
+        type: 'STEM_CLASH',
+        nodeA: controllerNode.id,
+        nodeB: controlledNode.id,
+        nodes: [controllerNode.id, controlledNode.id],
+        attacker: `${controllerStem}(${controllerPillar})`,
+        victim: `${controlledStem}(${controlledPillar})`,
+        basis,
+        gapMultiplier: gapMult,
+        details: `STEM_CLASH: ${controllerStem}(${controllerPillar}) controls ${controlledStem}(${controlledPillar}), basis=${basis.toFixed(1)}, gap×${gapMult}`,
+      });
+    }
+  }
+
   return state;
 }
 
-/** Step 6: Seasonal multipliers (stub) */
+// ---------------------------------------------------------------------------
+// Step 6: Seasonal Adjustment — 令调
+// ---------------------------------------------------------------------------
+
+/**
+ * Step 6: Apply percentage multiplier to every node (HS, EB main qi, h1, h2)
+ * and every bonus node based on the season determined by the month branch.
+ *
+ * For each node:
+ *   1. Look up element's state: SEASONAL_MATRIX[season][node.element]
+ *   2. Get multiplier: SEASONAL_MULTIPLIERS[state]
+ *   3. node.points = node.points × multiplier
+ *   4. Store node.seasonalMultiplier = multiplier
+ */
 export function step6Seasonal(state: WuxingState): WuxingState {
+  const season = state.season;
+
+  // Apply to all primary nodes
+  for (const node of state.nodes) {
+    const seasonalState = SEASONAL_MATRIX[season][node.element];
+    const multiplier = SEASONAL_MULTIPLIERS[seasonalState];
+    node.points = node.points * multiplier;
+    node.seasonalMultiplier = multiplier;
+  }
+
+  // Apply to all bonus nodes
+  for (const bonus of state.bonusNodes) {
+    const seasonalState = SEASONAL_MATRIX[season][bonus.element];
+    const multiplier = SEASONAL_MULTIPLIERS[seasonalState];
+    bonus.points = bonus.points * multiplier;
+  }
+
   return state;
 }
 
@@ -1039,8 +1634,7 @@ export function step9BalanceSim(
 
 /**
  * Run the full Wu Xing calculator pipeline.
- * Steps 3-7 are stubs — Steps 0 (init), 1 (pillar pairs), 2 (EB positive),
- * 8 (report), and 9 (balance sim) produce real data.
+ * Step 7 is a stub — all other steps (0-6, 8, 9) produce real data.
  */
 export function calculateWuxing(input: WuxingInput): WuxingResult {
   let state = initializeState(input);
