@@ -22,7 +22,7 @@ export type {
   ChartData,
 } from './models';
 
-// Strength
+// Strength (element counting & utilities — scoring moved to wuxing/calculator.ts)
 export {
   getSeasonalState,
   getSeasonalMultiplier,
@@ -33,11 +33,7 @@ export {
   countSupportVsDrain,
   adjustElementsForInteractions,
   detectFollowingChart,
-  simulateElementBalance,
-  simulateElementPairs,
-  determineUsefulGod,
   VERDICT_THRESHOLDS,
-  assessDayMasterStrength,
 } from './strength';
 
 // Ten Gods
@@ -101,6 +97,9 @@ export {
   analyzeForApi,
   analyze,
 } from './engine';
+
+// Wuxing Bridge (ChartData <-> WuxingInput)
+export { chartToWuxingInput } from './wuxing-bridge';
 
 // Interactions
 export {

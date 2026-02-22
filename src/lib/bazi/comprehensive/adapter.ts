@@ -15,7 +15,8 @@ import {
 import {
   DM_WEALTH_STORAGE, STORAGE_OPENER, LARGE_WEALTH_STORAGE, WEALTH_ELEMENT_STEMS,
 } from '../wealth-storage';
-import type { WuxingResult } from '../wuxing/calculator';
+import { calculateWuxing, wuxingToElementCounts, type WuxingResult } from '../wuxing/calculator';
+import { chartToWuxingInput } from './wuxing-bridge';
 import { getQiPhaseForPillar } from '../qi-phase';
 import type {
   ChartData, Pillar, StrengthAssessment, BranchInteraction,
@@ -27,7 +28,7 @@ import {
   classifyTenGodStrength, analyzeTenGodPatterns,
   checkSpouseStar, checkChildrenStar,
 } from './ten-gods';
-import { countElements, countAllElements, adjustElementsForInteractions, applySeasonalScaling } from './strength';
+import { countAllElements, adjustElementsForInteractions, applySeasonalScaling } from './strength';
 import { analyzeQiPhases } from './qi-phase-analysis';
 import { assessSpiritualSensitivity } from './spiritual-sensitivity';
 import {
@@ -454,60 +455,31 @@ function buildElementScores(
     return scores;
   }
 
-  if (wuxingResult) {
-    // Use wuxing element totals for natal scores (base + natal)
-    // Convert element totals to same scale as old pipeline: total * scaling_factor
-    // The old pipeline: elementCount * 50 = stemScore
-    // With wuxing: we use element.total values as the "counts" since they represent
-    // the same kind of accumulated weight (just computed differently)
-    const wuxingCounts: Record<string, number> = {};
-    for (const elem of ['Wood', 'Fire', 'Earth', 'Metal', 'Water']) {
-      wuxingCounts[elem] = wuxingResult.elements[elem as keyof typeof wuxingResult.elements].total;
-    }
-
-    // Normalize to match old pipeline scale: old pipeline produces counts ~1-5 range
-    // wuxing produces totals ~10-50 range. Scale so that sum matches old pipeline sum.
-    const wuxingTotal = Object.values(wuxingCounts).reduce((a, b) => a + b, 0);
-    const scaleFactor = wuxingTotal > 0 ? 1 / wuxingTotal : 0;
-
-    // For stem scores, use percentage-based approach: each stem gets its element's percentage
-    // This keeps the bar chart proportions identical to the wuxing percentages
-    const natalPctCounts: Record<string, number> = {};
-    for (const elem of ['Wood', 'Fire', 'Earth', 'Metal', 'Water']) {
-      // Convert percentage (0-100) to a "count" that, when multiplied by 50,
-      // gives a score proportional to the element's presence
-      natalPctCounts[elem] = wuxingResult.elements[elem as keyof typeof wuxingResult.elements].percent / 100 * 10;
-    }
-
-    const natalScores = _toStemScores(natalPctCounts);
-
-    // For post scores (full chart with luck/time pillars), fall back to old pipeline
-    // since wuxing only covers natal 4 pillars for now
-    let fullCounts = countAllElements(chart);
-    if (interactions && interactions.length > 0) {
-      fullCounts = adjustElementsForInteractions(fullCounts, interactions, chart);
-    }
-    const monthBranch = chart.pillars["month"].branch;
-    fullCounts = applySeasonalScaling(fullCounts, monthBranch);
-    const fullScores = _toStemScores(fullCounts);
-
-    return [natalScores, { ...natalScores }, fullScores];
+  // Compute wuxing result if not provided
+  if (!wuxingResult) {
+    wuxingResult = calculateWuxing(chartToWuxingInput(chart));
   }
 
-  // Fallback: old pipeline (no wuxing result available)
-  let natalCounts = countElements(chart);
-  let fullCounts = countAllElements(chart);
+  // Use wuxing element percentages for natal scores (base + natal)
+  // For stem scores, use percentage-based approach: each stem gets its element's percentage
+  // This keeps the bar chart proportions identical to the wuxing percentages
+  const natalPctCounts: Record<string, number> = {};
+  for (const elem of ['Wood', 'Fire', 'Earth', 'Metal', 'Water']) {
+    // Convert percentage (0-100) to a "count" that, when multiplied by 50,
+    // gives a score proportional to the element's presence
+    natalPctCounts[elem] = wuxingResult.elements[elem as keyof typeof wuxingResult.elements].percent / 100 * 10;
+  }
 
+  const natalScores = _toStemScores(natalPctCounts);
+
+  // For post scores (full chart with luck/time pillars), use old pipeline
+  // since wuxing only covers natal 4 pillars for now
+  let fullCounts = countAllElements(chart);
   if (interactions && interactions.length > 0) {
-    natalCounts = adjustElementsForInteractions(natalCounts, interactions, chart);
     fullCounts = adjustElementsForInteractions(fullCounts, interactions, chart);
   }
-
   const monthBranch = chart.pillars["month"].branch;
-  natalCounts = applySeasonalScaling(natalCounts, monthBranch);
   fullCounts = applySeasonalScaling(fullCounts, monthBranch);
-
-  const natalScores = _toStemScores(natalCounts);
   const fullScores = _toStemScores(fullCounts);
 
   return [natalScores, { ...natalScores }, fullScores];
@@ -657,13 +629,19 @@ function buildHealthAnalysis(
   flags: Record<string, RedFlag[]>,
   strength: StrengthAssessment,
   chart: ChartData,
+  elemCounts?: Record<string, number>,
 ): Record<string, unknown> {
   const healthFlags = flags.health ?? [];
-  const elemCounts = countElements(chart);
+  // Use wuxing-based element percentages if provided, otherwise compute
+  if (!elemCounts) {
+    const wr = calculateWuxing(chartToWuxingInput(chart));
+    elemCounts = wuxingToElementCounts(wr);
+  }
   const warnings: Array<Record<string, unknown>> = [];
 
+  // With percentage-based counts (avg=20), < 12% is deficient
   for (const elem of ["Wood", "Fire", "Earth", "Metal", "Water"]) {
-    if ((elemCounts[elem] ?? 0) < 1.0) {
+    if ((elemCounts[elem] ?? 0) < 12) {
       const organInfo = HEALTH_ELEMENT_MAP[elem];
       warnings.push({
         element: elem,
@@ -672,7 +650,7 @@ function buildHealthAnalysis(
         fu_organ: organInfo.yang_organ,
         severity: "moderate",
         conflict_count: 0,
-        weighted_score: Math.round((1.0 - (elemCounts[elem] ?? 0)) * 300) / 10,
+        weighted_score: Math.round((20 - (elemCounts[elem] ?? 0)) * 5) / 10,
         seasonal_state: strength.seasonal_state,
       });
     }
@@ -1429,10 +1407,14 @@ function _summaryLuckPillar(chart: ChartData, strength: StrengthAssessment): Rec
   return { id: "luck_pillar", title: "Current Luck Pillar", title_zh: "大運分析", text };
 }
 
-function _summaryHealth(chart: ChartData, strength: StrengthAssessment): Record<string, unknown> {
-  const elemCounts = countElements(chart);
+function _summaryHealth(chart: ChartData, strength: StrengthAssessment, elemCounts?: Record<string, number>): Record<string, unknown> {
+  // With wuxing percentages, values are already in percent (avg=20)
+  if (!elemCounts) {
+    const wr = calculateWuxing(chartToWuxingInput(chart));
+    elemCounts = wuxingToElementCounts(wr);
+  }
   const total = Object.values(elemCounts).reduce((a, b) => a + b, 0);
-  const avg = total > 0 ? total / 5 : 1.0;
+  const avg = total > 0 ? total / 5 : 20;
 
   const monthBranch = chart.pillars["month"].branch;
   const seasonalStates = (BRANCHES[monthBranch] as Record<string, unknown>).element_states as Record<string, string> ?? {};
@@ -1453,7 +1435,7 @@ function _summaryHealth(chart: ChartData, strength: StrengthAssessment): Record<
 
   for (const elem of ["Wood", "Fire", "Earth", "Metal", "Water"]) {
     const count = elemCounts[elem] ?? 0;
-    const pct = total > 0 ? (count / total * 100) : 20;
+    const pct = count; // Already in percentage
     const organInfo = HEALTH_ELEMENT_MAP[elem];
     const yinOrgan = organInfo.yin_organ;
     const bodyParts = organInfo.body_parts;
@@ -1515,7 +1497,7 @@ function _summaryHealth(chart: ChartData, strength: StrengthAssessment): Record<
   return { id: "health", title: "Health", title_zh: "健康", items };
 }
 
-function _summaryRemedies(strength: StrengthAssessment, chart: ChartData): Record<string, unknown> {
+function _summaryRemedies(strength: StrengthAssessment, chart: ChartData, elemCounts?: Record<string, number>): Record<string, unknown> {
   const useful = strength.useful_god;
   const remedies = ELEMENT_REMEDIES[useful];
   const items: Array<Record<string, unknown>> = [];
@@ -1528,9 +1510,12 @@ function _summaryRemedies(strength: StrengthAssessment, chart: ChartData): Recor
     if (avoid) items.push({ label: "Avoid Colors", value: avoid });
   }
 
-  const elemCounts = countElements(chart);
-  const totalCount = Object.values(elemCounts).reduce((a, b) => a + b, 0);
-  const avgCount = totalCount > 0 ? totalCount / 5 : 1.0;
+  // Use wuxing-based element percentages (avg=20)
+  if (!elemCounts) {
+    const wr = calculateWuxing(chartToWuxingInput(chart));
+    elemCounts = wuxingToElementCounts(wr);
+  }
+  const avgCount = 20; // wuxing percentages average to 20
 
   for (const elem of ["Wood", "Fire", "Earth", "Metal", "Water"]) {
     const count = elemCounts[elem] ?? 0;
@@ -1778,6 +1763,7 @@ function _summaryHonest(
   chart: ChartData, strength: StrengthAssessment,
   tgClassification: Record<string, Record<string, unknown>>,
   flags: Record<string, RedFlag[]>,
+  elemCounts?: Record<string, number>,
 ): Record<string, unknown> {
   const dmElement = chart.dm_element;
   const dmInfo = STEMS[chart.day_master];
@@ -1832,11 +1818,13 @@ function _summaryHonest(
   else if (rw === "PROMINENT") parts.push("Wealth: Rob Wealth is prominent — money comes but also leaves through others. Avoid partnerships and lending. Protect what you earn.");
   else if (iw === "PROMINENT") parts.push("Wealth: Strong Indirect Wealth — windfall potential through speculation, business, or investments. Risk tolerance is high, but so is the upside.");
 
-  // Health
-  const elemCounts = countElements(chart);
-  const totalCount = Object.values(elemCounts).reduce((a, b) => a + b, 0);
-  const avgCount = totalCount > 0 ? totalCount / 5 : 1.0;
-  const deficientElements = ["Wood", "Fire", "Earth", "Metal", "Water"].filter(e => (elemCounts[e] ?? 0) < avgCount * 0.5);
+  // Health — use wuxing percentages (avg=20)
+  if (!elemCounts) {
+    const wr = calculateWuxing(chartToWuxingInput(chart));
+    elemCounts = wuxingToElementCounts(wr);
+  }
+  const avgCount = 20; // wuxing percentages average to 20
+  const deficientElements = ["Wood", "Fire", "Earth", "Metal", "Water"].filter(e => (elemCounts![e] ?? 0) < avgCount * 0.5);
   if (deficientElements.length > 0) {
     const organs = deficientElements.map(e => `${HEALTH_ELEMENT_MAP[e].yin_organ.split("(")[0].trim()} (${e})`);
     parts.push(`Health: Watch ${organs.join(", ")} — these elements are deficient in your chart.`);
@@ -1940,19 +1928,22 @@ function _diffShenSha(shenSha: ShenShaResult[]): Record<string, unknown> | null 
   return { id: "shen_sha_diff", title: "Stars Activated", title_zh: "新增神煞", text: `${newStars.length} star(s) activated by luck/time pillars`, items };
 }
 
-function _diffElementShift(chart: ChartData): Record<string, unknown> | null {
-  const natalCounts = countElements(chart);
+function _diffElementShift(chart: ChartData, natalElemCounts?: Record<string, number>): Record<string, unknown> | null {
+  // Natal counts from wuxing (percentages, already summing to ~100)
+  if (!natalElemCounts) {
+    const wr = calculateWuxing(chartToWuxingInput(chart));
+    natalElemCounts = wuxingToElementCounts(wr);
+  }
+  // Full counts (with luck/time pillars) still use old pipeline
   const fullCounts = countAllElements(chart);
 
-  if (JSON.stringify(natalCounts) === JSON.stringify(fullCounts)) return null;
-
-  const natalTotal = Object.values(natalCounts).reduce((a, b) => a + b, 0);
   const fullTotal = Object.values(fullCounts).reduce((a, b) => a + b, 0);
 
   const EC: Record<string, string> = { Wood: "木", Fire: "火", Earth: "土", Metal: "金", Water: "水" };
   const items: Array<Record<string, unknown>> = [];
+  let anyDifference = false;
   for (const elem of ["Wood", "Fire", "Earth", "Metal", "Water"]) {
-    const natalPct = natalTotal > 0 ? natalCounts[elem] / natalTotal * 100 : 0;
+    const natalPct = natalElemCounts[elem] ?? 0; // Already percentage
     const fullPct = fullTotal > 0 ? fullCounts[elem] / fullTotal * 100 : 0;
     const change = fullPct - natalPct;
     if (Math.abs(change) < 1.0) continue;
@@ -1977,6 +1968,10 @@ function buildClientSummary(
   const shenSha = results.shen_sha as ShenShaResult[];
   const predictions = results.predictions as Record<string, EventPrediction[]>;
 
+  // Get wuxing element counts (percentages) from results
+  const wr = results.wuxing_result as WuxingResult | undefined;
+  const elemCounts = wr ? wuxingToElementCounts(wr) : undefined;
+
   const hasLuck = chart.luck_pillar !== null;
   const hasTimePeriod = Object.keys(chart.time_period_pillars).length > 0;
   const isFull = hasLuck || hasTimePeriod;
@@ -1993,16 +1988,16 @@ function buildClientSummary(
       _summaryShenSha(shenSha),
       _summaryRedFlags(flags),
       _summaryNatalPredictions(chart, tgClassification, strength, predictions, flags),
-      _summaryHealth(chart, strength),
-      _summaryRemedies(strength, chart),
-      _summaryHonest(chart, strength, tgClassification, flags),
+      _summaryHealth(chart, strength, elemCounts),
+      _summaryRemedies(strength, chart, elemCounts),
+      _summaryHonest(chart, strength, tgClassification, flags, elemCounts),
     ];
   } else {
     sections = [];
     const lpSection = _summaryLuckPillar(chart, strength);
     if (lpSection) sections.push(lpSection);
 
-    const elemDiff = _diffElementShift(chart);
+    const elemDiff = _diffElementShift(chart, elemCounts);
     if (elemDiff) sections.push(elemDiff);
 
     const tgDiff = _diffTenGodsArriving(tgEntries, tgClassification, chart);
@@ -2023,7 +2018,7 @@ function buildClientSummary(
       if (predSection) sections.push(predSection);
     }
 
-    sections.push(_summaryRemedies(strength, chart));
+    sections.push(_summaryRemedies(strength, chart, elemCounts));
   }
 
   return { tier, sections };
@@ -2061,7 +2056,10 @@ export function adaptToFrontend(chart: ChartData, results: Record<string, unknow
   // 4. Build element scores (use wuxing result if available)
   const [baseScore, natalScore, postScore] = buildElementScores(chart, interactions, wuxingResult);
 
-  // 5. Assemble response
+  // 5. Get wuxing element counts for downstream functions
+  const elemCounts = wuxingResult ? wuxingToElementCounts(wuxingResult) : undefined;
+
+  // 6. Assemble response
   const response: Record<string, unknown> = {};
 
   // Nodes
@@ -2079,7 +2077,7 @@ export function adaptToFrontend(chart: ChartData, results: Record<string, unknow
   response.daymaster_analysis = buildDaymasterAnalysis(strength, chart);
 
   // Life aspects
-  response.health_analysis = buildHealthAnalysis(flags, strength, chart);
+  response.health_analysis = buildHealthAnalysis(flags, strength, chart, elemCounts);
   response.wealth_analysis = buildWealthAnalysis(flags, strength, tgClassification, chart);
   response.learning_analysis = buildLearningAnalysis(flags, strength, tgClassification, chart);
 

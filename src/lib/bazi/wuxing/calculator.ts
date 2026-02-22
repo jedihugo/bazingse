@@ -166,6 +166,23 @@ export interface WuxingResult {
 export type { PillarPosition } from './tables';
 
 // ---------------------------------------------------------------------------
+// Bridge helpers — let old code consume WuxingResult in legacy formats
+// ---------------------------------------------------------------------------
+
+/**
+ * Convert a WuxingResult into a simple Record<string, number> mapping
+ * element name -> percentage. This lets downstream code that does
+ * `elemCounts["Water"]` keep its structure while using wuxing values.
+ */
+export function wuxingToElementCounts(result: WuxingResult): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const [elem, summary] of Object.entries(result.elements)) {
+    counts[elem] = summary.percent;
+  }
+  return counts;
+}
+
+// ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
 

@@ -18,7 +18,7 @@ import {
   mapAllTenGods, classifyTenGodStrength, checkSpouseStar,
   checkChildrenStar, analyzeTenGodPatterns, TEN_GOD_INFO,
 } from './ten-gods';
-import { assessDayMasterStrength, countElements } from './strength';
+import { countSupportVsDrain, getSeasonalState } from './strength';
 import { detectAllInteractions } from './interactions';
 import { runAllShenSha } from './shen-sha';
 import { runAllPredictions, getAnnualPillar } from './predictions';
@@ -28,6 +28,8 @@ import {
   SHEN_SHA_IMPACTS, SEVERITY_LANGUAGE,
   HEALTH_ELEMENT_MAP, ELEMENT_REMEDIES, LIFE_LESSON_TEMPLATES, _pick,
 } from './templates';
+import { calculateWuxing, wuxingToElementCounts, type WuxingResult } from '../wuxing/calculator';
+import { chartToWuxingInput } from './wuxing-bridge';
 
 
 // =============================================================================
@@ -550,11 +552,10 @@ function sectionHealth(
   chart: ChartData,
   strength: StrengthAssessment,
   shenSha: ShenShaResult[],
+  elemCounts: Record<string, number>,
 ): string {
   const lines: string[] = [];
   lines.push("## SECTION 8: HEALTH ANALYSIS (健康)\n");
-
-  const elemCounts = countElements(chart);
 
   // Element balance table
   lines.push("### Element Balance\n");
@@ -836,19 +837,60 @@ function sectionSummary(
 // MASTER REPORT GENERATOR
 // =============================================================================
 
-export function generateComprehensiveReport(chart: ChartData): string {
+export function generateComprehensiveReport(chart: ChartData, wuxingResult?: WuxingResult): string {
   /**
    * Generate the complete 11-section BaZi analysis report.
    * Pure TypeScript, zero LLM, fully deterministic (except random template selection).
    */
+  // Compute wuxing result if not provided
+  if (!wuxingResult) {
+    wuxingResult = calculateWuxing(chartToWuxingInput(chart));
+  }
+
+  // Map wuxing strength label to legacy verdict
+  const STRENGTH_TO_VERDICT: Record<string, string> = {
+    dominant: 'extremely_strong',
+    strong: 'strong',
+    balanced: 'neutral',
+    weak: 'weak',
+    very_weak: 'extremely_weak',
+  };
+
+  // Build element percentages from wuxing
+  const wuxingPercentages: Record<string, number> = {};
+  for (const elem of ['Wood', 'Fire', 'Earth', 'Metal', 'Water'] as const) {
+    wuxingPercentages[elem] = wuxingResult.elements[elem].percent;
+  }
+
+  // Build backward-compatible StrengthAssessment from wuxing
+  const [support, drain] = countSupportVsDrain(chart);
+  const seasonalState = getSeasonalState(chart);
+
+  const strength: StrengthAssessment = {
+    score: wuxingResult.dayMaster.percent,
+    verdict: STRENGTH_TO_VERDICT[wuxingResult.dayMaster.strength] ?? 'neutral',
+    useful_god: wuxingResult.gods.useful,
+    element_percentages: wuxingPercentages,
+    favorable_elements: [wuxingResult.gods.useful, wuxingResult.gods.favorable],
+    unfavorable_elements: [wuxingResult.gods.unfavorable, wuxingResult.gods.enemy],
+    support_count: Math.round(support * 100) / 100,
+    drain_count: Math.round(drain * 100) / 100,
+    seasonal_state: seasonalState,
+    is_following_chart: false,
+    following_type: null,
+    best_element_pairs: [],
+  };
+
+  // Element counts from wuxing (percentage-based)
+  const elemCounts = wuxingToElementCounts(wuxingResult);
+
   // Run all analyses
   const tgEntries = mapAllTenGods(chart);
   const tgClassification = classifyTenGodStrength(tgEntries);
-  const strength = assessDayMasterStrength(chart);
   const interactions = detectAllInteractions(chart);
   const shenSha = runAllShenSha(chart);
   const predictions = runAllPredictions(chart);
-  const env = assessEnvironment(chart, strength);
+  const env = assessEnvironment(chart, strength, wuxingResult);
 
   // Build report
   const sections = [
@@ -870,7 +912,7 @@ export function generateComprehensiveReport(chart: ChartData): string {
     "\n---\n",
     sectionLuckPillar(chart, strength),
     "\n---\n",
-    sectionHealth(chart, strength, shenSha),
+    sectionHealth(chart, strength, shenSha, elemCounts),
     "\n---\n",
     sectionRemedies(chart, strength, env),
     "\n---\n",

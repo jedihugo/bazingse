@@ -1,17 +1,17 @@
 import 'server-only';
 
 // =============================================================================
-// DAY MASTER STRENGTH ASSESSMENT ENGINE
+// ELEMENT COUNTING & STRENGTH UTILITIES
 // =============================================================================
-// DM strength = DM's element percentage of total chart elements.
-// ~20% = balanced (100% / 5 elements).
-// Branch interactions adjust element weights before computing percentages.
+// Provides element counting, seasonal scaling, rooting analysis, and
+// interaction-adjusted element counting. The main assessDayMasterStrength
+// function has been replaced by the Wu Xing calculator (wuxing/calculator.ts).
 // =============================================================================
 
 import { STEMS, BRANCHES, type StemName, type BranchName, type Element } from '../core';
 import { ELEMENT_CYCLES, getAllBranchQi } from '../derived';
 import { SEASONAL_ADJUSTMENT } from '../seasonal';
-import type { StrengthAssessment, BranchInteraction, ChartData } from './models';
+import type { BranchInteraction, ChartData } from './models';
 import { HARMONY_PAIRS, THREE_HARMONY_FRAMES, DIRECTIONAL_COMBOS } from './interactions';
 
 // Local helpers matching the pairKey/tripleKey from interactions.ts
@@ -411,200 +411,15 @@ export function detectFollowingChart(
 }
 
 // =============================================================================
-// USEFUL GOD (用神) DETERMINATION — BALANCE SIMULATION
+// MAIN STRENGTH ASSESSMENT — REMOVED
+// =============================================================================
+// The old assessDayMasterStrength, simulateElementBalance, simulateElementPairs,
+// and determineUsefulGod functions have been replaced by the Wu Xing calculator
+// in src/lib/bazi/wuxing/calculator.ts. The calculator's step 8 (report) and
+// step 9 (balance simulation) provide element percentages and Five Gods.
 // =============================================================================
 
-function _calcImbalance(pcts: Record<string, number>): number {
-  /** Sum of squared deviations from 20% — lower = more balanced. */
-  let sum = 0;
-  for (const p of Object.values(pcts)) {
-    sum += (p - 20.0) ** 2;
-  }
-  return sum;
-}
-
-function _simulateDose(
-  elementCounts: Record<string, number>,
-  total: number,
-  additions: Record<string, number>,
-): [number, Record<string, number>] {
-  /** Apply element additions and return [new_imbalance, new_percentages]. */
-  const adjusted = { ...elementCounts };
-  let doseTotal = 0;
-  for (const [elem, dose] of Object.entries(additions)) {
-    adjusted[elem] += dose;
-    doseTotal += dose;
-  }
-  const newTotal = total + doseTotal;
-  const newPcts: Record<string, number> = {};
-  for (const [e, c] of Object.entries(adjusted)) {
-    newPcts[e] = (c / newTotal) * 100;
-  }
-  return [_calcImbalance(newPcts), newPcts];
-}
-
-export function simulateElementBalance(elementCounts: Record<string, number>): {
-  useful_god: string | null;
-  favorable: string[];
-  unfavorable: string[];
-} {
-  /**
-   * Simulate adding each element to find which best balances the chart.
-   * Imbalance = sum of squared deviations from 20% (ideal equal distribution).
-   * The element whose addition produces the lowest imbalance = useful god.
-   */
-  const total = Object.values(elementCounts).reduce((a, b) => a + b, 0);
-  if (total === 0) {
-    return { useful_god: null, favorable: [], unfavorable: [] };
-  }
-
-  const currentPcts: Record<string, number> = {};
-  for (const [e, c] of Object.entries(elementCounts)) {
-    currentPcts[e] = (c / total) * 100;
-  }
-  const currentImbalance = _calcImbalance(currentPcts);
-
-  // Standard dose = 1.0 (one Heavenly Stem equivalent, like a luck pillar)
-  const dose = 1.0;
-  const improvements: Record<string, number> = {};
-
-  for (const testElem of Object.keys(elementCounts)) {
-    const [newImb] = _simulateDose(elementCounts, total, { [testElem]: dose });
-    improvements[testElem] = Math.round((currentImbalance - newImb) * 100) / 100;
-  }
-
-  // Rank by improvement (highest = most balancing)
-  const ranked = Object.keys(improvements).sort(
-    (a, b) => improvements[b] - improvements[a]
-  );
-  const favorable = ranked.filter(e => improvements[e] > 0);
-  const unfavorable = ranked.filter(e => improvements[e] <= 0);
-
-  return {
-    useful_god: ranked[0] ?? null,
-    favorable,
-    unfavorable,
-  };
-}
-
-export function simulateElementPairs(elementCounts: Record<string, number>): Array<Record<string, unknown>> {
-  /**
-   * Simulate adding pairs of elements (like a luck pillar's stem + branch).
-   * Tests all 15 unique pairs at equal dose (0.5 + 0.5 = 1.0 total).
-   * Returns top 5 pairs ranked by balancing improvement.
-   */
-  const total = Object.values(elementCounts).reduce((a, b) => a + b, 0);
-  if (total === 0) {
-    return [];
-  }
-
-  const currentPcts: Record<string, number> = {};
-  for (const [e, c] of Object.entries(elementCounts)) {
-    currentPcts[e] = (c / total) * 100;
-  }
-  const currentImbalance = _calcImbalance(currentPcts);
-
-  const elements = Object.keys(elementCounts).sort();
-  const results: Array<Record<string, unknown>> = [];
-
-  for (let i = 0; i < elements.length; i++) {
-    const e1 = elements[i];
-    for (let j = i; j < elements.length; j++) {
-      const e2 = elements[j];
-      const additions: Record<string, number> = {};
-      if (e1 === e2) {
-        additions[e1] = 1.0; // Same element: full dose
-      } else {
-        additions[e1] = 0.5;
-        additions[e2] = 0.5;
-      }
-
-      const [newImb, newPcts] = _simulateDose(elementCounts, total, additions);
-      const improvement = Math.round((currentImbalance - newImb) * 100) / 100;
-
-      const resultPcts: Record<string, number> = {};
-      for (const [k, v] of Object.entries(newPcts)) {
-        resultPcts[k] = Math.round(v * 10) / 10;
-      }
-
-      results.push({
-        elements: e1 !== e2 ? [e1, e2] : [e1],
-        improvement,
-        result_pcts: resultPcts,
-      });
-    }
-  }
-
-  results.sort((a, b) => (b.improvement as number) - (a.improvement as number));
-  return results.slice(0, 5); // Top 5 pairs
-}
-
-export function determineUsefulGod(
-  chart: ChartData,
-  verdict: string,
-  isFollowing: boolean,
-  followingType: string | null,
-  elementCounts?: Record<string, number>,
-): { useful_god: string | null; favorable: string[]; unfavorable: string[] } {
-  /**
-   * Determine the Useful God (用神) and favorable/unfavorable elements.
-   * Uses balance simulation: which element, when added, brings the chart
-   * closest to 20% equilibrium across all five elements.
-   * Following charts use categorical rules (go with the dominant force).
-   */
-  const dmElement = chart.dm_element;
-  const resourceElement = ELEMENT_CYCLES.generated_by[dmElement];
-  const outputElement = ELEMENT_CYCLES.generating[dmElement];
-  const wealthElement = ELEMENT_CYCLES.controlling[dmElement];
-  const officerElement = ELEMENT_CYCLES.controlled_by[dmElement];
-
-  if (isFollowing) {
-    // Following chart: go WITH the dominant force (no rebalancing)
-    if (followingType === "wealth") {
-      return {
-        useful_god: wealthElement,
-        favorable: [wealthElement, outputElement, officerElement],
-        unfavorable: [dmElement, resourceElement],
-      };
-    } else if (followingType === "officer") {
-      return {
-        useful_god: officerElement,
-        favorable: [officerElement, wealthElement, outputElement],
-        unfavorable: [dmElement, resourceElement],
-      };
-    } else if (followingType === "output") {
-      return {
-        useful_god: outputElement,
-        favorable: [outputElement, wealthElement],
-        unfavorable: [dmElement, resourceElement, officerElement],
-      };
-    } else {
-      return {
-        useful_god: wealthElement,
-        favorable: [wealthElement, outputElement],
-        unfavorable: [dmElement, resourceElement],
-      };
-    }
-  }
-
-  // Balance simulation: which element brings the chart closest to equilibrium?
-  if (elementCounts) {
-    return simulateElementBalance(elementCounts);
-  }
-
-  // Fallback (shouldn't reach here — element_counts always passed from assess)
-  return {
-    useful_god: outputElement,
-    favorable: [outputElement, wealthElement],
-    unfavorable: [],
-  };
-}
-
-// =============================================================================
-// MAIN STRENGTH ASSESSMENT
-// =============================================================================
-
-// Verdict thresholds (20% = balanced center)
+// Verdict thresholds (20% = balanced center) — kept for reference
 export const VERDICT_THRESHOLDS = {
   extremely_strong: 30.0,
   strong: 24.0,
@@ -612,128 +427,3 @@ export const VERDICT_THRESHOLDS = {
   neutral_lower: 16.0,
   weak: 10.0,
 } as const;
-
-export function assessDayMasterStrength(
-  chart: ChartData,
-  interactions?: BranchInteraction[],
-): StrengthAssessment {
-  /**
-   * DM strength = DM's element percentage of total chart elements.
-   * ~20% = balanced. Branch interactions and seasonal scaling adjust element weights.
-   */
-  // 1. Count raw elements
-  let elementCounts = countElements(chart);
-
-  // 2. Adjust for interactions (combinations add element weight, clashes reduce)
-  if (interactions && interactions.length > 0) {
-    elementCounts = adjustElementsForInteractions(
-      elementCounts, interactions, chart);
-  }
-
-  // 3. Apply seasonal scaling (旺相休囚死) — most influential factor
-  //    The month branch determines each element's seasonal state.
-  //    e.g., Winter (Hai): Water Prosperous x1.382, Fire Dead x0.786
-  const monthBranch = chart.pillars["month"].branch;
-  elementCounts = applySeasonalScaling(elementCounts, monthBranch);
-
-  // 4. Calculate percentages from seasonally-scaled weights
-  const total = Object.values(elementCounts).reduce((a, b) => a + b, 0);
-  let percentages: Record<string, number>;
-  if (total > 0) {
-    percentages = {};
-    for (const [elem, count] of Object.entries(elementCounts)) {
-      percentages[elem] = (count / total) * 100;
-    }
-  } else {
-    percentages = {};
-    for (const elem of Object.keys(elementCounts)) {
-      percentages[elem] = 20.0;
-    }
-  }
-
-  // 5. DM strength score = DM's element percentage (single source of truth)
-  const dmElement = chart.dm_element;
-  const score = Math.max(1.0, Math.min(50.0,
-    Math.round(percentages[dmElement] * 10) / 10));
-
-  // 6. Drain pressure: if drain elements individually exceed the DM,
-  //    the DM is under pressure even at a "balanced" percentage.
-  const outputElem = ELEMENT_CYCLES.generating[dmElement] ?? "";
-  const wealthElem = ELEMENT_CYCLES.controlling[dmElement] ?? "";
-  const officerElem = ELEMENT_CYCLES.controlled_by[dmElement] ?? "";
-
-  let drainPressure = 0.0;
-  for (const drainElem of [outputElem, wealthElem, officerElem]) {
-    if (drainElem) {
-      const excess = (percentages[drainElem] ?? 0) - score;
-      if (excess > 0) {
-        drainPressure += excess;
-      }
-    }
-  }
-
-  // 7. Seasonal state and root factors for verdict
-  const seasonalState = getSeasonalState(chart);
-  const rootInfo = checkRooting(chart);
-
-  // Seasonal effect is now in the percentages via scaling (step 3).
-  // Root adjustment is a small additional factor.
-  let effectivePct = score;
-  if (rootInfo.has_strong_root) {
-    effectivePct += 1.0;
-  } else if (!rootInfo.has_root) {
-    effectivePct -= 1.5;
-  }
-
-  // 8. Apply drain pressure — each point of excess reduces effective strength
-  effectivePct -= drainPressure * 0.4;
-
-  // 9. Determine verdict using effective_pct (20% = balanced)
-  let verdict: string;
-  if (effectivePct >= 30.0) {
-    verdict = "extremely_strong";
-  } else if (effectivePct >= 24.0) {
-    verdict = "strong";
-  } else if (effectivePct >= 16.0) {
-    verdict = "neutral";
-  } else if (effectivePct >= 10.0) {
-    verdict = "weak";
-  } else {
-    verdict = "extremely_weak";
-  }
-
-  // 10. Support/drain counts (kept for compatibility)
-  const [support, drain] = countSupportVsDrain(chart);
-
-  // 11. Check for following chart
-  const [isFollowing, followingType] = detectFollowingChart(
-    chart, support, drain, seasonalState, rootInfo);
-
-  // 12. Determine useful god via balance simulation (uses seasonally-scaled counts)
-  const godInfo = determineUsefulGod(chart, verdict, isFollowing, followingType,
-    elementCounts);
-
-  // 13. Simulate element pairs (best luck pillar combinations)
-  const bestPairs = !isFollowing ? simulateElementPairs(elementCounts) : [];
-
-  // Round percentages
-  const roundedPercentages: Record<string, number> = {};
-  for (const [k, v] of Object.entries(percentages)) {
-    roundedPercentages[k] = Math.round(v * 10) / 10;
-  }
-
-  return {
-    score,
-    verdict,
-    support_count: Math.round(support * 100) / 100,
-    drain_count: Math.round(drain * 100) / 100,
-    seasonal_state: seasonalState,
-    is_following_chart: isFollowing,
-    following_type: followingType,
-    useful_god: godInfo.useful_god ?? "",
-    favorable_elements: godInfo.favorable,
-    unfavorable_elements: godInfo.unfavorable,
-    element_percentages: roundedPercentages,
-    best_element_pairs: bestPairs,
-  };
-}

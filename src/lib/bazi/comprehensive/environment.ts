@@ -7,7 +7,8 @@ import 'server-only';
 import type { BranchName } from '../core';
 import { ELEMENT_CHINESE } from '../derived';
 import type { EnvironmentAssessment, ChartData, StrengthAssessment } from './models';
-import { countElements } from './strength';
+import { calculateWuxing, wuxingToElementCounts, type WuxingResult } from '../wuxing/calculator';
+import { chartToWuxingInput } from './wuxing-bridge';
 import { YI_MA_LOOKUP, getVoidBranches } from './shen-sha';
 
 // =============================================================================
@@ -51,6 +52,7 @@ const ELEMENT_GEOGRAPHY: Record<string, string> = {
 function assessCrossingWater(
   chart: ChartData,
   strength: StrengthAssessment,
+  elemCounts: Record<string, number>,
 ): { score: number; verdict: string; benefit: boolean; reason: string; factors: string[] } {
   let score = 0;
   const factors: string[] = [];
@@ -68,7 +70,6 @@ function assessCrossingWater(
   }
 
   // 2. Water depleted in natal chart
-  const elemCounts = countElements(chart);
   const waterCount = elemCounts["Water"] ?? 0;
   const fireCount = elemCounts["Fire"] ?? 0;
   const earthCount = elemCounts["Earth"] ?? 0;
@@ -195,8 +196,14 @@ function assessVoidDisruption(chart: ChartData): string[] {
 export function assessEnvironment(
   chart: ChartData,
   strength: StrengthAssessment,
+  wuxingResult?: WuxingResult,
 ): EnvironmentAssessment {
-  const cw = assessCrossingWater(chart, strength);
+  // Compute wuxing result if not provided
+  if (!wuxingResult) {
+    wuxingResult = calculateWuxing(chartToWuxingInput(chart));
+  }
+  const elemCounts = wuxingToElementCounts(wuxingResult);
+  const cw = assessCrossingWater(chart, strength, elemCounts);
   const dirs = getFavorableDirections(strength);
   const env = getIdealEnvironment(strength);
   const voidPalaces = assessVoidDisruption(chart);
