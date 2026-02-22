@@ -3,7 +3,7 @@
 // =============================================================================
 // Deterministic point-based Wu Xing (Five Element) calculator.
 // Chains steps 0-9 to produce a WuxingResult from pillar inputs.
-// Step 7 is a stub — it passes state through unchanged for now.
+// All steps (0-9) produce real data.
 // =============================================================================
 
 import type { Element, StemName, BranchName } from '../core';
@@ -32,6 +32,7 @@ import {
   NEGATIVE_RATES,
   SEASONAL_MATRIX,
   SEASONAL_MULTIPLIERS,
+  getStep7Gap,
 } from './tables';
 import type { PillarPosition, ControlRelation } from './tables';
 
@@ -1497,8 +1498,291 @@ export function step6Seasonal(state: WuxingState): WuxingState {
   return state;
 }
 
-/** Step 7: Natural flow — cross-pillar element interactions (stub) */
+// ---------------------------------------------------------------------------
+// Step 7: Natural Element Flow 自然五行流转
+// ---------------------------------------------------------------------------
+
+/**
+ * A "flow node" represents a visible node participating in cross-pillar
+ * element interactions. Can be a native HS/EB or a bonus node, each
+ * tagged with its grid position for gap calculation.
+ */
+interface FlowNode {
+  id: string;            // node ID (e.g. 'YP.HS', 'MP.EB+Fire_SIX_HARMONIES')
+  pillar: PillarPosition;
+  row: 0 | 1;           // 0 = HS row, 1 = EB row
+  element: Element;
+  /** Live mutable reference to the actual points value */
+  getPoints: () => number;
+  setPoints: (v: number) => void;
+  isBonus: boolean;
+  /** Grid key for getStep7Gap, e.g. 'YP.HS' or 'MP.EB' */
+  gridKey: string;
+}
+
+/**
+ * Step 7: Natural Element Flow — cross-pillar Wu Xing production/control
+ * interactions at half Step 1 rates.
+ *
+ * Scope:
+ *   - Each pillar's HS (primary qi)
+ *   - Each pillar's EB main qi (primary qi)
+ *   - Bonus qi from Step 2/3 combos and transformations
+ *   - Excluded: hidden stems (h1, h2)
+ *   - Excluded: same-pillar native HS <-> native EB (already in Step 1)
+ *
+ * Rates (half of Step 1):
+ *   Production: producer -10% of basis, produced +15% of basis
+ *   Control:    controller -10% of basis, controlled -15% of basis
+ *
+ * Gap multipliers based on Manhattan distance - 1 on the 2x4 grid.
+ * Processing order: pillar priority, then gap ascending, production before control.
+ */
 export function step7NaturalFlow(state: WuxingState): WuxingState {
+  // -- 1. Build flow nodes ------------------------------------------------
+
+  const flowNodes: FlowNode[] = [];
+
+  // Map for same-element bonus consolidation: gridKey -> FlowNode
+  // If a bonus node at a position has the same element as the native node
+  // there, combine their points into one FlowNode for interaction purposes.
+  const consolidatedMap = new Map<string, FlowNode>();
+
+  // Add native HS and EB main qi nodes
+  for (const pos of ['YP', 'MP', 'DP', 'HP'] as PillarPosition[]) {
+    const hsNode = state.nodes.find(n => n.id === `${pos}.HS`)!;
+    const ebNode = state.nodes.find(n => n.id === `${pos}.EB`)!;
+
+    const hsFlow: FlowNode = {
+      id: hsNode.id,
+      pillar: pos,
+      row: 0,
+      element: hsNode.element,
+      getPoints: () => hsNode.points,
+      setPoints: (v) => { hsNode.points = v; },
+      isBonus: false,
+      gridKey: `${pos}.HS`,
+    };
+    flowNodes.push(hsFlow);
+    consolidatedMap.set(`${pos}.HS:${hsNode.element}`, hsFlow);
+
+    const ebFlow: FlowNode = {
+      id: ebNode.id,
+      pillar: pos,
+      row: 1,
+      element: ebNode.element,
+      getPoints: () => ebNode.points,
+      setPoints: (v) => { ebNode.points = v; },
+      isBonus: false,
+      gridKey: `${pos}.EB`,
+    };
+    flowNodes.push(ebFlow);
+    consolidatedMap.set(`${pos}.EB:${ebNode.element}`, ebFlow);
+  }
+
+  // Add bonus nodes
+  for (const bonus of state.bonusNodes) {
+    // Determine grid position from sourceNode
+    const sourceId = bonus.sourceNode; // e.g. 'YP.EB' or 'MP.HS'
+    const parts = sourceId.split('.');
+    const bonusPillar = parts[0] as PillarPosition;
+    const sourceSlot = parts[1]; // 'HS' or 'EB'
+    const bonusRow: 0 | 1 = sourceSlot === 'HS' ? 0 : 1;
+    const gridKey = `${bonusPillar}.${sourceSlot}`;
+
+    // Same-element bonus consolidation check
+    const consolidationKey = `${gridKey}:${bonus.element}`;
+    const existing = consolidatedMap.get(consolidationKey);
+
+    if (existing) {
+      // Same element at same position — consolidate.
+      // Create a combined flow node that reads/writes the sum of both.
+      // We wrap the existing node to include the bonus's points.
+      const origGetPoints = existing.getPoints;
+      const origSetPoints = existing.setPoints;
+      const bonusRef = bonus;
+
+      // Replace the flow node's getter/setter to include bonus points
+      existing.getPoints = () => origGetPoints() + bonusRef.points;
+      existing.setPoints = (v: number) => {
+        // Distribute delta proportionally between original and bonus
+        const origPts = origGetPoints();
+        const bonusPts = bonusRef.points;
+        const total = origPts + bonusPts;
+        if (total > 0) {
+          const origShare = origPts / total;
+          origSetPoints(v * origShare);
+          bonusRef.points = v * (1 - origShare);
+        } else {
+          origSetPoints(v);
+        }
+      };
+      // Update the ID to show consolidation
+      existing.id = `${existing.id}+consolidated`;
+    } else {
+      // Different element or no native at this position — add as separate flow node
+      const bonusFlow: FlowNode = {
+        id: bonus.id,
+        pillar: bonusPillar,
+        row: bonusRow,
+        element: bonus.element,
+        getPoints: () => bonus.points,
+        setPoints: (v) => { bonus.points = v; },
+        isBonus: true,
+        gridKey,
+      };
+      flowNodes.push(bonusFlow);
+      consolidatedMap.set(consolidationKey, bonusFlow);
+    }
+  }
+
+  // -- 2. Generate all unique pairs, excluding same-pillar native HS<->EB --
+
+  interface FlowPair {
+    a: FlowNode;
+    b: FlowNode;
+    gap: number;
+    gapMult: number;
+    relation: 'produces' | 'controls' | 'produced_by' | 'controlled_by';
+    anchorPillar: PillarPosition; // which pillar "anchors" this pair
+  }
+
+  const allPairs: FlowPair[] = [];
+
+  for (let i = 0; i < flowNodes.length; i++) {
+    for (let j = i + 1; j < flowNodes.length; j++) {
+      const a = flowNodes[i];
+      const b = flowNodes[j];
+
+      // Skip same-element pairs
+      if (a.element === b.element) continue;
+
+      // Skip same-pillar native HS <-> native EB (already handled in Step 1)
+      if (
+        a.pillar === b.pillar &&
+        !a.isBonus && !b.isBonus &&
+        ((a.row === 0 && b.row === 1) || (a.row === 1 && b.row === 0))
+      ) {
+        continue;
+      }
+
+      // Compute gap using grid keys
+      const gap = getStep7Gap(a.gridKey, b.gridKey);
+      const gapMult = gapMultiplier(gap);
+
+      // Determine relationship from A's perspective
+      const rel = CONTROL_LOOKUP[a.element][b.element];
+      let relation: FlowPair['relation'];
+      switch (rel) {
+        case 'HS_PRODUCES_EB': relation = 'produces'; break;
+        case 'EB_PRODUCES_HS': relation = 'produced_by'; break;
+        case 'HS_CONTROLS_EB': relation = 'controls'; break;
+        case 'EB_CONTROLS_HS': relation = 'controlled_by'; break;
+        default: continue; // SAME — skip
+      }
+
+      // Anchor pillar = the highest-priority pillar among the pair's pillars
+      const aPriIdx = state.pillarPriority.indexOf(a.pillar);
+      const bPriIdx = state.pillarPriority.indexOf(b.pillar);
+      const anchorPillar = aPriIdx <= bPriIdx ? a.pillar : b.pillar;
+
+      allPairs.push({ a, b, gap, gapMult, relation, anchorPillar });
+    }
+  }
+
+  // -- 3. Sort by pillar priority -> gap ascending -> production before control
+
+  /** Returns 0 for production/produced_by, 1 for controls/controlled_by */
+  function relationSortKey(rel: FlowPair['relation']): number {
+    return (rel === 'produces' || rel === 'produced_by') ? 0 : 1;
+  }
+
+  allPairs.sort((x, y) => {
+    // Primary: anchor pillar priority
+    const xPri = state.pillarPriority.indexOf(x.anchorPillar);
+    const yPri = state.pillarPriority.indexOf(y.anchorPillar);
+    if (xPri !== yPri) return xPri - yPri;
+
+    // Secondary: gap ascending (closest first)
+    if (x.gap !== y.gap) return x.gap - y.gap;
+
+    // Tertiary: production before control
+    return relationSortKey(x.relation) - relationSortKey(y.relation);
+  });
+
+  // -- 4. Process each pair with continuous basis ---------------------
+
+  const PRODUCER_LOSS_RATE = 0.10;   // Half of Step 1's 20%
+  const PRODUCED_GAIN_RATE = 0.15;   // Half of Step 1's 30%
+  const CONTROLLER_LOSS_RATE = 0.10; // Half of Step 1's 20%
+  const CONTROLLED_LOSS_RATE = 0.15; // Half of Step 1's 30%
+
+  for (const pair of allPairs) {
+    const { a, b, gapMult, relation } = pair;
+    const aPts = a.getPoints();
+    const bPts = b.getPoints();
+    const basis = Math.min(aPts, bPts);
+
+    if (basis <= 0) continue; // Skip if either node is depleted
+
+    let logRelation: string;
+    let logDetails: string;
+
+    switch (relation) {
+      case 'produces': {
+        // A produces B: A loses, B gains
+        const loss = basis * PRODUCER_LOSS_RATE * gapMult;
+        const gain = basis * PRODUCED_GAIN_RATE * gapMult;
+        a.setPoints(Math.max(0, aPts - loss));
+        b.setPoints(bPts + gain);
+        logRelation = 'produces';
+        logDetails = `${a.id}(${a.element}) produces ${b.id}(${b.element}), basis=${basis.toFixed(2)}, gap×${gapMult}, loss=${loss.toFixed(2)}, gain=${gain.toFixed(2)}`;
+        break;
+      }
+      case 'produced_by': {
+        // B produces A: B loses, A gains
+        const loss = basis * PRODUCER_LOSS_RATE * gapMult;
+        const gain = basis * PRODUCED_GAIN_RATE * gapMult;
+        b.setPoints(Math.max(0, bPts - loss));
+        a.setPoints(aPts + gain);
+        logRelation = 'produced_by';
+        logDetails = `${b.id}(${b.element}) produces ${a.id}(${a.element}), basis=${basis.toFixed(2)}, gap×${gapMult}, loss=${loss.toFixed(2)}, gain=${gain.toFixed(2)}`;
+        break;
+      }
+      case 'controls': {
+        // A controls B: both lose
+        const controllerLoss = basis * CONTROLLER_LOSS_RATE * gapMult;
+        const controlledLoss = basis * CONTROLLED_LOSS_RATE * gapMult;
+        a.setPoints(Math.max(0, aPts - controllerLoss));
+        b.setPoints(Math.max(0, bPts - controlledLoss));
+        logRelation = 'controls';
+        logDetails = `${a.id}(${a.element}) controls ${b.id}(${b.element}), basis=${basis.toFixed(2)}, gap×${gapMult}, controllerLoss=${controllerLoss.toFixed(2)}, controlledLoss=${controlledLoss.toFixed(2)}`;
+        break;
+      }
+      case 'controlled_by': {
+        // B controls A: both lose
+        const controllerLoss = basis * CONTROLLER_LOSS_RATE * gapMult;
+        const controlledLoss = basis * CONTROLLED_LOSS_RATE * gapMult;
+        b.setPoints(Math.max(0, bPts - controllerLoss));
+        a.setPoints(Math.max(0, aPts - controlledLoss));
+        logRelation = 'controlled_by';
+        logDetails = `${b.id}(${b.element}) controls ${a.id}(${a.element}), basis=${basis.toFixed(2)}, gap×${gapMult}, controllerLoss=${controllerLoss.toFixed(2)}, controlledLoss=${controlledLoss.toFixed(2)}`;
+        break;
+      }
+    }
+
+    state.interactions.push({
+      step: 7,
+      type: 'NATURAL_FLOW',
+      nodeA: a.id,
+      nodeB: b.id,
+      relationship: logRelation,
+      basis,
+      gapMultiplier: gapMult,
+      details: logDetails,
+    });
+  }
+
   return state;
 }
 
@@ -1634,7 +1918,7 @@ export function step9BalanceSim(
 
 /**
  * Run the full Wu Xing calculator pipeline.
- * Step 7 is a stub — all other steps (0-6, 8, 9) produce real data.
+ * Steps 0-9 all produce real data.
  */
 export function calculateWuxing(input: WuxingInput): WuxingResult {
   let state = initializeState(input);

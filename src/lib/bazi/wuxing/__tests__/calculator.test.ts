@@ -415,15 +415,19 @@ describe('calculateWuxingUpToStep', () => {
     expect(anyDifferent).toBe(true);
   });
 
-  it('step=7 returns same state as step=6 (step 7 is still a stub)', () => {
+  it('step=7 modifies node points from step=6 (natural element flow)', () => {
     const s6 = calculateWuxingUpToStep(INPUT, 6);
     const s7 = calculateWuxingUpToStep(INPUT, 7);
 
-    // Step 7 is still a stub, so step=6 and step=7 produce same node points
+    // Step 7 applies cross-pillar interactions, so points should differ
+    let anyDifferent = false;
     for (let i = 0; i < s6.nodes.length; i++) {
-      expect(s6.nodes[i].points).toBe(s7.nodes[i].points);
+      if (s6.nodes[i].points !== s7.nodes[i].points) {
+        anyDifferent = true;
+        break;
+      }
     }
-    expect(s6.bonusNodes.length).toBe(s7.bonusNodes.length);
+    expect(anyDifferent).toBe(true);
   });
 });
 
@@ -431,10 +435,17 @@ describe('calculateWuxingUpToStep', () => {
 // 8. Stub functions are exported and pass through
 // =============================================================================
 
-describe('step stubs', () => {
-  it('remaining stub (step 7) returns the same state object', () => {
-    const state = initializeState(INPUT);
-    expect(step7NaturalFlow(state)).toBe(state);
+describe('step return values', () => {
+  it('step7NaturalFlow mutates and returns the same state object', () => {
+    let state = initializeState(INPUT);
+    state = step1PillarPairs(state);
+    state = step2EbPositive(state);
+    state = step3HsPositive(state);
+    state = step4EbNegative(state);
+    state = step5HsNegative(state);
+    state = step6Seasonal(state);
+    const result = step7NaturalFlow(state);
+    expect(result).toBe(state);
   });
 
   it('step2EbPositive mutates and returns the same state object', () => {
