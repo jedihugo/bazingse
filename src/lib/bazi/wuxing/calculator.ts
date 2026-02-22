@@ -2018,14 +2018,15 @@ export function step9BalanceSim(
     const assigned = new Set([useful, favorable, unfavorable, enemy]);
     idle = ELEMENTS.find(el => !assigned.has(el))!;
   } else {
-    // Collision — use σ ranking to assign roles
-    // σ rank: [0]=useful, [1]=2nd best, [2]=3rd, [3]=4th, [4]=unfavorable
-    // favorable = 2nd best σ (most beneficial after useful)
-    // enemy = 4th best σ (least beneficial before unfavorable)
-    // idle = remaining (3rd)
-    favorable = elementSigmas[1].element;
-    enemy = elementSigmas[3].element;
-    idle = elementSigmas[2].element;
+    // Collision — assign from σ ranking, skipping already-taken elements
+    const taken = new Set<Element>([useful, unfavorable]);
+    const remaining = elementSigmas
+      .map(s => s.element)
+      .filter(el => !taken.has(el));
+    // remaining is sorted by σ ascending: [0]=best, [1]=mid, [2]=worst
+    favorable = remaining[0];
+    idle = remaining[1];
+    enemy = remaining[2];
   }
 
   return { useful, favorable, unfavorable, enemy, idle };
