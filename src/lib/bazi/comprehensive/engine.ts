@@ -9,7 +9,7 @@ import 'server-only';
 
 import { STEMS, BRANCHES, type StemName, type BranchName } from '../core';
 import { getAllBranchQi, getTenGod, STEM_ORDER, BRANCH_ORDER } from '../derived';
-import type { ChartData, Pillar, LuckPillarInfo } from './models';
+import type { ChartData, Pillar, LuckPillarInfo, StrengthAssessment } from './models';
 import { generateComprehensiveReport } from './report';
 import { mapAllTenGods, classifyTenGodStrength } from './ten-gods';
 import { assessDayMasterStrength } from './strength';
@@ -17,6 +17,7 @@ import { detectAllInteractions } from './interactions';
 import { runAllShenSha } from './shen-sha';
 import { runAllPredictions } from './predictions';
 import { assessEnvironment } from './environment';
+import { calculateWuxing, type WuxingInput, type WuxingResult } from '../wuxing/calculator';
 
 
 export function buildChart(args: {
@@ -187,7 +188,54 @@ export function analyzeForApi(chart: ChartData): Record<string, unknown> {
    * Used by the /api/analyze_bazi adapter.
    */
   const interactions = detectAllInteractions(chart);
-  const strength = assessDayMasterStrength(chart, interactions);
+
+  // Old strength assessment (kept for backward-compatible fields)
+  const oldStrength = assessDayMasterStrength(chart, interactions);
+
+  // New Wu Xing calculator
+  const wuxingInput: WuxingInput = {
+    yearPillar: { stem: chart.pillars.year.stem, branch: chart.pillars.year.branch },
+    monthPillar: { stem: chart.pillars.month.stem, branch: chart.pillars.month.branch },
+    dayPillar: { stem: chart.pillars.day.stem, branch: chart.pillars.day.branch },
+    hourPillar: { stem: chart.pillars.hour.stem, branch: chart.pillars.hour.branch },
+    age: chart.age,
+    gender: chart.gender === 'male' ? 'M' : 'F',
+    location: 'hometown',
+  };
+  const wuxingResult = calculateWuxing(wuxingInput);
+
+  // Map wuxing strength label to legacy verdict
+  const STRENGTH_TO_VERDICT: Record<string, string> = {
+    dominant: 'extremely_strong',
+    strong: 'strong',
+    balanced: 'neutral',
+    weak: 'weak',
+    very_weak: 'extremely_weak',
+  };
+
+  // Build element_percentages from wuxing result
+  const wuxingPercentages: Record<string, number> = {};
+  for (const elem of ['Wood', 'Fire', 'Earth', 'Metal', 'Water'] as const) {
+    wuxingPercentages[elem] = wuxingResult.elements[elem].percent;
+  }
+
+  // Build merged StrengthAssessment: wuxing values override, old fields kept for compat
+  const strength: StrengthAssessment = {
+    score: wuxingResult.dayMaster.percent,
+    verdict: STRENGTH_TO_VERDICT[wuxingResult.dayMaster.strength] ?? 'neutral',
+    useful_god: wuxingResult.gods.useful,
+    element_percentages: wuxingPercentages,
+    favorable_elements: [wuxingResult.gods.useful, wuxingResult.gods.favorable],
+    unfavorable_elements: [wuxingResult.gods.unfavorable, wuxingResult.gods.enemy],
+    // Backward-compatible fields from old assessment
+    support_count: oldStrength.support_count,
+    drain_count: oldStrength.drain_count,
+    seasonal_state: oldStrength.seasonal_state,
+    is_following_chart: oldStrength.is_following_chart,
+    following_type: oldStrength.following_type,
+    best_element_pairs: oldStrength.best_element_pairs,
+  };
+
   const tgEntries = mapAllTenGods(chart);
   const tgClassification = classifyTenGodStrength(tgEntries);
   const shenSha = runAllShenSha(chart);
@@ -197,6 +245,7 @@ export function analyzeForApi(chart: ChartData): Record<string, unknown> {
 
   return {
     strength,
+    wuxing_result: wuxingResult,
     ten_god_entries: tgEntries,
     ten_god_classification: tgClassification,
     interactions,

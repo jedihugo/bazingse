@@ -15,6 +15,7 @@ import {
 import {
   DM_WEALTH_STORAGE, STORAGE_OPENER, LARGE_WEALTH_STORAGE, WEALTH_ELEMENT_STEMS,
 } from '../wealth-storage';
+import type { WuxingResult } from '../wuxing/calculator';
 import { getQiPhaseForPillar } from '../qi-phase';
 import type {
   ChartData, Pillar, StrengthAssessment, BranchInteraction,
@@ -442,7 +443,58 @@ function buildDaymasterAnalysis(strength: StrengthAssessment, chart: ChartData):
 function buildElementScores(
   chart: ChartData,
   interactions?: BranchInteraction[],
+  wuxingResult?: WuxingResult,
 ): [Record<string, number>, Record<string, number>, Record<string, number>] {
+  function _toStemScores(elemCounts: Record<string, number>): Record<string, number> {
+    const scores: Record<string, number> = {};
+    for (const stemId of Object.keys(STEMS)) {
+      const stemElem = STEMS[stemId as StemName].element;
+      scores[stemId] = Math.round((elemCounts[stemElem] ?? 0) * 50 * 10) / 10;
+    }
+    return scores;
+  }
+
+  if (wuxingResult) {
+    // Use wuxing element totals for natal scores (base + natal)
+    // Convert element totals to same scale as old pipeline: total * scaling_factor
+    // The old pipeline: elementCount * 50 = stemScore
+    // With wuxing: we use element.total values as the "counts" since they represent
+    // the same kind of accumulated weight (just computed differently)
+    const wuxingCounts: Record<string, number> = {};
+    for (const elem of ['Wood', 'Fire', 'Earth', 'Metal', 'Water']) {
+      wuxingCounts[elem] = wuxingResult.elements[elem as keyof typeof wuxingResult.elements].total;
+    }
+
+    // Normalize to match old pipeline scale: old pipeline produces counts ~1-5 range
+    // wuxing produces totals ~10-50 range. Scale so that sum matches old pipeline sum.
+    const wuxingTotal = Object.values(wuxingCounts).reduce((a, b) => a + b, 0);
+    const scaleFactor = wuxingTotal > 0 ? 1 / wuxingTotal : 0;
+
+    // For stem scores, use percentage-based approach: each stem gets its element's percentage
+    // This keeps the bar chart proportions identical to the wuxing percentages
+    const natalPctCounts: Record<string, number> = {};
+    for (const elem of ['Wood', 'Fire', 'Earth', 'Metal', 'Water']) {
+      // Convert percentage (0-100) to a "count" that, when multiplied by 50,
+      // gives a score proportional to the element's presence
+      natalPctCounts[elem] = wuxingResult.elements[elem as keyof typeof wuxingResult.elements].percent / 100 * 10;
+    }
+
+    const natalScores = _toStemScores(natalPctCounts);
+
+    // For post scores (full chart with luck/time pillars), fall back to old pipeline
+    // since wuxing only covers natal 4 pillars for now
+    let fullCounts = countAllElements(chart);
+    if (interactions && interactions.length > 0) {
+      fullCounts = adjustElementsForInteractions(fullCounts, interactions, chart);
+    }
+    const monthBranch = chart.pillars["month"].branch;
+    fullCounts = applySeasonalScaling(fullCounts, monthBranch);
+    const fullScores = _toStemScores(fullCounts);
+
+    return [natalScores, { ...natalScores }, fullScores];
+  }
+
+  // Fallback: old pipeline (no wuxing result available)
   let natalCounts = countElements(chart);
   let fullCounts = countAllElements(chart);
 
@@ -454,15 +506,6 @@ function buildElementScores(
   const monthBranch = chart.pillars["month"].branch;
   natalCounts = applySeasonalScaling(natalCounts, monthBranch);
   fullCounts = applySeasonalScaling(fullCounts, monthBranch);
-
-  function _toStemScores(elemCounts: Record<string, number>): Record<string, number> {
-    const scores: Record<string, number> = {};
-    for (const stemId of Object.keys(STEMS)) {
-      const stemElem = STEMS[stemId as StemName].element;
-      scores[stemId] = Math.round((elemCounts[stemElem] ?? 0) * 50 * 10) / 10;
-    }
-    return scores;
-  }
 
   const natalScores = _toStemScores(natalCounts);
   const fullScores = _toStemScores(fullCounts);
@@ -2004,6 +2047,7 @@ export function adaptToFrontend(chart: ChartData, results: Record<string, unknow
   const predictions = results.predictions as Record<string, EventPrediction[]>;
   const env = results.environment as EnvironmentAssessment;
   const comprehensiveReport = (results.comprehensive_report as string) ?? "";
+  const wuxingResult = results.wuxing_result as WuxingResult | undefined;
 
   // 1. Build all nodes
   const nodes = buildAllNodes(chart);
@@ -2014,8 +2058,8 @@ export function adaptToFrontend(chart: ChartData, results: Record<string, unknow
   // 3. Collect red flags
   const flags = _collectRedFlags(chart, strength, tgClassification, interactions, shenSha);
 
-  // 4. Build element scores
-  const [baseScore, natalScore, postScore] = buildElementScores(chart, interactions);
+  // 4. Build element scores (use wuxing result if available)
+  const [baseScore, natalScore, postScore] = buildElementScores(chart, interactions, wuxingResult);
 
   // 5. Assemble response
   const response: Record<string, unknown> = {};
