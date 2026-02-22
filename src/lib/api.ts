@@ -1,15 +1,7 @@
 // API helpers for BaZi chart generation
 
-// Detect if running inside Capacitor native app
-const isCapacitor = typeof window !== 'undefined' &&
-  // @ts-expect-error - Capacitor is injected at runtime
-  (window.Capacitor?.isNativePlatform?.() === true);
-
-// API URL: Railway for production, localhost for development
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ||
-  (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || isCapacitor)
-    ? 'http://localhost:8008'
-    : 'https://bazingse-production.up.railway.app');
+// All API routes are now served by Next.js (relative URLs)
+const API_BASE_URL = '';
 
 // Life Event types
 export interface LifeEvent {
