@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { put, list, del } from '@vercel/blob';
+import Database from 'better-sqlite3';
 import { randomUUID } from 'crypto';
 import type {
   Profile,
@@ -12,185 +12,158 @@ import type {
 } from './api';
 
 // ---------------------------------------------------------------------------
-// Blob path helpers
+// Database connection (singleton)
 // ---------------------------------------------------------------------------
 
-const INDEX_PATH = 'profiles/_index.json';
-const profilePath = (id: string) => `profiles/${id}.json`;
+const DB_PATH = process.env.DATABASE_PATH ?? '/data/bazingse.db';
+
+let _db: Database.Database | null = null;
+
+function getDb(): Database.Database {
+  if (!_db) {
+    _db = new Database(DB_PATH);
+    _db.pragma('journal_mode = WAL');
+    _db.pragma('foreign_keys = ON');
+    ensureSchema(_db);
+  }
+  return _db;
+}
+
+function ensureSchema(db: Database.Database): void {
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS profiles (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      birth_date TEXT NOT NULL,
+      birth_time TEXT,
+      gender TEXT NOT NULL,
+      place_of_birth TEXT,
+      phone TEXT,
+      life_events TEXT DEFAULT '[]',
+      created_at TEXT DEFAULT (datetime('now')),
+      updated_at TEXT DEFAULT (datetime('now'))
+    )
+  `);
+}
 
 // ---------------------------------------------------------------------------
-// Index entry — lightweight shape stored in the index blob
+// Row → Profile helper
 // ---------------------------------------------------------------------------
 
-interface ProfileIndexEntry {
+interface ProfileRow {
   id: string;
   name: string;
   birth_date: string;
   birth_time: string | null;
-  gender: 'male' | 'female';
+  gender: string;
   place_of_birth: string | null;
   phone: string | null;
+  life_events: string | null;
   created_at: string | null;
   updated_at: string | null;
 }
 
-function toIndexEntry(p: Profile): ProfileIndexEntry {
+function rowToProfile(row: ProfileRow): Profile {
+  let events: LifeEvent[] = [];
+  if (row.life_events) {
+    try { events = JSON.parse(row.life_events); } catch { /* empty */ }
+  }
   return {
-    id: p.id,
-    name: p.name,
-    birth_date: p.birth_date,
-    birth_time: p.birth_time,
-    gender: p.gender as 'male' | 'female',
-    place_of_birth: p.place_of_birth,
-    phone: p.phone,
-    created_at: p.created_at,
-    updated_at: p.updated_at,
+    id: row.id,
+    name: row.name,
+    birth_date: row.birth_date,
+    birth_time: row.birth_time,
+    gender: row.gender as 'male' | 'female',
+    place_of_birth: row.place_of_birth,
+    phone: row.phone,
+    life_events: events,
+    created_at: row.created_at,
+    updated_at: row.updated_at,
   };
-}
-
-// ---------------------------------------------------------------------------
-// Blob I/O helpers
-// ---------------------------------------------------------------------------
-
-/** Find a blob's public URL by exact pathname. */
-async function getBlobUrl(pathname: string): Promise<string | null> {
-  const { blobs } = await list({ prefix: pathname, limit: 1 });
-  if (blobs.length === 0 || blobs[0].pathname !== pathname) return null;
-  return blobs[0].url;
-}
-
-/** Read and parse a JSON blob by pathname. */
-async function readBlob<T>(pathname: string): Promise<T | null> {
-  const url = await getBlobUrl(pathname);
-  if (!url) return null;
-  const res = await fetch(url, { cache: 'no-store' });
-  if (!res.ok) return null;
-  return res.json() as Promise<T>;
-}
-
-/** Write a JSON blob (creates or overwrites). */
-async function writeBlob(pathname: string, data: unknown): Promise<void> {
-  await put(pathname, JSON.stringify(data), {
-    access: 'public',
-    addRandomSuffix: false,
-    contentType: 'application/json',
-  });
-}
-
-/** Delete a blob by pathname. */
-async function deleteBlobByPath(pathname: string): Promise<void> {
-  const url = await getBlobUrl(pathname);
-  if (url) await del(url);
 }
 
 // ---------------------------------------------------------------------------
 // Profile CRUD
 // ---------------------------------------------------------------------------
 
-/** List profiles (from lightweight index). */
 export async function getProfiles(
   skip = 0,
   limit = 100,
 ): Promise<Profile[]> {
-  const index = await readBlob<ProfileIndexEntry[]>(INDEX_PATH);
-  if (!index) return [];
+  const db = getDb();
+  const rows = db.prepare(
+    'SELECT * FROM profiles ORDER BY name ASC LIMIT ? OFFSET ?'
+  ).all(limit, skip) as ProfileRow[];
+  return rows.map(rowToProfile);
+}
 
-  const page = index.slice(skip, skip + limit);
+export async function getProfile(id: string): Promise<Profile | null> {
+  const db = getDb();
+  const row = db.prepare('SELECT * FROM profiles WHERE id = ?').get(id) as ProfileRow | undefined;
+  return row ? rowToProfile(row) : null;
+}
 
-  const profiles = await Promise.all(
-    page.map(async (entry) => {
-      const full = await readBlob<Profile>(profilePath(entry.id));
-      return full ?? { ...entry, life_events: [] };
-    }),
+export async function createProfile(data: ProfileCreate): Promise<Profile> {
+  const db = getDb();
+  const now = new Date().toISOString();
+  const id = randomUUID();
+
+  db.prepare(`
+    INSERT INTO profiles (id, name, birth_date, birth_time, gender, place_of_birth, phone, life_events, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, '[]', ?, ?)
+  `).run(
+    id, data.name, data.birth_date, data.birth_time ?? null,
+    data.gender, data.place_of_birth ?? null, data.phone ?? null,
+    now, now,
   );
 
-  return profiles;
+  return (await getProfile(id))!;
 }
 
-/** Get a single profile by ID (full, with life_events). */
-export async function getProfile(id: string): Promise<Profile | null> {
-  return readBlob<Profile>(profilePath(id));
-}
-
-/** Create a new profile. Returns the created profile. */
-export async function createProfile(data: ProfileCreate): Promise<Profile> {
-  const now = new Date().toISOString();
-  const profile: Profile = {
-    id: randomUUID(),
-    name: data.name,
-    birth_date: data.birth_date,
-    birth_time: data.birth_time ?? null,
-    gender: data.gender,
-    place_of_birth: data.place_of_birth ?? null,
-    phone: data.phone ?? null,
-    life_events: [],
-    created_at: now,
-    updated_at: now,
-  };
-
-  await writeBlob(profilePath(profile.id), profile);
-
-  const index = (await readBlob<ProfileIndexEntry[]>(INDEX_PATH)) ?? [];
-  index.push(toIndexEntry(profile));
-  await writeBlob(INDEX_PATH, index);
-
-  return profile;
-}
-
-/** Update an existing profile (partial update). Returns null if not found. */
 export async function updateProfile(
   id: string,
   data: ProfileUpdate,
 ): Promise<Profile | null> {
-  const profile = await readBlob<Profile>(profilePath(id));
-  if (!profile) return null;
+  const db = getDb();
+  const existing = db.prepare('SELECT * FROM profiles WHERE id = ?').get(id) as ProfileRow | undefined;
+  if (!existing) return null;
 
   const now = new Date().toISOString();
 
-  if (data.name !== undefined) profile.name = data.name;
-  if (data.birth_date !== undefined) profile.birth_date = data.birth_date;
-  if (data.birth_time !== undefined) profile.birth_time = data.birth_time ?? null;
-  if (data.gender !== undefined) profile.gender = data.gender;
-  if (data.place_of_birth !== undefined) profile.place_of_birth = data.place_of_birth ?? null;
-  if (data.phone !== undefined) profile.phone = data.phone ?? null;
-  profile.updated_at = now;
+  db.prepare(`
+    UPDATE profiles SET
+      name = ?, birth_date = ?, birth_time = ?, gender = ?,
+      place_of_birth = ?, phone = ?, updated_at = ?
+    WHERE id = ?
+  `).run(
+    data.name !== undefined ? data.name : existing.name,
+    data.birth_date !== undefined ? data.birth_date : existing.birth_date,
+    data.birth_time !== undefined ? (data.birth_time ?? null) : existing.birth_time,
+    data.gender !== undefined ? data.gender : existing.gender,
+    data.place_of_birth !== undefined ? (data.place_of_birth ?? null) : existing.place_of_birth,
+    data.phone !== undefined ? (data.phone ?? null) : existing.phone,
+    now, id,
+  );
 
-  await writeBlob(profilePath(id), profile);
-
-  const index = (await readBlob<ProfileIndexEntry[]>(INDEX_PATH)) ?? [];
-  const idx = index.findIndex((e) => e.id === id);
-  if (idx !== -1) {
-    index[idx] = toIndexEntry(profile);
-    await writeBlob(INDEX_PATH, index);
-  }
-
-  return profile;
+  return getProfile(id);
 }
 
-/** Delete a profile. Returns true if deleted, false if not found. */
 export async function deleteProfile(id: string): Promise<boolean> {
-  const profile = await readBlob<Profile>(profilePath(id));
-  if (!profile) return false;
-
-  await deleteBlobByPath(profilePath(id));
-
-  const index = (await readBlob<ProfileIndexEntry[]>(INDEX_PATH)) ?? [];
-  const filtered = index.filter((e) => e.id !== id);
-  await writeBlob(INDEX_PATH, filtered);
-
-  return true;
+  const db = getDb();
+  const result = db.prepare('DELETE FROM profiles WHERE id = ?').run(id);
+  return result.changes > 0;
 }
 
 // ---------------------------------------------------------------------------
-// Life Event CRUD
+// Life Event CRUD (stored as JSON array in profiles.life_events)
 // ---------------------------------------------------------------------------
 
-/** Add a life event to a profile. */
 export async function addLifeEvent(
   profileId: string,
   data: LifeEventCreate,
 ): Promise<LifeEvent | null> {
-  const profile = await readBlob<Profile>(profilePath(profileId));
+  const db = getDb();
+  const profile = await getProfile(profileId);
   if (!profile) return null;
 
   const now = new Date().toISOString();
@@ -206,22 +179,22 @@ export async function addLifeEvent(
     updated_at: now,
   };
 
-  if (!profile.life_events) profile.life_events = [];
-  profile.life_events.push(event);
-  profile.updated_at = now;
+  const events = profile.life_events ?? [];
+  events.push(event);
 
-  await writeBlob(profilePath(profileId), profile);
+  db.prepare('UPDATE profiles SET life_events = ?, updated_at = ? WHERE id = ?')
+    .run(JSON.stringify(events), now, profileId);
 
   return event;
 }
 
-/** Update a life event. */
 export async function updateLifeEvent(
   profileId: string,
   eventId: string,
   data: LifeEventUpdate,
 ): Promise<LifeEvent | null> {
-  const profile = await readBlob<Profile>(profilePath(profileId));
+  const db = getDb();
+  const profile = await getProfile(profileId);
   if (!profile || !profile.life_events) return null;
 
   const idx = profile.life_events.findIndex((e) => e.id === eventId);
@@ -239,39 +212,37 @@ export async function updateLifeEvent(
   event.updated_at = now;
 
   profile.life_events[idx] = event;
-  profile.updated_at = now;
 
-  await writeBlob(profilePath(profileId), profile);
+  db.prepare('UPDATE profiles SET life_events = ?, updated_at = ? WHERE id = ?')
+    .run(JSON.stringify(profile.life_events), now, profileId);
 
   return event;
 }
 
-/** Delete a life event. */
 export async function deleteLifeEvent(
   profileId: string,
   eventId: string,
 ): Promise<boolean> {
-  const profile = await readBlob<Profile>(profilePath(profileId));
+  const db = getDb();
+  const profile = await getProfile(profileId);
   if (!profile || !profile.life_events) return false;
 
   const before = profile.life_events.length;
-  profile.life_events = profile.life_events.filter((e) => e.id !== eventId);
+  const filtered = profile.life_events.filter((e) => e.id !== eventId);
+  if (filtered.length === before) return false;
 
-  if (profile.life_events.length === before) return false;
-
-  profile.updated_at = new Date().toISOString();
-  await writeBlob(profilePath(profileId), profile);
+  const now = new Date().toISOString();
+  db.prepare('UPDATE profiles SET life_events = ?, updated_at = ? WHERE id = ?')
+    .run(JSON.stringify(filtered), now, profileId);
 
   return true;
 }
 
-/** Get a single life event. */
 export async function getLifeEvent(
   profileId: string,
   eventId: string,
 ): Promise<LifeEvent | null> {
-  const profile = await readBlob<Profile>(profilePath(profileId));
+  const profile = await getProfile(profileId);
   if (!profile || !profile.life_events) return null;
-
   return profile.life_events.find((e) => e.id === eventId) ?? null;
 }
