@@ -472,8 +472,16 @@ function buildElementScores(
 
   const natalScores = _toStemScores(natalPctCounts);
 
-  // For post scores (full chart with luck/time pillars), use old pipeline
-  // since wuxing only covers natal 4 pillars for now
+  // Post scores: only differ from natal when luck/time pillars are present.
+  // Without them, post === natal (no arrows in the UI).
+  const hasExtraPillars = !!chart.luck_pillar || Object.keys(chart.time_period_pillars).length > 0;
+
+  if (!hasExtraPillars) {
+    return [natalScores, { ...natalScores }, { ...natalScores }];
+  }
+
+  // With luck/time pillars, use old pipeline for "full chart" scores
+  // (wuxing calculator doesn't include luck/time pillars yet)
   let fullCounts = countAllElements(chart);
   if (interactions && interactions.length > 0) {
     fullCounts = adjustElementsForInteractions(fullCounts, interactions, chart);
