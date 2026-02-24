@@ -160,6 +160,7 @@ export interface WuxingResult {
   dayMaster: DayMasterSummary;
   gods: FiveGods;
   interactions: InteractionLog[];
+  season: Element;  // seasonal element from month branch
 }
 
 // Re-export PillarPosition from tables so consumers don't need two imports
@@ -2129,6 +2130,7 @@ export function calculateWuxing(input: WuxingInput): WuxingResult {
     },
     gods,
     interactions: [...state.interactions],
+    season: state.season,
   };
 }
 

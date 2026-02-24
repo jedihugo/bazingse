@@ -16,6 +16,7 @@ import {
   DM_WEALTH_STORAGE, STORAGE_OPENER, LARGE_WEALTH_STORAGE, WEALTH_ELEMENT_STEMS,
 } from '../wealth-storage';
 import { calculateWuxing, wuxingToElementCounts, type WuxingResult, type InteractionLog } from '../wuxing/calculator';
+import { calculateDmLens } from '../wuxing/dm-lens';
 import { chartToWuxingInput } from './wuxing-bridge';
 import { getQiPhaseForPillar } from '../qi-phase';
 import type {
@@ -2245,6 +2246,11 @@ export function adaptToFrontend(chart: ChartData, results: Record<string, unknow
 
   // Daymaster analysis
   response.daymaster_analysis = buildDaymasterAnalysis(strength, chart);
+
+  // DM Lens (Step 8b) — support-pressure narrative
+  if (wuxingResult) {
+    response.dm_lens = calculateDmLens(wuxingResult);
+  }
 
   // Life aspects
   response.health_analysis = buildHealthAnalysis(flags, strength, chart, elemCounts);

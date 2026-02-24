@@ -205,6 +205,9 @@ export const CHART = {
 
 export const WUXING = {
   title:    { en: 'WU XING',  id: 'WU XING',  zh: '五行', py: 'wǔxíng' },
+  dm_lens:  { en: 'DM LENS',  id: 'LENSA DM', zh: '日主助力', py: 'rìzhǔ zhùlì' },
+  support:  { en: 'Support',  id: 'Dukungan', zh: '助力', py: 'zhùlì' },
+  drain:    { en: 'Drain',    id: 'Tekanan',  zh: '耗泄', py: 'hàoxiè' },
 } as const;
 
 // ──────────────────────────────────────────────

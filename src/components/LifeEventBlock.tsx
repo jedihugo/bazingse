@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import BaZiChart from './BaZiChart';
 import ElementAnalysis from './ElementAnalysis';
+import DmLensDisplay from './DmLensDisplay';
 import WealthStorageDisplay from './WealthStorageDisplay';
 import NarrativeDisplay from './NarrativeDisplay';
 import NarrativeCard from './NarrativeCard';
@@ -252,6 +253,9 @@ export default function LifeEventBlock({
 
             {/* Element Analysis */}
             <ElementAnalysis chartData={chartData} />
+
+            {/* DM Lens - Support/Pressure Narrative */}
+            <DmLensDisplay chartData={chartData} />
 
             {/* Wealth Storage Analysis */}
             <WealthStorageDisplay chartData={chartData} />
