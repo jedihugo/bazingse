@@ -1,456 +1,106 @@
-// API helpers for BaZi chart generation
+// API helpers for BaZi chart generation — powered by tRPC for end-to-end type safety
 
-// All API routes are now served by Next.js (relative URLs)
-const API_BASE_URL = '';
+import { trpc } from './trpc';
 
-// Life Event types
-export interface LifeEvent {
-  id: string;
-  year: number;
-  month?: number | null;
-  day?: number | null;
-  location?: string | null;
-  notes?: string | null;
-  is_abroad?: boolean;
-  created_at: string;
-  updated_at: string;
-}
+// ---------------------------------------------------------------------------
+// Re-export types from Zod schemas (inferred from tRPC router)
+// ---------------------------------------------------------------------------
 
-export interface LifeEventCreate {
-  year: number;
-  month?: number | null;
-  day?: number | null;
-  location?: string | null;
-  notes?: string | null;
-  is_abroad?: boolean;
-}
+export type { Profile, ProfileCreate, ProfileUpdate,
+  LifeEvent, LifeEventCreate, LifeEventUpdate,
+  DongGongDay, DongGongCalendarResponse, DongGongOfficer,
+  DongGongRating, DongGongConsult, DongGongForbidden,
+  AnalyzeBaziParams, StoredFormData,
+} from './api.types';
 
-export interface LifeEventUpdate {
-  year?: number;
-  month?: number | null;
-  day?: number | null;
-  location?: string | null;
-  notes?: string | null;
-  is_abroad?: boolean;
-}
+// Re-export utility functions (unchanged — they don't call APIs)
+export { loadFromStorage, saveToStorage, isValidDate, isValidJiaziPair } from './api.utils';
 
-// Profile types
-export interface Profile {
-  id: string;
-  name: string;
-  birth_date: string;
-  birth_time: string | null;
-  gender: 'male' | 'female';
-  place_of_birth: string | null;
-  phone: string | null;
-  life_events: LifeEvent[] | null;
-  created_at: string | null;
-  updated_at: string | null;
-}
+// ---------------------------------------------------------------------------
+// Profile CRUD — now via tRPC
+// ---------------------------------------------------------------------------
 
-export interface ProfileCreate {
-  name: string;
-  birth_date: string;
-  birth_time?: string;
-  gender: 'male' | 'female';
-  place_of_birth?: string;
-  phone?: string;
-}
+import type { Profile, ProfileCreate, ProfileUpdate } from './api.types';
 
-export interface ProfileUpdate {
-  name?: string;
-  birth_date?: string;
-  birth_time?: string;
-  gender?: 'male' | 'female';
-  place_of_birth?: string;
-  phone?: string;
-}
-
-// Profile CRUD functions
 export async function getProfiles(limit: number = 10000): Promise<Profile[]> {
-  const response = await fetch(`${API_BASE_URL}/api/profiles?limit=${limit}`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch profiles');
-  }
-  return response.json();
+  return trpc.profile.list.query({ limit });
 }
 
 export async function getProfile(id: string): Promise<Profile> {
-  const response = await fetch(`${API_BASE_URL}/api/profiles/${id}`);
-  if (!response.ok) {
-    if (response.status === 404) {
-      throw new Error('Profile not found');
-    }
-    throw new Error('Failed to fetch profile');
-  }
-  return response.json();
+  return trpc.profile.get.query({ id });
 }
 
 export async function createProfile(data: ProfileCreate): Promise<Profile> {
-  const response = await fetch(`${API_BASE_URL}/api/profiles`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(error.detail || 'Failed to create profile');
-  }
-  return response.json();
+  return trpc.profile.create.mutate(data);
 }
 
 export async function updateProfile(id: string, data: ProfileUpdate): Promise<Profile> {
-  const response = await fetch(`${API_BASE_URL}/api/profiles/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-  if (!response.ok) {
-    if (response.status === 404) {
-      throw new Error('Profile not found');
-    }
-    throw new Error('Failed to update profile');
-  }
-  return response.json();
+  return trpc.profile.update.mutate({ id, data });
 }
 
 export async function deleteProfile(id: string): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/api/profiles/${id}`, {
-    method: 'DELETE',
-  });
-  if (!response.ok) {
-    if (response.status === 404) {
-      throw new Error('Profile not found');
-    }
-    throw new Error('Failed to delete profile');
-  }
+  await trpc.profile.delete.mutate({ id });
 }
 
-// Life Event CRUD functions
+// ---------------------------------------------------------------------------
+// Life Event CRUD — now via tRPC
+// ---------------------------------------------------------------------------
+
+import type { LifeEvent, LifeEventCreate, LifeEventUpdate } from './api.types';
+
 export async function createLifeEvent(profileId: string, data: LifeEventCreate): Promise<LifeEvent> {
-  const response = await fetch(`${API_BASE_URL}/api/profiles/${profileId}/life_events`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-  if (!response.ok) {
-    if (response.status === 404) {
-      throw new Error('Profile not found');
-    }
-    const error = await response.json().catch(() => ({}));
-    throw new Error(error.detail || 'Failed to create life event');
-  }
-  return response.json();
+  return trpc.lifeEvent.create.mutate({ profileId, data });
 }
 
 export async function updateLifeEvent(
   profileId: string,
   eventId: string,
-  data: LifeEventUpdate
+  data: LifeEventUpdate,
 ): Promise<LifeEvent> {
-  const response = await fetch(`${API_BASE_URL}/api/profiles/${profileId}/life_events/${eventId}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-  if (!response.ok) {
-    if (response.status === 404) {
-      throw new Error('Life event not found');
-    }
-    throw new Error('Failed to update life event');
-  }
-  return response.json();
+  return trpc.lifeEvent.update.mutate({ profileId, eventId, data });
 }
 
 export async function deleteLifeEvent(profileId: string, eventId: string): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/api/profiles/${profileId}/life_events/${eventId}`, {
-    method: 'DELETE',
-  });
-  if (!response.ok) {
-    if (response.status === 404) {
-      throw new Error('Life event not found');
-    }
-    throw new Error('Failed to delete life event');
-  }
+  await trpc.lifeEvent.delete.mutate({ profileId, eventId });
 }
 
-// Dong Gong Calendar types
-export interface DongGongOfficer {
-  id: string;
-  chinese: string;
-  english: string;
-}
+// ---------------------------------------------------------------------------
+// Dong Gong Calendar — now via tRPC
+// ---------------------------------------------------------------------------
 
-export interface DongGongRating {
-  id: string;
-  value: number;
-  symbol: string;
-  chinese: string;
-}
-
-export interface DongGongConsult {
-  promoted: boolean;
-  original_rating: DongGongRating;
-  reason: string;
-}
-
-export interface DongGongForbidden {
-  type: string;
-  chinese: string;
-  english: string;
-  solar_term_id: string;
-  solar_term_chinese: string;
-  solar_term_english: string;
-  forbidden_start_hour: number;
-  forbidden_end_hour: number;
-}
-
-export interface DongGongDay {
-  day: number;
-  weekday: number;
-  day_stem: string;
-  day_branch: string;
-  day_stem_chinese: string;
-  day_branch_chinese: string;
-  pillar: string;
-  year_stem: string;
-  year_branch: string;
-  year_stem_chinese: string;
-  year_branch_chinese: string;
-  chinese_month: number | null;
-  chinese_month_name: string;
-  officer: DongGongOfficer | null;
-  rating: DongGongRating | null;
-  good_for: string[];
-  bad_for: string[];
-  description_chinese: string;
-  description_english: string;
-  consult?: DongGongConsult | null;
-  forbidden?: DongGongForbidden | null;
-  moon_phase: { emoji: string; english: string; chinese: string; lunar_day: number };
-}
-
-export interface DongGongCalendarResponse {
-  year: number;
-  month: number;
-  first_day_weekday: number;
-  days_in_month: number;
-  days: DongGongDay[];
-  chinese_months_spanned: {
-    month: number;
-    chinese: string;
-    branch: string;
-    stem: string;
-    stem_chinese: string;
-    branch_id: string;
-    branch_chinese: string;
-  }[];
-  chinese_years_spanned: {
-    stem: string;
-    stem_chinese: string;
-    branch: string;
-    branch_chinese: string;
-  }[];
-}
+import type { DongGongCalendarResponse } from './api.types';
 
 export async function getDongGongCalendar(year: number, month: number): Promise<DongGongCalendarResponse> {
-  const response = await fetch(`${API_BASE_URL}/api/dong_gong_calendar?year=${year}&month=${month}`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch Dong Gong calendar');
-  }
-  return response.json();
+  return trpc.dongGong.calendar.query({ year, month });
 }
 
-export interface AnalyzeBaziParams {
-  birthDate: string;
-  birthTime: string;
-  gender: 'male' | 'female';
-  unknownHour?: boolean;
-  // Time travel / analysis period
-  analysisYear?: number | null;
-  includeAnnualLuck?: boolean;
-  analysisMonth?: number | null;
-  includeMonthlyLuck?: boolean;
-  analysisDay?: number | null;
-  includeDailyLuck?: boolean;
-  analysisTime?: string;
-  includeHourlyLuck?: boolean;
-  // Talisman parameters
-  showTalismans?: boolean;
-  talismanYearHS?: string | null;
-  talismanYearEB?: string | null;
-  talismanMonthHS?: string | null;
-  talismanMonthEB?: string | null;
-  talismanDayHS?: string | null;
-  talismanDayEB?: string | null;
-  talismanHourHS?: string | null;
-  talismanHourEB?: string | null;
-  // Location
-  showLocation?: boolean;
-  locationType?: 'overseas' | 'birthplace' | null;
-  // School
-  school?: 'classic' | 'physics';
-}
+// ---------------------------------------------------------------------------
+// BaZi Analysis — now via tRPC
+// ---------------------------------------------------------------------------
+
+import type { AnalyzeBaziParams } from './api.types';
 
 export async function analyzeBazi(params: AnalyzeBaziParams) {
   const timeParam = params.unknownHour ? 'unknown' : params.birthTime;
 
-  let apiUrl = `${API_BASE_URL}/api/analyze_bazi?birth_date=${params.birthDate}&birth_time=${encodeURIComponent(timeParam)}&gender=${params.gender}`;
-
-  // Add analysis parameters if time travel mode is enabled
-  if (params.analysisYear) {
-    apiUrl += `&analysis_year=${params.analysisYear}`;
-    apiUrl += `&include_annual_luck=${params.includeAnnualLuck ?? true}`;
-
-    if (params.analysisMonth && params.includeMonthlyLuck) {
-      apiUrl += `&analysis_month=${params.analysisMonth}`;
-    }
-
-    if (params.analysisDay && params.includeDailyLuck) {
-      apiUrl += `&analysis_day=${params.analysisDay}`;
-    }
-
-    if (params.analysisTime && params.includeHourlyLuck) {
-      apiUrl += `&analysis_time=${encodeURIComponent(params.analysisTime)}`;
-    }
-  }
-
-  // Add talisman parameters
-  if (params.showTalismans) {
-    if (params.talismanYearHS) apiUrl += `&talisman_year_hs=${params.talismanYearHS}`;
-    if (params.talismanYearEB) apiUrl += `&talisman_year_eb=${params.talismanYearEB}`;
-    if (params.talismanMonthHS) apiUrl += `&talisman_month_hs=${params.talismanMonthHS}`;
-    if (params.talismanMonthEB) apiUrl += `&talisman_month_eb=${params.talismanMonthEB}`;
-    if (params.talismanDayHS) apiUrl += `&talisman_day_hs=${params.talismanDayHS}`;
-    if (params.talismanDayEB) apiUrl += `&talisman_day_eb=${params.talismanDayEB}`;
-    if (params.talismanHourHS) apiUrl += `&talisman_hour_hs=${params.talismanHourHS}`;
-    if (params.talismanHourEB) apiUrl += `&talisman_hour_eb=${params.talismanHourEB}`;
-  }
-
-  // Add location parameter
-  if (params.showLocation && params.locationType) {
-    apiUrl += `&location=${params.locationType}`;
-  }
-
-  // Add school parameter
-  if (params.school && params.school !== 'classic') {
-    apiUrl += `&school=${params.school}`;
-  }
-
-  const response = await fetch(apiUrl);
-
-  if (!response.ok) {
-    let errorMessage = 'Chart API request failed';
-    try {
-      const errorData = await response.json();
-      if (errorData.detail) {
-        errorMessage = typeof errorData.detail === 'string'
-          ? errorData.detail
-          : JSON.stringify(errorData.detail);
-      } else if (errorData.message) {
-        errorMessage = errorData.message;
-      }
-    } catch {
-      // Response wasn't JSON, use status text
-      errorMessage = `API error: ${response.status} ${response.statusText}`;
-    }
-    throw new Error(errorMessage);
-  }
-
-  return response.json();
-}
-
-// LocalStorage helpers
-const STORAGE_KEY = 'bazingse_form_data';
-
-export interface StoredFormData {
-  birthDate: string;
-  birthTime: string;
-  gender: 'male' | 'female';
-  unknownHour: boolean;
-  yearInput: number;
-  monthInput: number;
-  dayInput: number;
-  analysisYear: number | null;
-  analysisMonth: number | null;
-  analysisDay: number | null;
-  analysisTime: string;
-  showAnalysisPeriod: boolean;
-  includeAnnualLuck: boolean;
-  includeMonthlyLuck: boolean;
-  includeDailyLuck: boolean;
-  includeHourlyLuck: boolean;
-  showTalismans: boolean;
-  talismanYearHS: string | null;
-  talismanYearEB: string | null;
-  talismanMonthHS: string | null;
-  talismanMonthEB: string | null;
-  talismanDayHS: string | null;
-  talismanDayEB: string | null;
-  talismanHourHS: string | null;
-  talismanHourEB: string | null;
-  showLocation: boolean;
-  locationType: 'overseas' | 'birthplace' | null;
-}
-
-export function loadFromStorage(): StoredFormData | null {
-  if (typeof window === 'undefined') return null;
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    return saved ? JSON.parse(saved) : null;
-  } catch (e) {
-    console.error('Error loading from localStorage:', e);
-    return null;
-  }
-}
-
-export function saveToStorage(data: Partial<StoredFormData>): void {
-  if (typeof window === 'undefined') return;
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  } catch (e) {
-    console.error('Error saving to localStorage:', e);
-  }
-}
-
-// Date validation helper
-export function isValidDate(year: number, month: number, day: number): boolean {
-  if (!year || !month || !day) return false;
-  if (month < 1 || month > 12) return false;
-  if (day < 1 || day > 31) return false;
-  if (year < 1900 || year > 2100) return false;
-
-  const date = new Date(year, month - 1, day);
-  return date.getFullYear() === year &&
-         date.getMonth() === month - 1 &&
-         date.getDate() === day;
-}
-
-// 60 Jia-Zi validation
-const JIAZI_60 = [
-  { stem: 'Jia', branch: 'Zi' }, { stem: 'Yi', branch: 'Chou' }, { stem: 'Bing', branch: 'Yin' },
-  { stem: 'Ding', branch: 'Mao' }, { stem: 'Wu', branch: 'Chen' }, { stem: 'Ji', branch: 'Si' },
-  { stem: 'Geng', branch: 'Wu' }, { stem: 'Xin', branch: 'Wei' }, { stem: 'Ren', branch: 'Shen' },
-  { stem: 'Gui', branch: 'You' }, { stem: 'Jia', branch: 'Xu' }, { stem: 'Yi', branch: 'Hai' },
-  { stem: 'Bing', branch: 'Zi' }, { stem: 'Ding', branch: 'Chou' }, { stem: 'Wu', branch: 'Yin' },
-  { stem: 'Ji', branch: 'Mao' }, { stem: 'Geng', branch: 'Chen' }, { stem: 'Xin', branch: 'Si' },
-  { stem: 'Ren', branch: 'Wu' }, { stem: 'Gui', branch: 'Wei' }, { stem: 'Jia', branch: 'Shen' },
-  { stem: 'Yi', branch: 'You' }, { stem: 'Bing', branch: 'Xu' }, { stem: 'Ding', branch: 'Hai' },
-  { stem: 'Wu', branch: 'Zi' }, { stem: 'Ji', branch: 'Chou' }, { stem: 'Geng', branch: 'Yin' },
-  { stem: 'Xin', branch: 'Mao' }, { stem: 'Ren', branch: 'Chen' }, { stem: 'Gui', branch: 'Si' },
-  { stem: 'Jia', branch: 'Wu' }, { stem: 'Yi', branch: 'Wei' }, { stem: 'Bing', branch: 'Shen' },
-  { stem: 'Ding', branch: 'You' }, { stem: 'Wu', branch: 'Xu' }, { stem: 'Ji', branch: 'Hai' },
-  { stem: 'Geng', branch: 'Zi' }, { stem: 'Xin', branch: 'Chou' }, { stem: 'Ren', branch: 'Yin' },
-  { stem: 'Gui', branch: 'Mao' }, { stem: 'Jia', branch: 'Chen' }, { stem: 'Yi', branch: 'Si' },
-  { stem: 'Bing', branch: 'Wu' }, { stem: 'Ding', branch: 'Wei' }, { stem: 'Wu', branch: 'Shen' },
-  { stem: 'Ji', branch: 'You' }, { stem: 'Geng', branch: 'Xu' }, { stem: 'Xin', branch: 'Hai' },
-  { stem: 'Ren', branch: 'Zi' }, { stem: 'Gui', branch: 'Chou' }, { stem: 'Jia', branch: 'Yin' },
-  { stem: 'Yi', branch: 'Mao' }, { stem: 'Bing', branch: 'Chen' }, { stem: 'Ding', branch: 'Si' },
-  { stem: 'Wu', branch: 'Wu' }, { stem: 'Ji', branch: 'Wei' }, { stem: 'Geng', branch: 'Shen' },
-  { stem: 'Xin', branch: 'You' }, { stem: 'Ren', branch: 'Xu' }, { stem: 'Gui', branch: 'Hai' }
-];
-
-export function isValidJiaziPair(hs: string | null, eb: string | null): boolean {
-  if (!hs || !eb) return true; // Partial selection allowed
-  return JIAZI_60.some(pair => pair.stem === hs && pair.branch === eb);
+  return trpc.bazi.analyze.query({
+    birth_date: params.birthDate,
+    birth_time: timeParam || null,
+    gender: params.gender,
+    analysis_year: params.analysisYear ?? null,
+    include_annual_luck: params.includeAnnualLuck ?? true,
+    analysis_month: (params.analysisMonth && params.includeMonthlyLuck) ? params.analysisMonth : null,
+    analysis_day: (params.analysisDay && params.includeDailyLuck) ? params.analysisDay : null,
+    analysis_time: (params.analysisTime && params.includeHourlyLuck) ? params.analysisTime : null,
+    school: params.school ?? 'classic',
+    talisman_year_hs: params.showTalismans ? (params.talismanYearHS ?? null) : null,
+    talisman_year_eb: params.showTalismans ? (params.talismanYearEB ?? null) : null,
+    talisman_month_hs: params.showTalismans ? (params.talismanMonthHS ?? null) : null,
+    talisman_month_eb: params.showTalismans ? (params.talismanMonthEB ?? null) : null,
+    talisman_day_hs: params.showTalismans ? (params.talismanDayHS ?? null) : null,
+    talisman_day_eb: params.showTalismans ? (params.talismanDayEB ?? null) : null,
+    talisman_hour_hs: params.showTalismans ? (params.talismanHourHS ?? null) : null,
+    talisman_hour_eb: params.showTalismans ? (params.talismanHourEB ?? null) : null,
+    location: (params.showLocation && params.locationType) ? params.locationType : null,
+  });
 }

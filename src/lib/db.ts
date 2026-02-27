@@ -7,7 +7,7 @@ import type {
   ProfileUpdate,
   LifeEventCreate,
   LifeEventUpdate,
-} from './api';
+} from './api.types';
 
 // ---------------------------------------------------------------------------
 // Railway API base URL

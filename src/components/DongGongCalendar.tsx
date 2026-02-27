@@ -425,7 +425,7 @@ function DayDetail({ day, onClose }: { day: DongGongDay; onClose: () => void }) 
       {day.consult?.promoted && (
         <div className="mb-2 text-xs" style={{ color: 'var(--tui-text-muted)' }}>
           <span className="tui-text-muted">
-            {t(CALENDAR.originally)}: {day.consult.original_rating.symbol} {day.consult.original_rating.chinese}
+            {t(CALENDAR.originally)}: {day.consult.original_rating?.symbol} {day.consult.original_rating?.chinese}
           </span>
           <span className="mx-1">—</span>
           <span style={{ color: 'var(--tui-water)' }}>{day.consult.reason}</span>
