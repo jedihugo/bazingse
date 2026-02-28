@@ -4,8 +4,8 @@ import type { AppRouter } from '$lib/server/trpc/router';
 
 function getBaseUrl() {
   if (typeof window !== 'undefined') return '';
-  // SSR — use localhost
-  return `http://localhost:${process.env.PORT ?? 4321}`;
+  // SSR on Cloudflare Workers — no localhost available, use relative URL
+  return '';
 }
 
 export const trpc = createTRPCClient<AppRouter>({
