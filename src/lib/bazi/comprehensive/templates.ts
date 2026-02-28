@@ -1,4 +1,3 @@
-import 'server-only';
 
 // =============================================================================
 // TEMPLATE LIBRARY FOR INTERPRETATIONS

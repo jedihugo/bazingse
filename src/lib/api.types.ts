@@ -12,9 +12,9 @@ export interface LifeEvent {
   day?: number | null;
   location?: string | null;
   notes?: string | null;
-  is_abroad?: boolean;
-  created_at: string;
-  updated_at: string;
+  is_abroad?: boolean | null;
+  created_at: string | null;
+  updated_at: string | null;
 }
 
 export interface LifeEventCreate {

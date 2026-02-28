@@ -1,0 +1,14 @@
+{
+  "name": "bazingse",
+  "compatibility_date": "2025-02-01",
+  "compatibility_flags": ["nodejs_als"],
+  "pages_build_output_dir": ".svelte-kit/cloudflare",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "bazingse-db",
+      "database_id": "41ebc1ed-f62a-4841-a741-d75edb290e92",
+      "migrations_dir": "drizzle"
+    }
+  ]
+}

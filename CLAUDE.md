@@ -2,181 +2,232 @@
 
 Guidance for AI agents working on **BaZingSe** - a full-stack Chinese BaZi (Four Pillars/八字) astrology application.
 
-**Status**: Production-ready API with comprehensive analysis engine, Next.js 14 frontend with i18n, TUI-style Anti-WIMP input system, deployed on Vercel + Railway.
+**Status**: SvelteKit + Svelte 5 frontend, TypeScript BaZi engine, tRPC API, Drizzle ORM, deployed on Cloudflare Pages + D1.
 
 ---
 
 ## Project Overview
 
-- **Frontend**: Next.js 14 + React 18 at repo root (NOT in `app/` subfolder)
-- **Backend**: Python FastAPI + sxtwl calendar library
-- **Deployment**: Vercel (frontend) + Railway (backend + SQLite DB)
-- **i18n**: next-intl with locales: `en`, `id` (default), `zh`
-- **Testing**: Playwright E2E test suite
+- **Frontend**: SvelteKit + Svelte 5 (runes mode) at repo root
+- **Backend**: tRPC routers + TypeScript BaZi engine (same repo, server-side)
+- **Database**: Cloudflare D1 (SQLite) via Drizzle ORM
+- **Deployment**: Cloudflare Pages (frontend + API)
+- **i18n**: Deferred (hardcoded English strings for now)
 - **UI Paradigm**: TUI-style Anti-WIMP (keyboard-first, no modals)
 
 ---
 
-## CRITICAL: Project Structure (Updated 2026-02-17)
-
-**The Next.js app is at the REPO ROOT, not in a subfolder.**
+## Project Structure
 
 ```
 bazingse/
-├── middleware.ts              # MUST be at root for Next.js Edge runtime
-├── next.config.js             # Next.js config with next-intl plugin
-├── package.json               # Frontend dependencies
+├── svelte.config.js           # SvelteKit config (Cloudflare adapter)
+├── vite.config.ts             # Vite config
+├── package.json               # Dependencies
 ├── tsconfig.json              # TypeScript config
-├── src/                       # Next.js source code
-│   ├── app/                   # App Router (3 pages)
-│   │   ├── layout.tsx         # Root layout with PasswordGate + Analytics
-│   │   ├── page.tsx           # Home page (profiles list)
-│   │   ├── globals.css        # Global styles (~53KB)
-│   │   ├── profile/[id]/      # Profile detail page
-│   │   │   └── page.tsx
-│   │   └── calendar/          # Dong Gong calendar page
-│   │       └── page.tsx
-│   ├── components/            # React components
+├── capacitor.config.ts        # Capacitor iOS/Android config
+├── src/
+│   ├── app.css                # Global styles (TUI theme)
+│   ├── app.html               # HTML shell
+│   ├── routes/                # SvelteKit routes (3 pages + API)
+│   │   ├── +layout.svelte     # Root layout (PasswordGate, Header, ThemeToggle)
+│   │   ├── +page.svelte       # Home page (profiles list)
+│   │   ├── profile/[id]/
+│   │   │   └── +page.svelte   # Profile detail page
+│   │   ├── calendar/
+│   │   │   └── +page.svelte   # Dong Gong calendar page
+│   │   └── api/               # REST + tRPC API routes
+│   │       ├── trpc/[...path]/+server.ts  # tRPC handler
+│   │       ├── health/+server.ts
+│   │       ├── profiles/+server.ts
+│   │       ├── profiles/[id]/+server.ts
+│   │       ├── profiles/[id]/life_events/+server.ts
+│   │       ├── profiles/[id]/life_events/[eid]/+server.ts
+│   │       ├── analyze_bazi/+server.ts
+│   │       └── dong_gong_calendar/+server.ts
+│   ├── components/            # Svelte 5 components
 │   │   ├── chat-form/         # TUI-style input components
-│   │   └── *.tsx              # Page-level and display components
-│   ├── i18n/                  # Internationalization config
-│   ├── lib/                   # Utilities (api.ts)
-│   └── locales/               # Translation files (en/, id/, zh/)
-├── public/                    # Static assets
-├── api/                       # Backend - Python FastAPI
-│   ├── bazingse.py            # Core interaction engine (~5300 lines)
-│   ├── routes.py              # API endpoints
-│   ├── chart_constructor.py   # Chart generation
-│   ├── library/               # All BaZi logic modules
-│   │   ├── core.py            # STEMS + BRANCHES (single source of truth)
-│   │   ├── comprehensive/     # New comprehensive analysis engine
-│   │   ├── narrative/         # Narrative generation
-│   │   ├── life_aspects/      # Health, wealth, learning analysis
-│   │   ├── pattern_engine/    # Universal pattern detection
-│   │   └── *.py               # Scoring, physics, qi_phase, etc.
-│   ├── crud.py / models.py / schemas.py / database.py  # DB layer
-│   └── run_bazingse.py        # Local dev server
+│   │   ├── BaZiChart.svelte   # Pillar cards renderer
+│   │   ├── PillarCard.svelte  # Individual pillar display
+│   │   ├── PillarTag.svelte   # Compact pillar label
+│   │   ├── ElementAnalysis.svelte
+│   │   ├── NarrativeCard.svelte
+│   │   ├── NarrativeDisplay.svelte
+│   │   ├── DmLensDisplay.svelte
+│   │   ├── WealthStorageDisplay.svelte
+│   │   ├── ClientSummaryDisplay.svelte
+│   │   ├── ProfilePage.svelte
+│   │   ├── ProfileInfoBlock.svelte
+│   │   ├── LifeEventBlock.svelte
+│   │   ├── InlineProfileForm.svelte
+│   │   ├── InlineLifeEventForm.svelte
+│   │   ├── SearchableProfileList.svelte
+│   │   ├── DongGongCalendar.svelte
+│   │   ├── PasswordGate.svelte
+│   │   ├── Header.svelte
+│   │   └── ThemeToggle.svelte
+│   └── lib/                   # Shared libraries
+│       ├── api.ts             # Client API (tRPC-backed)
+│       ├── api.types.ts       # Shared TypeScript types
+│       ├── api.utils.ts       # LocalStorage, validation utils
+│       ├── trpc.ts            # tRPC client setup
+│       ├── bazi/              # BaZi calculation engine (TypeScript)
+│       │   ├── core.ts        # STEMS + BRANCHES (source of truth)
+│       │   ├── chart.ts       # Chart construction
+│       │   ├── index.ts       # Engine entry point
+│       │   ├── comprehensive/ # Comprehensive analysis engine
+│       │   ├── narrative/     # Narrative generation
+│       │   ├── life-aspects/  # Health, wealth, learning
+│       │   ├── pattern-engine/# Universal pattern detection
+│       │   ├── wuxing/        # Wu Xing scoring
+│       │   └── *.ts           # Other modules
+│       └── server/            # Server-side only
+│           ├── db/
+│           │   ├── index.ts   # D1 database connection
+│           │   └── schema.ts  # Drizzle schema
+│           ├── services/      # Business logic
+│           │   ├── bazi.ts
+│           │   └── dong-gong.ts
+│           └── trpc/          # tRPC setup
+│               ├── init.ts    # tRPC initialization
+│               ├── router.ts  # Root router (AppRouter)
+│               ├── context.ts # Request context (D1 db)
+│               ├── errors.ts  # Error mapping
+│               ├── schemas.ts # Zod schemas
+│               └── routers/   # Sub-routers
+│                   ├── profile.ts
+│                   ├── lifeEvent.ts
+│                   ├── bazi.ts
+│                   ├── dongGong.ts
+│                   └── health.ts
+├── api/                       # Legacy Python backend (to be removed)
+├── mcp-server/                # Legacy MCP server (to be removed)
 ├── ios/                       # Capacitor iOS app
 └── tests/                     # Playwright tests
-```
-
-### CRITICAL: Middleware Location
-
-**Middleware MUST be at project root (`middleware.ts`), NOT in `src/`.**
-
-Next.js requires middleware at the root level when the app is at root. If middleware is in `src/middleware.ts`, it will NOT be recognized and all routes will 404.
-
-```typescript
-// middleware.ts (at repo root)
-import createMiddleware from 'next-intl/middleware';
-import { defineRouting } from 'next-intl/routing';
-
-// Inline routing config to avoid import issues on Vercel Edge
-const routing = defineRouting({
-  locales: ['en', 'id', 'zh'],
-  defaultLocale: 'id',
-  localePrefix: 'always',
-});
-
-export default createMiddleware(routing);
 ```
 
 ---
 
 ## Frontend Pages & Component Tree
 
-### 3 Pages (App Router)
+### 3 Pages (SvelteKit Routes)
 
 | Route | Page File | Key Components |
 |-------|-----------|----------------|
-| `/` | `src/app/page.tsx` | Header, InlineProfileForm, SearchableProfileList |
-| `/profile/[id]` | `src/app/profile/[id]/page.tsx` | Header, ProfilePage |
-| `/calendar` | `src/app/calendar/page.tsx` | Header, DongGongCalendar |
+| `/` | `src/routes/+page.svelte` | Header, InlineProfileForm, SearchableProfileList |
+| `/profile/[id]` | `src/routes/profile/[id]/+page.svelte` | Header, ProfilePage |
+| `/calendar` | `src/routes/calendar/+page.svelte` | Header, DongGongCalendar |
 
 ### Core Components (`src/components/`)
 
 | Component | Purpose |
 |-----------|---------|
-| `PasswordGate.tsx` | App access protection |
-| `Header.tsx` | Logo + title + ThemeToggle |
-| `ProfilePage.tsx` | Profile view orchestrator (info, life events, chart) |
-| `ProfileInfoBlock.tsx` | Editable profile info display |
-| `LifeEventBlock.tsx` | Life event display with BaZi chart + analysis |
-| `BaZiChart.tsx` | Pillar cards renderer |
-| `PillarCard.tsx` | Individual pillar display |
-| `PillarTag.tsx` | Compact pillar label |
-| `ElementAnalysis.tsx` | Element score breakdown |
-| `NarrativeDisplay.tsx` | Narrative cards container |
-| `NarrativeCard.tsx` | Individual narrative card |
-| `ClientSummaryDisplay.tsx` | Client-facing summary with diffs |
-| `DongGongCalendar.tsx` | Dong Gong date selection calendar |
-| `InlineProfileForm.tsx` | Create profile (inline, no modal) |
-| `InlineLifeEventForm.tsx` | Add life event (inline, no modal) |
-| `SearchableProfileList.tsx` | Filterable profile list on home page |
-| `ThemeToggle.tsx` | Dark/light mode toggle |
-| `LocaleProvider.tsx` | i18n context wrapper |
+| `PasswordGate.svelte` | App access protection |
+| `Header.svelte` | Logo + title + ThemeToggle |
+| `ProfilePage.svelte` | Profile view orchestrator |
+| `ProfileInfoBlock.svelte` | Editable profile info display |
+| `LifeEventBlock.svelte` | Life event with BaZi chart + analysis |
+| `BaZiChart.svelte` | Pillar cards renderer |
+| `PillarCard.svelte` | Individual pillar display |
+| `PillarTag.svelte` | Compact pillar label |
+| `ElementAnalysis.svelte` | Element score breakdown |
+| `NarrativeDisplay.svelte` | Narrative cards container |
+| `NarrativeCard.svelte` | Individual narrative card |
+| `DmLensDisplay.svelte` | Day Master lens analysis |
+| `WealthStorageDisplay.svelte` | Wealth storage analysis |
+| `ClientSummaryDisplay.svelte` | Client-facing summary |
+| `DongGongCalendar.svelte` | Dong Gong calendar |
+| `InlineProfileForm.svelte` | Create profile (inline) |
+| `InlineLifeEventForm.svelte` | Add life event (inline) |
+| `SearchableProfileList.svelte` | Filterable profile list |
+| `ThemeToggle.svelte` | Dark/light mode toggle |
 
 ### Input Components (`src/components/chat-form/`)
 
 | Component | Purpose |
 |-----------|---------|
-| `ChatFormContext.tsx` | React context for focus management |
-| `ChatForm.tsx` | Container with title bar, keyboard shortcuts |
-| `ChatFormField.tsx` | Field wrapper with blinking cursor `>` |
-| `GuidedDateInput.tsx` | YYYY/MM/DD with auto-advance |
-| `GuidedTimeInput.tsx` | HH:MM with unknown toggle |
-| `InlineSelector.tsx` | Radio-style keyboard selection `(●)/(○)` |
-| `TypeaheadSelect.tsx` | Keyboard-navigable dropdown replacement |
+| `ChatFormContext.svelte` | Svelte context for focus management |
+| `ChatForm.svelte` | Container with title bar, keyboard shortcuts |
+| `ChatFormField.svelte` | Field wrapper with blinking cursor `>` |
+| `GuidedDateInput.svelte` | YYYY/MM/DD with auto-advance |
+| `GuidedTimeInput.svelte` | HH:MM with unknown toggle |
+| `GuidedYearInput.svelte` | Year-only input |
+| `InlineSelector.svelte` | Radio-style keyboard selection `(●)/(○)` |
+| `GenderSelector.svelte` | Male/Female selector |
+| `TypeaheadSelect.svelte` | Keyboard-navigable dropdown |
 
 ---
 
 ## Backend Architecture
 
-### Core Engine
+### tRPC Router Structure
 
-- `api/bazingse.py` (~5300 lines) — Monolithic with inner functions (closures over `nodes` dict)
-- All BaZi logic lives in `api/library/` modules; `bazingse.py` uses `from library import *`
+Root router (`src/lib/server/trpc/router.ts`) merges 5 sub-routers:
+- `health` — Health check
+- `profile` — CRUD for profiles
+- `lifeEvent` — CRUD for life events
+- `bazi` — BaZi chart analysis
+- `dongGong` — Dong Gong calendar
 
-### Library Modules (`api/library/`)
+### tRPC + REST API
 
-| Module | Purpose |
-|--------|---------|
-| `core.py` | STEMS + BRANCHES — single source of truth |
-| `derived.py` | All computed data from core |
-| `combinations.py` | Positive: Three Meetings, Six Harmonies, etc. |
-| `conflicts.py` | Negative: Punishments, Harms, Clashes, etc. |
-| `scoring.py` / `dynamic_scoring.py` | Element scoring systems |
-| `seasonal.py` | Seasonal strength configs |
-| `qi_phase.py` | Twelve Life Stages (十二长生) |
-| `physics.py` | Physics school (Yin/Yang polarity modifier) |
-| `wealth_storage.py` | Wealth storage (財庫) analysis |
-| `dong_gong.py` | Dong Gong date selection system |
-| `distance.py` | Node distance calculations |
-| `unity.py` | Wu Xing combat engine |
-| `unit_tracker.py` | Unit story tracker |
-| `comprehensive/` | New comprehensive analysis engine (zero-LLM) |
-| `narrative/` | Narrative generation (templates, chains, localization) |
-| `life_aspects/` | Health, wealth, learning, ten gods detail |
-| `pattern_engine/` | Universal pattern detection + life events |
+The primary API is tRPC at `/api/trpc/[...path]`. REST routes at `/api/*` are thin backward-compatibility wrappers that create a server-side tRPC caller and delegate.
 
-### API Endpoints (`api/routes.py`)
+### BaZi Engine (`src/lib/bazi/`)
 
+All BaZi calculations are in TypeScript:
+- `core.ts` — STEMS + BRANCHES (single source of truth)
+- `chart.ts` — Chart construction
+- `comprehensive/` — Comprehensive analysis engine
+- `narrative/` — Narrative generation
+- `wuxing/` — Wu Xing scoring system
+- `pattern-engine/` — Universal pattern detection
+
+### Database
+
+Cloudflare D1 (SQLite) accessed via Drizzle ORM:
+- Schema: `src/lib/server/db/schema.ts`
+- Connection: `src/lib/server/db/index.ts` (wraps D1 binding)
+
+---
+
+## Svelte 5 Conventions
+
+### Runes (MUST use these patterns)
+
+```svelte
+<script lang="ts">
+  // State
+  let count = $state(0);
+  let items = $state<string[]>([]);
+
+  // Derived values
+  let doubled = $derived(count * 2);
+  let filtered = $derived.by(() => items.filter(i => i.length > 3));
+
+  // Props
+  interface Props { name: string; onClick?: () => void; }
+  let { name, onClick }: Props = $props();
+
+  // Effects
+  $effect(() => { console.log(count); });
+</script>
 ```
-GET  /health                              # Health check
-GET  /api/analyze_bazi?...                # BaZi chart analysis (main)
-GET  /api/comprehensive_analysis?...      # Comprehensive report (zero-LLM, markdown)
-GET  /api/dong_gong_calendar?...          # Dong Gong date selection
-POST /api/seed                            # Seed database (if empty)
-GET  /api/profiles                        # List all profiles
-POST /api/profiles                        # Create profile
-GET  /api/profiles/{id}                   # Get profile
-PUT  /api/profiles/{id}                   # Update profile
-DELETE /api/profiles/{id}                 # Delete profile
-POST /api/profiles/{id}/life_events       # Add life event
-GET  /api/profiles/{id}/life_events/{eid} # Get life event
-PUT  /api/profiles/{id}/life_events/{eid} # Update life event
-DELETE /api/profiles/{id}/life_events/{eid} # Delete life event
-```
+
+### Key Patterns
+
+1. **Props:** `let { prop1, prop2 }: Props = $props()`
+2. **Children:** `import type { Snippet } from 'svelte'; let { children }: { children: Snippet } = $props()` + `{@render children()}`
+3. **Navigation:** `import { goto } from '$app/navigation'`
+4. **Route params:** `import { page } from '$app/stores'; let id = $derived($page.params.id)`
+5. **API calls:** Import from `$lib/api`
+6. **Events:** `onclick` (lowercase), `onkeydown`, `oninput`
+7. **Conditionals:** `{#if cond}...{:else}...{/if}`
+8. **Loops:** `{#each arr as item (item.id)}...{/each}`
+9. **Class binding:** `class:active={isActive}`
+10. **Refs:** `bind:this={element}`
+11. **Scoped CSS:** `<style>` block at end of file
+12. **No `'use client'`** — not needed in Svelte
 
 ---
 
@@ -207,87 +258,23 @@ DELETE /api/profiles/{id}/life_events/{eid} # Delete life event
 
 ## Password Gate
 
-The app is protected by a simple password gate.
-
 **Password**: `lombok29`
 
-**Implementation** (`src/components/PasswordGate.tsx`):
+**Implementation** (`src/components/PasswordGate.svelte`):
 - Checks `sessionStorage` for auth status
 - Shows password input if not authenticated
-- Auth persists for browser session (until tab closed)
-- Wraps entire app in `src/app/layout.tsx`
-
----
-
-## Production Infrastructure
-
-### Frontend: Vercel
-- **URL**: https://bazingse.vercel.app
-- Auto-deploys from `main` branch
-- Vercel Web Analytics enabled
-- No `vercel.json` needed - Next.js at repo root is auto-detected
-
-### Backend: Railway
-- **URL**: https://bazingse-production.up.railway.app
-- Python FastAPI with sxtwl calendar library
-- Auto-deploys from `main` branch (watches `api/` directory)
-
-### Database: Railway SQLite (SOURCE OF TRUTH)
-- **Location**: `/data/bazingse.db` on Railway persistent volume
-- **NO local database** - Railway is the single source of truth
-- Seed endpoint: `POST /api/seed` (only works if DB is empty)
-
----
-
-## Internationalization (i18n)
-
-Using `next-intl` for multi-language support.
-
-| Code | Language | Default |
-|------|----------|---------|
-| `id` | Bahasa Indonesia | yes |
-| `en` | English | |
-| `zh` | 中文 | |
-
-### URL Structure
-
-```
-/               → Home (profiles list)
-/profile/123    → Profile page
-/calendar       → Dong Gong calendar
-```
-
-### Adding Translations
-
-1. Add JSON file in `src/locales/{locale}/`
-2. Export from `src/locales/{locale}/index.ts`
-3. Use in components: `const t = useTranslations('namespace');`
+- Wraps entire app in `src/routes/+layout.svelte`
 
 ---
 
 ## Development Commands
 
-### Frontend (Next.js 14 - Port 4321)
 ```bash
 cd /Users/macbookair/GitHub/bazingse
 npm install
-npm run dev     # Development server: http://localhost:4321
+npm run dev     # Development server (Vite)
 npm run build   # Production build
-npm run start   # Preview production build
-```
-
-### Backend (FastAPI - Port 8008)
-```bash
-cd /Users/macbookair/GitHub/bazingse/api
-source .venv/bin/activate
-pip install -r requirements.txt
-python run_bazingse.py  # http://localhost:8008
-```
-
-### Kill Port Conflicts
-```bash
-lsof -ti:4321 | xargs kill -9  # Kill frontend port
-lsof -ti:8008 | xargs kill -9  # Kill backend port
+npm run preview # Preview production build
 ```
 
 ---
@@ -295,12 +282,6 @@ lsof -ti:8008 | xargs kill -9  # Kill backend port
 ## CRITICAL: Pattern-Based Thinking
 
 **When given an example, NEVER hardcode for just that one case. Always identify the pattern and apply it universally.**
-
-### Key Questions to Ask:
-1. **"Is this a single instance or a pattern?"** (Usually a pattern!)
-2. **"Where else does this pattern occur?"** (Search with grep/Glob)
-3. **"What's the root cause?"** (Fix the source, not symptoms)
-4. **"Are there similar cases?"** (Apply fix universally)
 
 ---
 
@@ -322,51 +303,29 @@ The user is **non-technical**. This means:
 
 ---
 
-## CRITICAL: API is the Single Source of Truth
-
-**ALL BaZi calculations and display metadata MUST live in the Python API backend.**
-
-**Frontend responsibilities (ONLY):**
-- Collect user inputs
-- Call backend APIs
-- Display returned data using API-provided styling
-- Handle UI interactions
-
-**Frontend must NEVER:**
-- Calculate elements, stems, branches, or Ten Gods
-- Hardcode hex colors or styling
-- Create mock/fallback data
-
----
-
 ## Design Principles
 
-1. **Backend is Source of Truth** - Never calculate BaZi logic in frontend
-2. **KISS** - Keep solutions simple (middle-schooler friendly)
-3. **Anti-WIMP** - Keyboard-first, no modals, inline forms
-4. **TUI-Style** - Terminal aesthetic, content-first, minimal chrome
-5. **Mobile-First** - 99% users on mobile, desktop = mobile + padding
-6. **NO HORIZONTAL SCROLLING** - Page must never scroll left/right
-7. **i18n Ready** - All user-facing strings in locale files
-8. **TypeScript Strict Mode** - All frontend code typed
+1. **KISS** - Keep solutions simple
+2. **Anti-WIMP** - Keyboard-first, no modals, inline forms
+3. **TUI-Style** - Terminal aesthetic, content-first, minimal chrome
+4. **Mobile-First** - 99% users on mobile, desktop = mobile + padding
+5. **NO HORIZONTAL SCROLLING** - Page must never scroll left/right
+6. **TypeScript Strict Mode** - All code typed
 
 ---
 
 ## TL;DR for AI Agents
 
-1. **Next.js is at REPO ROOT** - Not in `app/` subfolder
-2. **Middleware at root** - `middleware.ts`, NOT `src/middleware.ts`
-3. **Password**: `lombok29` (stored in sessionStorage)
-4. **Anti-WIMP** - No modals, inline forms, keyboard-first
-5. **i18n locales**: `en`, `id` (default), `zh`
-6. **Port 4321** for frontend, **Port 8008** for backend
-7. **Vercel** for frontend, **Railway** for backend + database
-8. **Railway SQLite is SOURCE OF TRUTH** - No local database, always refer to Railway
-9. **Backend is Source of Truth** - No BaZi logic in frontend
-10. **Pattern-based thinking** - Apply fixes universally, not just to examples
-11. **Non-technical user** - Explain in plain language, no jargon
-12. **3 pages**: Home (profiles), Profile detail, Calendar
+1. **SvelteKit + Svelte 5** with runes ($state, $derived, $props, $effect)
+2. **tRPC** for type-safe API, REST routes for backward compat
+3. **Cloudflare D1** database via Drizzle ORM
+4. **Password**: `lombok29` (stored in sessionStorage)
+5. **Anti-WIMP** - No modals, inline forms, keyboard-first
+6. **BaZi engine** in TypeScript at `src/lib/bazi/`
+7. **Pattern-based thinking** - Apply fixes universally
+8. **Non-technical user** - Explain in plain language
+9. **3 pages**: Home (profiles), Profile detail, Calendar
 
 ---
 
-**Last Updated:** 2026-02-17 (Comprehensive engine, calendar, wealth storage, client summary, cleanup)
+**Last Updated:** 2026-02-28 (SvelteKit + Svelte 5 migration complete)

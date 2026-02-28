@@ -7,10 +7,10 @@ const USE_DEV_SERVER = true;
 const config: CapacitorConfig = {
   appId: 'com.bazingse.app',
   appName: 'BaZingSe',
-  webDir: 'out',
+  webDir: 'build',
   server: USE_DEV_SERVER ? {
-    // Development: Load from Next.js dev server for live reload
-    url: 'http://localhost:4321',
+    // Development: Load from SvelteKit dev server for live reload
+    url: 'http://localhost:5173',
     cleartext: true,
   } : {
     // Production: Load from bundled files

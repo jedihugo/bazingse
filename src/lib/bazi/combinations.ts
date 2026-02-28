@@ -1,4 +1,3 @@
-import 'server-only';
 
 // =============================================================================
 // POSITIVE COMBINATION PATTERNS (DERIVED FROM CORE)

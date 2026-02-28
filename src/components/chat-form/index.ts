@@ -1,10 +1,12 @@
 // Chat-form component library barrel export
 // Terminal/chat-style input system for keyboard-first navigation
 
-export { default as ChatForm } from './ChatForm';
-export { default as ChatFormField, ChatFieldInput } from './ChatFormField';
-export { ChatFormProvider, useChatForm, useChatFormField } from './ChatFormContext';
-export { default as GuidedDateInput, GuidedYearInput } from './GuidedDateInput';
-export { default as GuidedTimeInput } from './GuidedTimeInput';
-export { default as InlineSelector, GenderSelector } from './InlineSelector';
-export { default as TypeaheadSelect } from './TypeaheadSelect';
+export { default as ChatForm } from './ChatForm.svelte';
+export { default as ChatFormField } from './ChatFormField.svelte';
+export { default as GuidedDateInput } from './GuidedDateInput.svelte';
+export { default as GuidedYearInput } from './GuidedYearInput.svelte';
+export { default as GuidedTimeInput } from './GuidedTimeInput.svelte';
+export { default as InlineSelector } from './InlineSelector.svelte';
+export { default as GenderSelector } from './GenderSelector.svelte';
+export { default as TypeaheadSelect } from './TypeaheadSelect.svelte';
+export { createChatFormContext, getChatFormContext } from './context.svelte';

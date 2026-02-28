@@ -1,4 +1,3 @@
-import 'server-only';
 
 // =============================================================================
 // NEGATIVE CONFLICT PATTERNS (DERIVED FROM CORE)

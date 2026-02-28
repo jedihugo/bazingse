@@ -1,4 +1,3 @@
-import 'server-only';
 
 // =============================================================================
 // HEAVENLY STEM PATTERNS (Declarative Format)

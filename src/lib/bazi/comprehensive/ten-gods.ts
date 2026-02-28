@@ -1,4 +1,3 @@
-import 'server-only';
 
 // =============================================================================
 // TEN GODS (十神) COMPREHENSIVE MAPPING ENGINE

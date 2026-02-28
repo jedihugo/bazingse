@@ -35,9 +35,12 @@ venv
 test-results/
 playwright-report/
 
-# Next.js
-.next/
+# SvelteKit
+.svelte-kit/
 *.tsbuildinfo
+
+# Cloudflare
+.wrangler/
 
 # Database
 *.db
