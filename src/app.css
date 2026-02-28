@@ -1,0 +1,695 @@
+/* BaZingSe - TUI-Style CSS */
+/* Terminal User Interface aesthetic - content-first, text-dense, minimal chrome */
+/* Supports both light and dark themes */
+
+/* ===== RESETS ===== */
+
+/* iOS safe area support */
+:root {
+  --sat: env(safe-area-inset-top);
+  --sar: env(safe-area-inset-right);
+  --sab: env(safe-area-inset-bottom);
+  --sal: env(safe-area-inset-left);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Reset button appearance - prevent dark system buttons on iOS/dark mode */
+button {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* Base font size - uniform, readable */
+html {
+  font-size: 14px;
+}
+
+body {
+  font-size: 1rem;
+  line-height: 1.4;
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--tui-bg);
+  color: var(--tui-fg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* ===== LIGHT THEME (Default) ===== */
+:root {
+  /* TUI Light Theme - Content-first, readable */
+  --tui-bg: #ffffff;           /* Clean white background */
+  --tui-bg-alt: #f8f9fa;       /* Subtle alternate */
+  --tui-bg-panel: #ffffff;     /* Panel background */
+  --tui-fg: #000000;           /* Pure black text - maximum readability */
+  --tui-fg-dim: #333333;       /* Slightly dimmed */
+  --tui-fg-muted: #666666;     /* Muted text */
+  --tui-border: #cccccc;       /* Standard border */
+  --tui-border-bright: #000000;/* Highlighted border */
+  --tui-border-dim: #e0e0e0;   /* Dimmed border */
+
+  /* Element Colors - Dark/saturated for light background readability */
+  --tui-wood: #006600;         /* Yang Wood - dark green */
+  --tui-fire: #cc0000;         /* Yang Fire - dark red */
+  --tui-earth: #996600;        /* Yang Earth - dark gold */
+  --tui-metal: #444444;        /* Yang Metal - dark gray */
+  --tui-water: #0066cc;        /* Yang Water - dark blue */
+
+  /* Yin variants - slightly lighter */
+  --tui-wood-yin: #228b22;     /* Yin Wood */
+  --tui-fire-yin: #dc143c;     /* Yin Fire */
+  --tui-earth-yin: #b8860b;    /* Yin Earth */
+  --tui-metal-yin: #777777;    /* Yin Metal */
+  --tui-water-yin: #4169e1;    /* Yin Water */
+
+  /* Accent Colors - muted */
+  --tui-accent-purple: #663399;
+  --tui-accent-pink: #993366;
+  --tui-accent-teal: #006666;
+  --tui-accent-orange: #cc6600;
+
+  /* TUI Status Colors */
+  --tui-success: #1a7f37;
+  --tui-warning: #9a6700;
+  --tui-error: #cf222e;
+  --tui-info: #0969da;
+
+  /* ===== MOBILE-FIRST RESPONSIVE SPACING ===== */
+  --space-xs: 0.0625rem;  /* 1px */
+  --space-sm: 0.125rem;   /* 2px */
+  --space-md: 0.25rem;    /* 4px */
+  --space-lg: 0.5rem;     /* 8px */
+  --space-xl: 0.75rem;    /* 12px */
+  --space-2xl: 1rem;      /* 16px */
+  --space-3xl: 1.5rem;    /* 24px */
+
+  /* Container padding - mobile: minimal */
+  --container-px: 0.25rem;  /* 4px */
+  --container-py: 0.5rem;   /* 8px */
+
+  /* Component spacing - tight */
+  --card-padding: 0.375rem; /* 6px */
+  --section-gap: 0.5rem;    /* 8px */
+
+  /* Legacy Colors (kept for compatibility during transition) */
+  --color-white: #ffffff;
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
+
+  --color-blue-50: #eff6ff;
+  --color-blue-100: #dbeafe;
+  --color-blue-200: #bfdbfe;
+  --color-blue-300: #93c5fd;
+  --color-blue-400: #60a5fa;
+  --color-blue-500: #3b82f6;
+  --color-blue-600: #2563eb;
+  --color-blue-700: #1d4ed8;
+
+  --color-purple-50: #faf5ff;
+  --color-purple-100: #f3e8ff;
+  --color-purple-200: #e9d5ff;
+  --color-purple-300: #d8b4fe;
+  --color-purple-500: #a855f7;
+  --color-purple-700: #7e22ce;
+
+  --color-pink-50: #fdf2f8;
+  --color-pink-100: #fce7f3;
+  --color-pink-300: #f9a8d4;
+  --color-pink-500: #ec4899;
+  --color-pink-600: #db2777;
+  --color-pink-700: #be185d;
+
+  --color-green-50: #f0fdf4;
+  --color-green-100: #dcfce7;
+  --color-green-200: #bbf7d0;
+  --color-green-300: #86efac;
+  --color-green-600: #16a34a;
+  --color-green-700: #15803d;
+
+  --color-red-50: #fef2f2;
+  --color-red-100: #fee2e2;
+  --color-red-200: #fecaca;
+  --color-red-300: #fca5a5;
+  --color-red-400: #f87171;
+  --color-red-600: #dc2626;
+  --color-red-700: #b91c1c;
+
+  --color-orange-50: #fff7ed;
+  --color-orange-100: #ffedd5;
+  --color-orange-400: #fb923c;
+  --color-orange-500: #f97316;
+  --color-orange-700: #c2410c;
+
+  --color-yellow-400: #facc15;
+  --color-yellow-700: #a16207;
+
+  --color-amber-50: #fffbeb;
+  --color-amber-700: #b45309;
+
+  --color-teal-50: #f0fdfa;
+  --color-teal-400: #2dd4bf;
+  --color-teal-500: #14b8a6;
+  --color-teal-600: #0d9488;
+  --color-teal-700: #0f766e;
+
+  --color-indigo-50: #eef2ff;
+  --color-indigo-200: #c7d2fe;
+  --color-indigo-600: #4f46e5;
+  --color-indigo-700: #4338ca;
+
+  --color-emerald-50: #ecfdf5;
+
+  /* Shadows - DISABLED for TUI minimal chrome */
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+
+  /* Transitions */
+  --transition-all: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-very-slow: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Border radius - DISABLED for TUI minimal chrome */
+  --border-radius: 0;
+}
+
+/* ===== DARK THEME (System Preference) - Catppuccin Mocha-inspired ===== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --tui-bg: #1e1e2e;
+    --tui-bg-alt: #313244;
+    --tui-bg-panel: #24273a;
+    --tui-fg: #cdd6f4;
+    --tui-fg-dim: #a6adc8;
+    --tui-fg-muted: #6c7086;
+    --tui-border: #45475a;
+    --tui-border-bright: #cdd6f4;
+    --tui-border-dim: #313244;
+
+    --tui-wood: #a6e3a1;
+    --tui-fire: #f38ba8;
+    --tui-earth: #f9e2af;
+    --tui-metal: #bac2de;
+    --tui-water: #89b4fa;
+
+    --tui-wood-yin: #94e2d5;
+    --tui-fire-yin: #eba0ac;
+    --tui-earth-yin: #f5c2e7;
+    --tui-metal-yin: #9399b2;
+    --tui-water-yin: #74c7ec;
+
+    --tui-accent-purple: #cba6f7;
+    --tui-accent-pink: #f5c2e7;
+    --tui-accent-teal: #94e2d5;
+    --tui-accent-orange: #fab387;
+
+    --tui-success: #a6e3a1;
+    --tui-warning: #f9e2af;
+    --tui-error: #f38ba8;
+    --tui-info: #89b4fa;
+
+    --color-white: #cdd6f4;
+    --color-gray-50: #1e1e2e;
+    --color-gray-100: #24273a;
+    --color-gray-200: #313244;
+    --color-gray-300: #45475a;
+    --color-gray-400: #585b70;
+    --color-gray-500: #6c7086;
+    --color-gray-600: #7f849c;
+    --color-gray-700: #a6adc8;
+    --color-gray-800: #bac2de;
+    --color-gray-900: #cdd6f4;
+
+    --color-blue-50: #1e1e2e;
+    --color-blue-100: #24273a;
+    --color-blue-200: #313244;
+    --color-blue-300: #74c7ec;
+    --color-blue-400: #89b4fa;
+    --color-blue-500: #89b4fa;
+    --color-blue-600: #74c7ec;
+    --color-blue-700: #89b4fa;
+
+    --color-purple-50: #1e1e2e;
+    --color-purple-100: #24273a;
+    --color-purple-200: #45475a;
+    --color-purple-300: #cba6f7;
+    --color-purple-500: #cba6f7;
+    --color-purple-700: #cba6f7;
+
+    --color-pink-50: #1e1e2e;
+    --color-pink-100: #24273a;
+    --color-pink-300: #f5c2e7;
+    --color-pink-500: #f5c2e7;
+    --color-pink-600: #f5c2e7;
+    --color-pink-700: #f5c2e7;
+
+    --color-green-50: #1e1e2e;
+    --color-green-100: #24273a;
+    --color-green-200: #313244;
+    --color-green-300: #a6e3a1;
+    --color-green-600: #a6e3a1;
+    --color-green-700: #a6e3a1;
+
+    --color-red-50: #1e1e2e;
+    --color-red-100: #24273a;
+    --color-red-200: #313244;
+    --color-red-300: #f38ba8;
+    --color-red-400: #f38ba8;
+    --color-red-600: #f38ba8;
+    --color-red-700: #f38ba8;
+
+    --color-orange-50: #1e1e2e;
+    --color-orange-100: #24273a;
+    --color-orange-400: #fab387;
+    --color-orange-500: #fab387;
+    --color-orange-700: #fab387;
+
+    --color-yellow-400: #f9e2af;
+    --color-yellow-700: #f9e2af;
+
+    --color-amber-50: #1e1e2e;
+    --color-amber-700: #f9e2af;
+
+    --color-teal-50: #1e1e2e;
+    --color-teal-400: #94e2d5;
+    --color-teal-500: #94e2d5;
+    --color-teal-600: #94e2d5;
+    --color-teal-700: #94e2d5;
+
+    --color-indigo-50: #1e1e2e;
+    --color-indigo-200: #45475a;
+    --color-indigo-600: #b4befe;
+    --color-indigo-700: #b4befe;
+
+    --color-emerald-50: #1e1e2e;
+  }
+}
+
+/* ===== MANUAL THEME OVERRIDES ===== */
+/* Dark theme - applied when data-theme="dark" regardless of system preference */
+[data-theme="dark"] {
+  --tui-bg: #1e1e2e;
+  --tui-bg-alt: #313244;
+  --tui-bg-panel: #24273a;
+  --tui-fg: #cdd6f4;
+  --tui-fg-dim: #a6adc8;
+  --tui-fg-muted: #6c7086;
+  --tui-border: #45475a;
+  --tui-border-bright: #cdd6f4;
+  --tui-border-dim: #313244;
+
+  --tui-wood: #a6e3a1;
+  --tui-fire: #f38ba8;
+  --tui-earth: #f9e2af;
+  --tui-metal: #bac2de;
+  --tui-water: #89b4fa;
+
+  --tui-wood-yin: #94e2d5;
+  --tui-fire-yin: #eba0ac;
+  --tui-earth-yin: #f5c2e7;
+  --tui-metal-yin: #9399b2;
+  --tui-water-yin: #74c7ec;
+
+  --tui-accent-purple: #cba6f7;
+  --tui-accent-pink: #f5c2e7;
+  --tui-accent-teal: #94e2d5;
+  --tui-accent-orange: #fab387;
+
+  --tui-success: #a6e3a1;
+  --tui-warning: #f9e2af;
+  --tui-error: #f38ba8;
+  --tui-info: #89b4fa;
+
+  --color-white: #cdd6f4;
+  --color-gray-50: #1e1e2e;
+  --color-gray-100: #24273a;
+  --color-gray-200: #313244;
+  --color-gray-300: #45475a;
+  --color-gray-400: #585b70;
+  --color-gray-500: #6c7086;
+  --color-gray-600: #7f849c;
+  --color-gray-700: #a6adc8;
+  --color-gray-800: #bac2de;
+  --color-gray-900: #cdd6f4;
+
+  --color-blue-50: #1e1e2e;
+  --color-blue-100: #24273a;
+  --color-blue-200: #313244;
+  --color-blue-300: #74c7ec;
+  --color-blue-400: #89b4fa;
+  --color-blue-500: #89b4fa;
+  --color-blue-600: #74c7ec;
+  --color-blue-700: #89b4fa;
+
+  --color-purple-50: #1e1e2e;
+  --color-purple-100: #24273a;
+  --color-purple-200: #45475a;
+  --color-purple-300: #cba6f7;
+  --color-purple-500: #cba6f7;
+  --color-purple-700: #cba6f7;
+
+  --color-pink-50: #1e1e2e;
+  --color-pink-100: #24273a;
+  --color-pink-300: #f5c2e7;
+  --color-pink-500: #f5c2e7;
+  --color-pink-600: #f5c2e7;
+  --color-pink-700: #f5c2e7;
+
+  --color-green-50: #1e1e2e;
+  --color-green-100: #24273a;
+  --color-green-200: #313244;
+  --color-green-300: #a6e3a1;
+  --color-green-600: #a6e3a1;
+  --color-green-700: #a6e3a1;
+
+  --color-red-50: #1e1e2e;
+  --color-red-100: #24273a;
+  --color-red-200: #313244;
+  --color-red-300: #f38ba8;
+  --color-red-400: #f38ba8;
+  --color-red-600: #f38ba8;
+  --color-red-700: #f38ba8;
+
+  --color-orange-50: #1e1e2e;
+  --color-orange-100: #24273a;
+  --color-orange-400: #fab387;
+  --color-orange-500: #fab387;
+  --color-orange-700: #fab387;
+
+  --color-yellow-400: #f9e2af;
+  --color-yellow-700: #f9e2af;
+
+  --color-amber-50: #1e1e2e;
+  --color-amber-700: #f9e2af;
+
+  --color-teal-50: #1e1e2e;
+  --color-teal-400: #94e2d5;
+  --color-teal-500: #94e2d5;
+  --color-teal-600: #94e2d5;
+  --color-teal-700: #94e2d5;
+
+  --color-indigo-50: #1e1e2e;
+  --color-indigo-200: #45475a;
+  --color-indigo-600: #b4befe;
+  --color-indigo-700: #b4befe;
+
+  --color-emerald-50: #1e1e2e;
+}
+
+/* Light theme - force light mode when data-theme="light" */
+[data-theme="light"] {
+  --tui-bg: #ffffff;
+  --tui-bg-alt: #f8f9fa;
+  --tui-bg-panel: #ffffff;
+  --tui-fg: #000000;
+  --tui-fg-dim: #333333;
+  --tui-fg-muted: #666666;
+  --tui-border: #cccccc;
+  --tui-border-bright: #000000;
+  --tui-border-dim: #e0e0e0;
+
+  --tui-wood: #006600;
+  --tui-fire: #cc0000;
+  --tui-earth: #996600;
+  --tui-metal: #444444;
+  --tui-water: #0066cc;
+
+  --tui-wood-yin: #228b22;
+  --tui-fire-yin: #dc143c;
+  --tui-earth-yin: #b8860b;
+  --tui-metal-yin: #777777;
+  --tui-water-yin: #4169e1;
+
+  --tui-accent-purple: #663399;
+  --tui-accent-pink: #993366;
+  --tui-accent-teal: #006666;
+  --tui-accent-orange: #cc6600;
+
+  --tui-success: #1a7f37;
+  --tui-warning: #9a6700;
+  --tui-error: #cf222e;
+  --tui-info: #0969da;
+
+  --color-white: #ffffff;
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
+
+  --color-blue-50: #eff6ff;
+  --color-blue-100: #dbeafe;
+  --color-blue-200: #bfdbfe;
+  --color-blue-300: #93c5fd;
+  --color-blue-400: #60a5fa;
+  --color-blue-500: #3b82f6;
+  --color-blue-600: #2563eb;
+  --color-blue-700: #1d4ed8;
+
+  --color-purple-50: #faf5ff;
+  --color-purple-100: #f3e8ff;
+  --color-purple-200: #e9d5ff;
+  --color-purple-300: #d8b4fe;
+  --color-purple-500: #a855f7;
+  --color-purple-700: #7e22ce;
+
+  --color-pink-50: #fdf2f8;
+  --color-pink-100: #fce7f3;
+  --color-pink-300: #f9a8d4;
+  --color-pink-500: #ec4899;
+  --color-pink-600: #db2777;
+  --color-pink-700: #be185d;
+
+  --color-green-50: #f0fdf4;
+  --color-green-100: #dcfce7;
+  --color-green-200: #bbf7d0;
+  --color-green-300: #86efac;
+  --color-green-600: #16a34a;
+  --color-green-700: #15803d;
+
+  --color-red-50: #fef2f2;
+  --color-red-100: #fee2e2;
+  --color-red-200: #fecaca;
+  --color-red-300: #fca5a5;
+  --color-red-400: #f87171;
+  --color-red-600: #dc2626;
+  --color-red-700: #b91c1c;
+
+  --color-orange-50: #fff7ed;
+  --color-orange-100: #ffedd5;
+  --color-orange-400: #fb923c;
+  --color-orange-500: #f97316;
+  --color-orange-700: #c2410c;
+
+  --color-yellow-400: #facc15;
+  --color-yellow-700: #a16207;
+
+  --color-amber-50: #fffbeb;
+  --color-amber-700: #b45309;
+
+  --color-teal-50: #f0fdfa;
+  --color-teal-400: #2dd4bf;
+  --color-teal-500: #14b8a6;
+  --color-teal-600: #0d9488;
+  --color-teal-700: #0f766e;
+
+  --color-indigo-50: #eef2ff;
+  --color-indigo-200: #c7d2fe;
+  --color-indigo-600: #4f46e5;
+  --color-indigo-700: #4338ca;
+
+  --color-emerald-50: #ecfdf5;
+}
+
+/* ===== TUI CORE COMPONENTS ===== */
+
+/* TUI Frame - bordered container */
+.tui-frame {
+  border: 1px solid var(--tui-border);
+  background: var(--tui-bg-panel);
+}
+
+.tui-frame-title {
+  background: var(--tui-bg-alt);
+  border-bottom: 1px solid var(--tui-border);
+  padding: 0.25rem 0.5rem;
+  color: var(--tui-fg);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* TUI Input */
+.tui-input {
+  background: var(--tui-bg);
+  border: 1px solid var(--tui-border);
+  color: var(--tui-fg);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.tui-input:focus {
+  border-color: var(--tui-border-bright);
+  outline: none;
+}
+
+.tui-input::placeholder {
+  color: var(--tui-fg-muted);
+}
+
+/* TUI Button */
+.tui-btn {
+  background: var(--tui-bg-alt);
+  border: 1px solid var(--tui-border);
+  color: var(--tui-fg);
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  cursor: pointer;
+}
+
+.tui-btn:hover {
+  background: var(--tui-bg-panel);
+  border-color: var(--tui-fg-dim);
+}
+
+.tui-btn:active {
+  background: var(--tui-bg);
+}
+
+/* ===== TUI TEXT UTILITIES ===== */
+
+.tui-text { color: var(--tui-fg); }
+.tui-text-dim { color: var(--tui-fg-dim); }
+.tui-text-muted { color: var(--tui-fg-muted); }
+
+/* Yang element text colors */
+.tui-text-wood { color: var(--tui-wood); }
+.tui-text-fire { color: var(--tui-fire); }
+.tui-text-earth { color: var(--tui-earth); }
+.tui-text-metal { color: var(--tui-metal); }
+.tui-text-water { color: var(--tui-water); }
+
+/* Yin element text colors */
+.tui-text-wood-yin { color: var(--tui-wood-yin); }
+.tui-text-fire-yin { color: var(--tui-fire-yin); }
+.tui-text-earth-yin { color: var(--tui-earth-yin); }
+.tui-text-metal-yin { color: var(--tui-metal-yin); }
+.tui-text-water-yin { color: var(--tui-water-yin); }
+
+/* Accent text colors */
+.tui-text-purple { color: var(--tui-accent-purple); }
+.tui-text-pink { color: var(--tui-accent-pink); }
+.tui-text-teal { color: var(--tui-accent-teal); }
+.tui-text-orange { color: var(--tui-accent-orange); }
+
+/* ===== TUI BACKGROUND UTILITIES ===== */
+
+.tui-bg { background: var(--tui-bg); }
+.tui-bg-alt { background: var(--tui-bg-alt); }
+.tui-bg-panel { background: var(--tui-bg-panel); }
+
+/* ===== TUI BORDER UTILITIES ===== */
+
+.tui-border { border: 1px solid var(--tui-border); }
+.tui-border-color { border-color: var(--tui-border); }
+.tui-border-bright { border-color: var(--tui-border-bright); }
+
+/* ===== LAYOUT UTILITIES ===== */
+
+.min-h-screen { min-height: 100vh; }
+.mx-auto { margin-left: auto; margin-right: auto; }
+
+.main-content {
+  padding: 0;
+  padding-bottom: 4rem;
+}
+
+/* Smooth transitions for interactive elements */
+button, input, select {
+  transition: var(--transition-all);
+}
+
+/* ===== CORE UTILITY CLASSES ===== */
+
+/* Flexbox */
+.flex { display: flex; }
+.flex-1 { flex: 1 1 0%; }
+.flex-col { flex-direction: column; }
+.flex-row { flex-direction: row; }
+.flex-wrap { flex-wrap: wrap; }
+.flex-shrink-0 { flex-shrink: 0; }
+.items-center { align-items: center; }
+.items-start { align-items: flex-start; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.justify-end { justify-content: flex-end; }
+.gap-1 { gap: 0.25rem; }
+.gap-2 { gap: 0.5rem; }
+.gap-3 { gap: 0.75rem; }
+.gap-4 { gap: 1rem; }
+
+/* Spacing */
+.px-4 { padding-left: 1rem; padding-right: 1rem; }
+.py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+.p-2 { padding: 0.5rem; }
+.p-4 { padding: 1rem; }
+.mb-4 { margin-bottom: 1rem; }
+.mt-2 { margin-top: 0.5rem; }
+
+/* Typography */
+.text-center { text-align: center; }
+.text-2xl { font-size: 1.5rem; line-height: 2rem; }
+.text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+.text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+.text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+.text-xs { font-size: 0.75rem; line-height: 1rem; }
+.font-bold { font-weight: 700; }
+.font-semibold { font-weight: 600; }
+.font-mono { font-family: 'JetBrains Mono', monospace; }
+
+/* Display */
+.block { display: block; }
+.hidden { display: none; }
+.w-full { width: 100%; }
+.relative { position: relative; }
+
+/* Screen reader only - visually hidden but accessible */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

@@ -1,10 +1,14 @@
 {
   "name": "bazingse-app",
   "private": true,
-  "version": "1.0.0",
+  "version": "2.0.0",
+  "type": "module",
   "scripts": {
-    "api": "cd ../api && python3 run_bazingse.py",
-    "api:install": "cd ../api && pip3 install -r requirements.txt",
+    "dev": "vite dev --port 4321",
+    "build": "vite build",
+    "preview": "vite preview --port 4321",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "cap:sync": "npm run build && npx cap sync",
     "cap:ios": "npm run build && npx cap sync ios && npx cap open ios",
     "cap:run:ios": "npm run build && npx cap sync ios && npx cap run ios"
@@ -13,17 +17,26 @@
     "@capacitor/cli": "^8.0.1",
     "@capacitor/core": "^8.0.1",
     "@capacitor/ios": "^8.0.1",
+    "@sveltejs/adapter-cloudflare": "^6.0.0",
+    "@sveltejs/kit": "^2.21.0",
+    "@sveltejs/vite-plugin-svelte": "^5.0.0",
     "@trpc/client": "^11.10.0",
     "@trpc/server": "^11.10.0",
+    "drizzle-orm": "^0.44.0",
     "superjson": "^2.2.6",
-    "zod": "^4.3.6"
+    "svelte": "^5.0.0",
+    "zod": "^3.24.0"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.0.0",
     "@playwright/test": "^1.57.0",
     "@types/node": "^20.0.0",
+    "drizzle-kit": "^0.30.0",
     "lunar-typescript": "^1.8.6",
-    "playwright": "^1.57.0",
+    "svelte-check": "^4.0.0",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.18"
+    "vite": "^6.0.0",
+    "vitest": "^4.0.18",
+    "wrangler": "^4.0.0"
   }
 }
