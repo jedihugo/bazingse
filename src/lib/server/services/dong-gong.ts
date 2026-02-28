@@ -2,8 +2,8 @@ import { Solar } from 'lunar-typescript';
 import {
   getDongGongOfficer, getDongGongRating, getDongGongDayInfo, checkConsultPromotion,
   DONG_GONG_RATINGS, DONG_GONG_DAY_OFFICERS, DONG_GONG_MONTHS, DONG_GONG_BRANCH_TO_MONTH,
-} from '@/lib/bazi/dong-gong';
-import type { BranchName } from '@/lib/bazi/core';
+} from '$lib/bazi/dong-gong';
+import type { BranchName } from '$lib/bazi/core';
 import { checkFourExtinctionSeparation } from './bazi';
 
 // =============================================================================

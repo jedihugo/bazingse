@@ -1,12 +1,12 @@
 import { Solar } from 'lunar-typescript';
-import { generateBaziChart, generateLuckPillars, generateXiaoYunPillars } from '@/lib/bazi/chart';
-import { buildChart, analyzeForApi } from '@/lib/bazi/comprehensive/engine';
-import { adaptToFrontend } from '@/lib/bazi/comprehensive/adapter';
-import { BRANCHES, type BranchName } from '@/lib/bazi/core';
+import { generateBaziChart, generateLuckPillars, generateXiaoYunPillars } from '$lib/bazi/chart';
+import { buildChart, analyzeForApi } from '$lib/bazi/comprehensive/engine';
+import { adaptToFrontend } from '$lib/bazi/comprehensive/adapter';
+import { BRANCHES, type BranchName } from '$lib/bazi/core';
 import {
   getDongGongOfficer, getDongGongRating, getDongGongDayInfo, checkConsultPromotion,
   DONG_GONG_RATINGS, DONG_GONG_DAY_OFFICERS, DONG_GONG_MONTHS, DONG_GONG_BRANCH_TO_MONTH,
-} from '@/lib/bazi/dong-gong';
+} from '$lib/bazi/dong-gong';
 
 // =============================================================================
 // FOUR EXTINCTION / FOUR SEPARATION CHECK

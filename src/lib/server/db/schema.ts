@@ -1,4 +1,5 @@
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
+import { relations } from 'drizzle-orm';
 
 export const profiles = sqliteTable('profiles', {
 	id: text('id').primaryKey(),
@@ -11,6 +12,10 @@ export const profiles = sqliteTable('profiles', {
 	created_at: text('created_at'),
 	updated_at: text('updated_at')
 });
+
+export const profilesRelations = relations(profiles, ({ many }) => ({
+	lifeEvents: many(lifeEvents),
+}));
 
 export const lifeEvents = sqliteTable('life_events', {
 	id: text('id').primaryKey(),
@@ -26,3 +31,10 @@ export const lifeEvents = sqliteTable('life_events', {
 	created_at: text('created_at'),
 	updated_at: text('updated_at')
 });
+
+export const lifeEventsRelations = relations(lifeEvents, ({ one }) => ({
+	profile: one(profiles, {
+		fields: [lifeEvents.profile_id],
+		references: [profiles.id],
+	}),
+}));
