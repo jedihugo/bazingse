@@ -1,4 +1,3 @@
-import 'server-only';
 
 // =============================================================================
 // SEASONAL STRENGTH & TRANSFORMATION RULES

@@ -1,4 +1,3 @@
-import 'server-only';
 
 // =============================================================================
 // ADAPTER: Comprehensive Engine -> Frontend JSON

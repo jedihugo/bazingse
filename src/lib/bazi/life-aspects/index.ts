@@ -1,4 +1,3 @@
-import 'server-only';
 
 // =============================================================================
 // LIFE ASPECTS MODULE - Barrel Export

@@ -1,4 +1,3 @@
-import 'server-only';
 
 // =============================================================================
 // PHYSICS SCHOOL — Yin/Yang Polarity Threshold

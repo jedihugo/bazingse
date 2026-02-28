@@ -1,4 +1,3 @@
-import 'server-only';
 
 // =============================================================================
 // WUXING BRIDGE — ChartData <-> WuxingInput conversion
